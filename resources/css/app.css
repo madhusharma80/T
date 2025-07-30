@@ -1,0 +1,10 @@
+body{
+ margin:0;
+ padding:0;
+ font-family: sans-serif;
+ background-image: url('https://images.pexels.com/photos/1089441/pexels-photo-1089441.jpeg');
+ background-size: cover;         
+ background-position: center;    
+ background-attachment: fixed;   
+ background-repeat: no-repeat;                     
+}
