@@ -115,6 +115,8 @@ const updateTodo = async (todo) => {
 // Set task to edit mode
 const editTodo = (todo) => {
   todo.isEditing = true;
+
+
 };
 
 // Save edited todo
