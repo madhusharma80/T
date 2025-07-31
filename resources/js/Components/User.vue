@@ -1,13 +1,12 @@
 <template>
   <div class="container">
-      <div class="sidebar" :class="{ 'sidebar-hidden': !sidebarOpen }"></div>
     <h1 class="title">EMPLOYEE TASK MANAGEMENT - TO-DO LIST</h1>
     <table class="table">
       <thead>
         <tr>
           <th>
             <select v-model="newEmployee.id">
-              <option value=""> Id </option>
+              <option value="">Select Id</option>
               <option v-for="id in employeeIds" :key="id" :value="id">{{ id }}</option>
             </select>
           </th>
@@ -18,15 +17,15 @@
             </select>
           </th>
           <th>
-            <select v-model="newEmployee.department">
-              <option value="">Department</option>
-              <option v-for="department in departments" :key="department" :value="department">{{ department }}</option>
+            <select v-model="newEmployee.department_id">
+              <option value="">Select Department</option>
+              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
           </th>
           <th>
-            <select v-model="newEmployee.designation">
-              <option value="">Designation</option>
-              <option v-for="designation in designations" :key="designation" :value="designation">{{ designation }}</option>
+            <select v-model="newEmployee.designation_id">
+              <option value="">Select Designation</option>
+              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
             </select>
           </th>
           <th>
@@ -41,12 +40,11 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Display added rows -->
         <tr v-for="(employee, index) in employees" :key="index">
           <td>
             <span v-if="!employee.isEditing">{{ employee.id }}</span>
             <select v-else v-model="employee.id">
-              <option value="">Select Email</option>
+              <option value="">Select Id</option>
               <option v-for="id in employeeIds" :key="id" :value="id">{{ id }}</option>
             </select>
           </td>
@@ -58,17 +56,17 @@
             </select>
           </td>
           <td>
-            <span v-if="!employee.isEditing">{{ employee.department }}</span>
-            <select v-else v-model="employee.department">
+            <span v-if="!employee.isEditing">{{ employee.department.name }}</span>
+            <select v-else v-model="employee.department_id">
               <option value="">Select Department</option>
-              <option v-for="department in departments" :key="department" :value="department">{{ department }}</option>
+              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
           </td>
           <td>
-            <span v-if="!employee.isEditing">{{ employee.designation }}</span>
-            <select v-else v-model="employee.designation">
+            <span v-if="!employee.isEditing">{{ employee.designation.name }}</span>
+            <select v-else v-model="employee.designation_id">
               <option value="">Select Designation</option>
-              <option v-for="designation in designations" :key="designation" :value="designation">{{ designation }}</option>
+              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
             </select>
           </td>
           <td>
@@ -80,9 +78,9 @@
           </td>
           <td>
             <div class="button-group">
-            <button class="btn btn-secondary " @click="editEmployee(employee)" v-if="!employee.isEditing">Edit</button>
-            <button class="btn btn-success" @click="saveEmployee(employee)" v-if="employee.isEditing">Save</button>
-            <button class="btn btn-danger" @click="deleteEmployee(index)">Delete</button>
+              <button class="btn btn-secondary " @click="editEmployee(employee)" v-if="!employee.isEditing">Edit</button>
+              <button class="btn btn-success" @click="saveEmployee(employee)" v-if="employee.isEditing">Save</button>
+              <button class="btn btn-danger" @click="deleteEmployee(index)">Delete</button>
             </div>
           </td>
         </tr>
@@ -93,95 +91,57 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
 
-// Data (using ref for reactivity)
+// Define the reactive data
 const employees = ref([]);
+const departments = ref([]);
+const designations = ref([]);
+const employeeIds = ref([]);  // Employee IDs list
+const employeeEmails = ref([]);  // Employee emails list
+const assignedTo = ref([]);  // Assigned employees list
 const newEmployee = ref({
-  id: '',
-  email: '',
-  department: '',
-  designation: '',
+  department_id: '',
+  designation_id: '',
   assigned_to: ''
 });
 
-const departments = ref([]);
-const designations = ref([]);
-const assignedTo = ref([]);
-const employeeIds = ref([]);
-const employeeEmails = ref([]);
-
-// Load employees from localStorage if available
-onMounted(() => {
-  const storedEmployees = localStorage.getItem('employees');
-  if (storedEmployees) {
-    employees.value = JSON.parse(storedEmployees); // Parse the data and load it into employees
-  }
-  fetchEmployeeData();  // Fetch dynamic data from the API
-});
-
-// Fetch data from the backend API
-function fetchEmployeeData() {
-  axios.get('/api/employee-data')  // Assuming your API route for employee data
-    .then(response => {
-      const data = response.data;
-      departments.value = data.departments;
-      designations.value = data.designations;
-      assignedTo.value = data.assignedTo;
-      employeeIds.value = data.employeeIds;
-      employeeEmails.value = data.employeeEmails;
-    })
-    .catch(error => {
-      console.error('Error fetching employee data:', error);
-    });
-}
-
-// Computed property to enable/disable the Add button based on the selection
+// Define the state for disabling the Add button
 const isAddDisabled = computed(() => {
-  return !(newEmployee.value.id && newEmployee.value.email && newEmployee.value.department &&
-           newEmployee.value.designation && newEmployee.value.assigned_to);
+  return !newEmployee.value.id || !newEmployee.value.email || !newEmployee.value.department_id || !newEmployee.value.designation_id || !newEmployee.value.assigned_to;
 });
 
-// Method to add a new employee to the table
-function addEmployee() {
-  const newEmployeeData = { ...newEmployee.value, isEditing: false };
-  employees.value.push(newEmployeeData); // Add the new employee to the employees list
+// Fetch data when component is mounted
+onMounted(async () => {
+  try {
+    // Fetch department and designation data
+    const departmentDesignationResponse = await fetch('/api/department-designation-data');
+    const departmentDesignationData = await departmentDesignationResponse.json();
+    departments.value = departmentDesignationData.departments;
+    designations.value = departmentDesignationData.designations;
+    
+    // Fetch employee data
+    const employeeResponse = await fetch('/api/employees');
+    const employeeData = await employeeResponse.json();
+    employees.value = employeeData;
 
-  // Save updated employees list to localStorage
-  localStorage.setItem('employees', JSON.stringify(employees.value));
+    // Populate the missing properties from the employee data
+    employeeIds.value = employeeData.map(employee => employee.id);  // Get list of employee IDs
+    employeeEmails.value = employeeData.map(employee => employee.email);  // Get list of emails
+    assignedTo.value = employeeData.map(employee => employee.name);  // Assuming employees have a 'name' field
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+});
 
-  // Clear the form after adding the employee
-  newEmployee.value = {
-    id: '',
-    email: '',
-    department: '',
-    designation: '',
-    assigned_to: ''
-  };
-}
-
-// Method to enable editing for a specific employee
-function editEmployee(employee) {
-  employee.isEditing = true;
-}
-
-// Method to save the edited employee
-function saveEmployee(employee) {
-  employee.isEditing = false; 
-  // Save updated employees list to localStorage
-  localStorage.setItem('employees', JSON.stringify(employees.value));
-}
-
-// Method to delete a specific employee from the list
-function deleteEmployee(index) {
-  employees.value.splice(index, 1); // Remove the employee from the list
-  // Save updated employees list to localStorage
-  localStorage.setItem('employees', JSON.stringify(employees.value));
-}
+// Add a new employee
+const addEmployee = () => {
+  console.log(newEmployee.value);
+  // Logic to add the new employee to the system goes here.
+};
 </script>
 
 <style scoped>
-.title{
+.title {
   border-bottom: 1px solid #679fd8;
   text-align: center;
   color: #333;
@@ -189,8 +149,7 @@ function deleteEmployee(index) {
   font-weight: 600;
   font-family: serif;
 }
-
-.container{
+.container {
   max-width: 1000px;
   margin: 100px auto;
   background-color: #f8f9fa;
@@ -199,57 +158,47 @@ function deleteEmployee(index) {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   border: 1px solid rgb(118, 165, 209);
 }
-
 table {
   width: 100%;
   border-collapse: collapse;
 }
-
 th, td {
   padding: 12px;
   border: 2px solid #ddd;
   background: linear-gradient(to bottom, #3a699b, #8daeca);
-  color: white;
+  color:white;
 }
-
 select {
   width: 100%;
   padding: 5px;
   border: 1px solid #ddd;
   margin-top: 5px;
 }
-
 button {
   padding: 5px 10px;
   cursor: pointer;
   margin-top: 5px;
 }
-
 button:disabled {
   cursor: not-allowed;
   background-color: #ddd;
 }
-
 .button-group {
   display: flex;
   gap: 10px;
   justify-content: flex-start;
 }
-
 .button-group button {
-  flex: 1 1 auto; 
+  flex: 1 1 auto;
 }
-
 .add_btn {
   width: 100%;
   background-color: #ddd;
 }
-
 button:hover {
   background-color: #f4f4f4;
-  color: black;
+  color:black;
 }
-
 input {
   padding: 5px;
   width: 100%;

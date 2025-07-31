@@ -6,25 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    public function up()
+    {
+        Schema::create('departments', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();  // Department name
+            $table->timestamps();
+        });
+    }
 
-// database/migrations/{timestamp}_create_departments_table.php
-
-public function up()
-{
-    Schema::create('departments', function (Blueprint $table) {
-        $table->id();
-        $table->string('name')->unique();  // This should be here
-        $table->timestamps();
-    });
-}
-
-
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('departments');

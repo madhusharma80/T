@@ -6,24 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-// database/migrations/{timestamp}_create_designations_table.php
+    public function up()
+    {
+        Schema::create('designations', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();  // Designation name
+            $table->timestamps();
+        });
+    }
 
-public function up()
-{
-    Schema::create('designations', function (Blueprint $table) {
-        $table->id();
-        $table->string('name')->unique();
-        $table->timestamps();
-    });
-}
-
-
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('designations');

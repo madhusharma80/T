@@ -15,11 +15,11 @@ import User from './Components/User.vue';
 
 const routes = [
   { path: '/', component: Register},
-  { path: '/login', component: Login, name: 'login',},
-  { path: '/register', component: Register, name: 'register', },
-  { path: '/setting', component: Setting, name: 'setting ', },
-  { path: '/todolist', component: TodoList, name: 'todolist', },
-  { path: '/User', component: User, name: 'user', },
+  { path: '/login', component: Login, name: 'login' },
+  { path: '/register', component: Register, name: 'register' },
+  { path: '/setting', component: Setting, name: 'setting' },
+  { path: '/todolist', component: TodoList, name: 'todolist' },
+  { path: '/user', component: User, name: 'user' },
   {
     path: '/welcome',
     component: Welcome,
@@ -32,7 +32,7 @@ const routes = [
       }
     }
   },
-  
+ 
 ];
 
 const router = createRouter({

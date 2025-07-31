@@ -9,11 +9,9 @@ class Department extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-    ];
-
-    // Define relationship with Employee model (One to Many)
+    protected $fillable = ['name'];
+    
+    // Relationship with Employees
     public function employees()
     {
         return $this->hasMany(Employee::class);

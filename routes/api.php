@@ -1,37 +1,35 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\support\Facades\Auth;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TodoController;
-use App\Http\Controllers\TaskController;
 use App\Http\Controllers\EmployeeController;
-
+use Illuminate\Http\Request;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/welcome', [AuthController::class, 'welcome']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    // Logout and authenticated user routes
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
 
-//SETTING->update,change password form route
+    // Update profile and change password routes
     Route::put('/user/update', [AuthController::class, 'updateProfile']);
     Route::put('/user/change-password', [AuthController::class, 'changePassword']);
 
-//TODO routes
-    Route::get('/todos', [TodoController::class, 'index']);
+    // Todo routes
+    Route::get('/user', [AuthController::class, 'user']);
     Route::post('/todos', [TodoController::class, 'store']);
-    Route::put('/todos/{id}', [TodoController::class, 'update']);
-    Route::delete('/todos/{id}', [TodoController::class, 'destroy']);
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-
-});
+    Route::get('/todos', [TodoController::class, 'index']);
+    // Other protected routes
 
 
 
-Route::middleware('auth:sanctum')->get('/employee-data', [EmployeeController::class, 'getEmployeeData']);
+    // Employee routes
+    Route::get('/department-designation-data', [EmployeeController::class, 'getDepartmentAndDesignationData']);
+    Route::get('/employees', [EmployeeController::class, 'getEmployees']);
+    Route::post('/employees', [EmployeeController::class, 'addEmployee']);
 });

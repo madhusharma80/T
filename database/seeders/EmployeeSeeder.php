@@ -1,7 +1,5 @@
 <?php
 
-// database/seeders/EmployeeSeeder.php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -13,11 +11,11 @@ class EmployeeSeeder extends Seeder
     {
         Employee::create([
             'email' => 'john@example.com',
-            'department' => 'HR',
-            'designation' => 'Manager',
+            'department_id' => 1,  // HR
+            'designation_id' => 1,  // Manager
             'assigned_to' => 'John Doe'
         ]);
-
+        
         // Add more employees as needed
     }
 }

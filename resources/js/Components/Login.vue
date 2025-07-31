@@ -105,8 +105,9 @@ const login = async () => {
     });
 
     if (response.data.token) {
+  
       localStorage.setItem('token', response.data.token);
-      
+
       localStorage.setItem('userName', response.data.user.name); 
       localStorage.setItem('userEmail', response.data.user.email);
       localStorage.setItem('userPassword', response.data.user.password);

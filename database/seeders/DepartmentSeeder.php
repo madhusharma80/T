@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -10,11 +9,12 @@ class DepartmentSeeder extends Seeder
 {
     public function run()
     {
-        DB::table('departments')->insert([
-            ['name' => 'HR'],
-            ['name' => 'Engineering'],
-            ['name' => 'Sales'],
-            ['name' => 'Marketing']
-        ]);
+        $departments = ['HR', 'Engineering', 'Sales', 'Marketing'];
+
+        foreach ($departments as $department) {
+            if (!DB::table('departments')->where('name', $department)->exists()) {
+                DB::table('departments')->insert(['name' => $department]);
+            }
+        }
     }
 }
