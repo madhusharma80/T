@@ -26,7 +26,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/todos', [TodoController::class, 'index']);
 
 
-Route::middleware('auth:sanctum')->get('/dropdown-data', [Controller::class, 'fetchDropdownData']);
+Route::middleware('auth:sanctum')->get('/departments', [Controller::class, 'fetchDropdownData']);
 
 });
-                                                                                                                                                                                        

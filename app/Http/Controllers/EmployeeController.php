@@ -11,14 +11,13 @@ class EmployeeController extends Controller
 {
    public function fetchDropdownData()
 {
-    if (auth()->check()) {
-        $user = auth()->user();
-        dd($user);  // Dump user info to verify authentication
-    } else {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-}
+       $departments = Department::all();
+        $designations= Designation::all(); 
+        $employees = Employee::all();   // You can use 'pluck' to get specific columns
 
+        // Return the departments as a JSON response
+        return response()->json($departments);
+    }
 }
 
 
