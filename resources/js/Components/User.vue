@@ -96,9 +96,9 @@ import { ref, computed, onMounted } from 'vue';
 const employees = ref([]);
 const departments = ref([]);
 const designations = ref([]);
-const employeeIds = ref([]);  // Employee IDs list
-const employeeEmails = ref([]);  // Employee emails list
-const assignedTo = ref([]);  // Assigned employees list
+const employeeIds = ref([]);  
+const employeeEmails = ref([]);  
+const assignedTo = ref([]); 
 const newEmployee = ref({
   department_id: '',
   designation_id: '',
@@ -125,9 +125,9 @@ onMounted(async () => {
     employees.value = employeeData;
 
     // Populate the missing properties from the employee data
-    employeeIds.value = employeeData.map(employee => employee.id);  // Get list of employee IDs
-    employeeEmails.value = employeeData.map(employee => employee.email);  // Get list of emails
-    assignedTo.value = employeeData.map(employee => employee.name);  // Assuming employees have a 'name' field
+    employeeIds.value = employeeData.map(employee => employee.id);  
+    employeeEmails.value = employeeData.map(employee => employee.email); 
+    assignedTo.value = employeeData.map(employee => employee.name);  
   } catch (error) {
     console.error('Error fetching data:', error);
   }

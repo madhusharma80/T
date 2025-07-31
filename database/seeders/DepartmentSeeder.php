@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Department;
 
 class DepartmentSeeder extends Seeder
 {
@@ -12,9 +12,7 @@ class DepartmentSeeder extends Seeder
         $departments = ['HR', 'Engineering', 'Sales', 'Marketing'];
 
         foreach ($departments as $department) {
-            if (!DB::table('departments')->where('name', $department)->exists()) {
-                DB::table('departments')->insert(['name' => $department]);
-            }
+            Department::create(['name' => $department]);
         }
     }
 }

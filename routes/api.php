@@ -24,12 +24,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/todos', [TodoController::class, 'store']);
     Route::get('/todos', [TodoController::class, 'index']);
-    // Other protected routes
 
 
+Route::middleware('auth:sanctum')->get('/dropdown-data', [Controller::class, 'fetchDropdownData']);
 
-    // Employee routes
-    Route::get('/department-designation-data', [EmployeeController::class, 'getDepartmentAndDesignationData']);
-    Route::get('/employees', [EmployeeController::class, 'getEmployees']);
-    Route::post('/employees', [EmployeeController::class, 'addEmployee']);
 });
+                                                                                                                                                                                        

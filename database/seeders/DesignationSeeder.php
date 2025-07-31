@@ -9,12 +9,10 @@ class DesignationSeeder extends Seeder
 {
     public function run()
     {
-        $designations = ['Manager', 'Developer', 'Analyst'];
+        $designations = ['Manager', 'Developer', 'Analyst', 'Sales Representative'];
 
         foreach ($designations as $designation) {
-            if (!Designation::where('name', $designation)->exists()) {
-                Designation::create(['name' => $designation]);
-            }
+            Designation::create(['name' => $designation]);
         }
     }
 }
