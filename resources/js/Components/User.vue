@@ -93,10 +93,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-
+import axios from 'axios';
 
 // Data (using ref for reactivity)
-const employees = ref([]); 
+const employees = ref([]);
 const newEmployee = ref({
   id: '',
   email: '',
@@ -105,13 +105,11 @@ const newEmployee = ref({
   assigned_to: ''
 });
 
-const departments = ref(['Web Development', 'Web Designing', 'Sales', 'Marketing']);
-const designations = ref(['Designer', 'Trainee', 'Intern', 'Developer']);
-const assignedTo = ref(['John', 'Jane', 'Doe', 'Smith']);
-const employeeIds = ref([1, 2, 3, 4, 5]);
-const employeeEmails = ref(['john@example.com', 'jane@example.com', 'doe@example.com','Smith@gmail']); 
-
-
+const departments = ref([]);
+const designations = ref([]);
+const assignedTo = ref([]);
+const employeeIds = ref([]);
+const employeeEmails = ref([]);
 
 // Load employees from localStorage if available
 onMounted(() => {
@@ -119,7 +117,24 @@ onMounted(() => {
   if (storedEmployees) {
     employees.value = JSON.parse(storedEmployees); // Parse the data and load it into employees
   }
+  fetchEmployeeData();  // Fetch dynamic data from the API
 });
+
+// Fetch data from the backend API
+function fetchEmployeeData() {
+  axios.get('/api/employee-data')  // Assuming your API route for employee data
+    .then(response => {
+      const data = response.data;
+      departments.value = data.departments;
+      designations.value = data.designations;
+      assignedTo.value = data.assignedTo;
+      employeeIds.value = data.employeeIds;
+      employeeEmails.value = data.employeeEmails;
+    })
+    .catch(error => {
+      console.error('Error fetching employee data:', error);
+    });
+}
 
 // Computed property to enable/disable the Add button based on the selection
 const isAddDisabled = computed(() => {
@@ -167,13 +182,14 @@ function deleteEmployee(index) {
 
 <style scoped>
 .title{
-border-bottom: 1px solid #679fd8;
+  border-bottom: 1px solid #679fd8;
   text-align: center;
   color: #333;
   font-size: 1.7em;
   font-weight: 600;
   font-family: serif;
 }
+
 .container{
   max-width: 1000px;
   margin: 100px auto;
@@ -182,29 +198,33 @@ border-bottom: 1px solid #679fd8;
   border-radius: 8px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   border: 1px solid rgb(118, 165, 209);
-  
 }
+
 table {
   width: 100%;
   border-collapse: collapse;
 }
+
 th, td {
   padding: 12px;
   border: 2px solid #ddd;
   background: linear-gradient(to bottom, #3a699b, #8daeca);
-  color:white;
+  color: white;
 }
+
 select {
   width: 100%;
   padding: 5px;
   border: 1px solid #ddd;
   margin-top: 5px;
 }
+
 button {
   padding: 5px 10px;
   cursor: pointer;
   margin-top: 5px;
 }
+
 button:disabled {
   cursor: not-allowed;
   background-color: #ddd;
@@ -215,18 +235,21 @@ button:disabled {
   gap: 10px;
   justify-content: flex-start;
 }
+
 .button-group button {
   flex: 1 1 auto; 
 }
-.add_btn{
-width: 100%;
-background-color: #ddd;
 
+.add_btn {
+  width: 100%;
+  background-color: #ddd;
 }
+
 button:hover {
   background-color: #f4f4f4;
-  color:black;
+  color: black;
 }
+
 input {
   padding: 5px;
   width: 100%;

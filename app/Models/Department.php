@@ -1,7 +1,5 @@
 <?php
 
-// app/Models/Department.php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,7 +9,13 @@ class Department extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name',
+    ];
+
+    // Define relationship with Employee model (One to Many)
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
+    }
 }
-
-

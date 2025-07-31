@@ -31,8 +31,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 });
 
-Route::middleware('auth:sanctum')->get('/departments', [EmployeeController::class, 'getDepartments']);
-Route::middleware('auth:sanctum')->get('/designations', [EmployeeController::class, 'getDesignations']);
-Route::middleware('auth:sanctum')->get('/employees', [EmployeeController::class, 'getEmployees']);
 
+
+Route::middleware('auth:sanctum')->get('/employee-data', [EmployeeController::class, 'getEmployeeData']);
 });

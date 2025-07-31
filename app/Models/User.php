@@ -2,25 +2,34 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, HasApiTokens; 
-    
+    use HasApiTokens, HasFactory, Notifiable;
+
     protected $fillable = [
-        'name',  
+        'name',
         'email',
         'password',
     ];
 
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
-    public function tasks()
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    // Relationship with Employee (One to One)
+    public function employee()
     {
-        return $this->hasMany(Task::class);
+        return $this->hasOne(Employee::class);
     }
 }
-
-

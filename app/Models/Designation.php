@@ -9,5 +9,13 @@ class Designation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name',
+    ];
+
+    // Define relationship with Employee model (One to Many)
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
+    }
 }

@@ -2,29 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
+use App\Models\Designation;
+use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
-    // Get departments (This can be fetched from a database table or be static)
-    public function getDepartments()
+    // Method to fetch dynamic employee data for the frontend
+    public function getEmployeeData()
     {
-        $departments = ['HR', 'Engineering', 'Sales', 'Marketing']; // You can replace this with database fetch logic
-        return response()->json($departments);
-    }
+        // Fetch data from the database
+        $department = Department::all()->pluck('name'); // Get only the 'name' column
+        $designation = Designation::all()->pluck('name'); // Get only the 'name' column
+        $assignedTo = User::all()->pluck('name'); // Get only the 'name' column from users
+        $employeeIds = Employee::all()->pluck('id'); // Get employee IDs
+        $employeeEmails = Employee::all()->pluck('email'); // Get employee emails
 
-    // Get designations (This can be fetched from a database table or be static)
-    public function getDesignations()
-    {
-        $designations = ['Manager', 'Lead', 'Intern', 'Developer']; // Replace with DB fetch if needed
-        return response()->json($designations);
-    }
-
-    // Get employees for the assigned_to dropdown (fetch from users table)
-    public function getEmployees()
-    {
-        $employees = User::select('id', 'name', 'email')->get(); // Get user data
-        return response()->json($employees);
+        // Return the data in JSON format
+        return response()->json([
+            'departments' => $departments,
+            'designations' => $designations,
+            'assignedTo' => $assignedTo,
+            'employeeIds' => $employeeIds,
+            'employeeEmails' => $employeeEmails,
+        ]);
     }
 }

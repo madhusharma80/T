@@ -18,13 +18,6 @@ class EmployeeSeeder extends Seeder
             'assigned_to' => 'John Doe'
         ]);
 
-        Employee::create([
-            'email' => 'jane@example.com',
-            'department' => 'Engineering',
-            'designation' => 'Lead',
-            'assigned_to' => 'Jane Doe'
-        ]);
-
         // Add more employees as needed
     }
 }
