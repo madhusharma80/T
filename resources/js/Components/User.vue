@@ -31,7 +31,7 @@
           <th>
             <select v-model="newEmployee.assigned_to">
               <option value="">Assigned To</option>
-              <option v-for="assigned in assignedTo" :key="assigned" :value="assigned">{{ assigned }}</option>
+              <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}</option>
             </select>
           </th>
           <th>
@@ -70,15 +70,15 @@
             </select>
           </td>
           <td>
-            <span v-if="!employee.isEditing">{{ employee.assigned_to }}</span>
+            <span v-if="!employee.isEditing">{{ employee.assigned_to.name || employee.assigned_to.id }}</span>
             <select v-else v-model="employee.assigned_to">
               <option value="">Select Assigned To</option>
-              <option v-for="assigned in assignedTo" :key="assigned" :value="assigned">{{ assigned }}</option>
+              <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name || assigned.id }}</option>
             </select>
           </td>
           <td>
             <div class="button-group">
-              <button class="btn btn-secondary " @click="editEmployee(employee)" v-if="!employee.isEditing">Edit</button>
+              <button class="btn btn-secondary" @click="editEmployee(employee)" v-if="!employee.isEditing">Edit</button>
               <button class="btn btn-success" @click="saveEmployee(employee)" v-if="employee.isEditing">Save</button>
               <button class="btn btn-danger" @click="deleteEmployee(index)">Delete</button>
             </div>
@@ -96,9 +96,9 @@ import { ref, computed, onMounted } from 'vue';
 const employees = ref([]);
 const departments = ref([]);
 const designations = ref([]);
-const employeeIds = ref([]);  
-const employeeEmails = ref([]);  
-const assignedTo = ref([]); 
+const employeeIds = ref([]);
+const employeeEmails = ref([]);
+const assignedTo = ref([]);
 const newEmployee = ref({
   department_id: '',
   designation_id: '',
@@ -113,30 +113,60 @@ const isAddDisabled = computed(() => {
 // Fetch data when component is mounted
 onMounted(async () => {
   try {
-    // Fetch department and designation data
-    const departmentDesignationResponse = await fetch('/api/department-designation-data');
-    const departmentDesignationData = await departmentDesignationResponse.json();
-    departments.value = departmentDesignationData.departments;
-    designations.value = departmentDesignationData.designations;
-    
-    // Fetch employee data
-    const employeeResponse = await fetch('/api/employees');
-    const employeeData = await employeeResponse.json();
-    employees.value = employeeData;
+    // Fetch department, designation, and employee data
+    const response = await fetch('/api/department-designation-data', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`  // Include token for authentication
+      }
+    });
 
-    // Populate the missing properties from the employee data
-    employeeIds.value = employeeData.map(employee => employee.id);  
-    employeeEmails.value = employeeData.map(employee => employee.email); 
-    assignedTo.value = employeeData.map(employee => employee.name);  
+    const data = await response.json();
+    
+    // Log data for debugging
+    console.log('Fetched data:', data);
+
+    // Set departments and designations
+    departments.value = data.departments;
+    designations.value = data.designations;
+    
+    // Set employees
+    employees.value = data.employees;
+
+    // Populate missing properties
+    employeeIds.value = data.employees.map(employee => employee.id);
+    employeeEmails.value = data.employees.map(employee => employee.email);
+    
+    // Populate the assignedTo field with employee names or ids if name is missing
+    assignedTo.value = data.employees.map(employee => ({
+      id: employee.id,
+      name: employee.name || employee.id  // If name is missing, use id as fallback
+    }));
+
   } catch (error) {
     console.error('Error fetching data:', error);
   }
 });
 
-// Add a new employee
+// Add a new employee (just logs for now)
 const addEmployee = () => {
   console.log(newEmployee.value);
-  // Logic to add the new employee to the system goes here.
+  // Perform your logic to add the employee
+};
+
+// Edit an employee's details
+const editEmployee = (employee) => {
+  employee.isEditing = true;
+};
+
+// Save the edited employee
+const saveEmployee = (employee) => {
+  employee.isEditing = false;
+};
+
+// Delete an employee
+const deleteEmployee = (index) => {
+  employees.value.splice(index, 1); 
 };
 </script>
 

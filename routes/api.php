@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/todos', [TodoController::class, 'store']);
     Route::get('/todos', [TodoController::class, 'index']);
 
+    Route::get('/department-designation-data', [EmployeeController::class, 'fetchDropdownData']);
 
-Route::middleware('auth:sanctum')->get('/departments', [Controller::class, 'fetchDropdownData']);
 
 });
