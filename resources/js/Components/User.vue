@@ -4,43 +4,56 @@
     <table class="table">
       <thead>
         <tr>
+          <!-- Employee ID -->
           <th>
             <select v-model="newEmployee.id">
               <option value="">Select Id</option>
               <option v-for="id in employeeIds" :key="id" :value="id">{{ id }}</option>
             </select>
           </th>
+
+          <!-- Employee Email -->
           <th>
             <select v-model="newEmployee.email">
               <option value="">Select Email</option>
               <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
             </select>
           </th>
+
+          <!-- Department -->
           <th>
             <select v-model="newEmployee.department_id">
               <option value="">Select Department</option>
               <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
           </th>
+
+          <!-- Designation -->
           <th>
             <select v-model="newEmployee.designation_id">
               <option value="">Select Designation</option>
               <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
             </select>
           </th>
+
+          <!-- Assigned To -->
           <th>
             <select v-model="newEmployee.assigned_to">
               <option value="">Assigned To</option>
               <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}</option>
             </select>
           </th>
+
+          <!-- Add Button -->
           <th>
             <button class="btn btn-primary add_btn" @click="addEmployee" :disabled="isAddDisabled">Add</button>
           </th>
         </tr>
       </thead>
+
       <tbody>
-        <tr v-for="(employee, index) in employees" :key="index">
+        <!-- Employee Table Rows -->
+        <tr v-for="(employee, index) in employees" :key="employee.id">
           <td>
             <span v-if="!employee.isEditing">{{ employee.id }}</span>
             <select v-else v-model="employee.id">
@@ -48,6 +61,7 @@
               <option v-for="id in employeeIds" :key="id" :value="id">{{ id }}</option>
             </select>
           </td>
+
           <td>
             <span v-if="!employee.isEditing">{{ employee.email }}</span>
             <select v-else v-model="employee.email">
@@ -55,6 +69,7 @@
               <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
             </select>
           </td>
+
           <td>
             <span v-if="!employee.isEditing">{{ employee.department.name }}</span>
             <select v-else v-model="employee.department_id">
@@ -62,6 +77,7 @@
               <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
           </td>
+
           <td>
             <span v-if="!employee.isEditing">{{ employee.designation.name }}</span>
             <select v-else v-model="employee.designation_id">
@@ -69,17 +85,19 @@
               <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
             </select>
           </td>
+
           <td>
-            <span v-if="!employee.isEditing">{{ employee.assigned_to.name || employee.assigned_to.id }}</span>
+            <span v-if="!employee.isEditing">{{ employee.assigned_to.name }}</span>
             <select v-else v-model="employee.assigned_to">
-              <option value="">Select Assigned To</option>
-              <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name || assigned.id }}</option>
+              <option value="">Assigned To</option>
+              <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}</option>
             </select>
           </td>
+
           <td>
             <div class="button-group">
-              <button class="btn btn-secondary" @click="editEmployee(employee)" v-if="!employee.isEditing">Edit</button>
-              <button class="btn btn-success" @click="saveEmployee(employee)" v-if="employee.isEditing">Save</button>
+              <button v-if="!employee.isEditing" class="btn btn-secondary" @click="editEmployee(employee)">Edit</button>
+              <button v-if="employee.isEditing" class="btn btn-success" @click="saveEmployee(employee, index)">Save</button>
               <button class="btn btn-danger" @click="deleteEmployee(index)">Delete</button>
             </div>
           </td>
@@ -93,13 +111,15 @@
 import { ref, computed, onMounted } from 'vue';
 
 // Define the reactive data
-const employees = ref([]);
+const employees = ref([]); // Only users' added employees
 const departments = ref([]);
 const designations = ref([]);
 const employeeIds = ref([]);
 const employeeEmails = ref([]);
 const assignedTo = ref([]);
 const newEmployee = ref({
+  id: '',
+  email: '',
   department_id: '',
   designation_id: '',
   assigned_to: ''
@@ -113,7 +133,6 @@ const isAddDisabled = computed(() => {
 // Fetch data when component is mounted
 onMounted(async () => {
   try {
-    // Fetch department, designation, and employee data
     const response = await fetch('/api/department-designation-data', {
       method: 'GET',
       headers: {
@@ -122,25 +141,19 @@ onMounted(async () => {
     });
 
     const data = await response.json();
-    
-    // Log data for debugging
-    console.log('Fetched data:', data);
 
-    // Set departments and designations
+    // Set departments and designations (These are the only pre-loaded values)
     departments.value = data.departments;
     designations.value = data.designations;
-    
-    // Set employees
-    employees.value = data.employees;
 
-    // Populate missing properties
+    // Populate missing properties for employee dropdowns (we won't load employees yet)
     employeeIds.value = data.employees.map(employee => employee.id);
     employeeEmails.value = data.employees.map(employee => employee.email);
-    
-    // Populate the assignedTo field with employee names or ids if name is missing
+
+    // Populate the assignedTo field with employee names and ids (not showing pre-loaded employees)
     assignedTo.value = data.employees.map(employee => ({
       id: employee.id,
-      name: employee.name || employee.id  // If name is missing, use id as fallback
+      name: employee.email // Or use employee.name if you want that
     }));
 
   } catch (error) {
@@ -148,25 +161,73 @@ onMounted(async () => {
   }
 });
 
-// Add a new employee (just logs for now)
+// Add a new employee to the employees array
 const addEmployee = () => {
-  console.log(newEmployee.value);
-  // Perform your logic to add the employee
+  if (isAddDisabled.value) {
+    return; // Don't add if fields are incomplete
+  }
+
+  // Push the new employee to the list with default "isEditing" as false
+  employees.value.push({
+    id: newEmployee.value.id,
+    email: newEmployee.value.email,
+    department_id: newEmployee.value.department_id,
+    designation_id: newEmployee.value.designation_id,
+    assigned_to: newEmployee.value.assigned_to,  // Ensure the correct value is added
+    department: departments.value.find(department => department.id === newEmployee.value.department_id),
+    designation: designations.value.find(designation => designation.id === newEmployee.value.designation_id),
+    assigned_to_name: assignedTo.value.find(assigned => assigned.id === newEmployee.value.assigned_to).name,
+    isEditing: false, // New employee is not in editing mode
+  });
+
+  // Reset the form fields after adding the employee
+  resetForm();
 };
 
-// Edit an employee's details
+// Edit employee - set `isEditing` to true to enable editing mode
 const editEmployee = (employee) => {
   employee.isEditing = true;
+
+  // Populate form with the employee's current values
+  newEmployee.value = {
+    id: employee.id,
+    email: employee.email,
+    department_id: employee.department_id,
+    designation_id: employee.designation_id,
+    assigned_to: employee.assigned_to,
+  };
 };
 
-// Save the edited employee
-const saveEmployee = (employee) => {
+// Save employee after editing
+const saveEmployee = (employee, index) => {
   employee.isEditing = false;
+
+  // Update the employee data in the list with the newly edited values
+  employees.value[index] = { 
+    ...employee,
+    department: departments.value.find(department => department.id === employee.department_id),
+    designation: designations.value.find(designation => designation.id === employee.designation_id),
+    assigned_to_name: assignedTo.value.find(assigned => assigned.id === employee.assigned_to)?.name
+  };
+
+  // Reset form after saving the edited employee
+  resetForm();
 };
 
-// Delete an employee
+// Delete an employee from the list
 const deleteEmployee = (index) => {
-  employees.value.splice(index, 1); 
+  employees.value.splice(index, 1); // Remove employee at the specified index
+};
+
+// Reset the form fields
+const resetForm = () => {
+  newEmployee.value = {
+    id: '',
+    email: '',
+    department_id: '',
+    designation_id: '',
+    assigned_to: ''
+  };
 };
 </script>
 

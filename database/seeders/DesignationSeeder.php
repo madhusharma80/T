@@ -9,7 +9,7 @@ class DesignationSeeder extends Seeder
 {
     public function run()
     {
-        $designations = ['Manager', 'Developer', 'Analyst', 'Sales Representative'];
+        $designations = ['Trainee', 'Developer', 'Analyst', 'Sales Representative'];
 
         foreach ($designations as $designation) {
             Designation::create(['name' => $designation]);
