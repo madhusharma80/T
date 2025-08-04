@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\EmployeeController;
@@ -21,11 +20,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/change-password', [AuthController::class, 'changePassword']);
 
     // Todo routes
-    Route::get('/user', [AuthController::class, 'user']);
-    Route::post('/todos', [TodoController::class, 'store']);
-    Route::get('/todos', [TodoController::class, 'index']);
+    Route::get('/todos', [TodoController::class, 'index']);  // Get all todos
+    Route::post('/todos', [TodoController::class, 'store']);  // Create a new todo
+    Route::put('/todos/{id}', [TodoController::class, 'update']);  // Update a specific todo
+    Route::delete('/todos/{id}', [TodoController::class, 'destroy']);  // Delete a specific todo
 
+    // Department and designation data for dropdown (this is assuming it's for employee data)
     Route::get('/department-designation-data', [EmployeeController::class, 'fetchDropdownData']);
-
-
 });
+

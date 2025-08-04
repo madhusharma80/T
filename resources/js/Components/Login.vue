@@ -40,8 +40,8 @@ import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
-const email = ref('');
-const password = ref('');
+const email = ref('demo@gmail.com');
+const password = ref('12345678');
 const errors = ref({});
 const message = ref('');
 const messageType = ref('');

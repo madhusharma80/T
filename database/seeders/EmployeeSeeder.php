@@ -9,25 +9,55 @@ class EmployeeSeeder extends Seeder
 {
     public function run()
     {
-        // Create Employee 1
+    
         $employee1 = Employee::create([
             'email' => 'john.doe@example.com',
-            'department_id' => 1,  // HR
-            'designation_id' => 1,  // Manager
+            'department_id' => 1,  
+            'designation_id' => 1, 
+           
         ]);
-
-        // Create Employee 2
+      
         $employee2 = Employee::create([
             'email' => 'jane.smith@example.com',
-            'department_id' => 2,  // Engineering
-            'designation_id' => 2,  // Developer
+            'department_id' => 2,  
+            'designation_id' => 2,  
+    
         ]);
 
-        // Update 'assigned_to' relationships
-        $employee1->assigned_to = $employee2->id; // Assign Employee 2 to Employee 1
+        $employee3 = Employee::create([
+            'email' => 'mark.johnson@example.com',
+            'department_id' => 3, 
+            'designation_id' => 3,  
+          
+        ]);
+
+        $employee4 = Employee::create([
+            'email' => 'emily.brown@example.com',
+            'department_id' => 4, 
+            'designation_id' => 4,  
+            
+        ]);
+
+        $employee5 = Employee::create([
+            'email' => 'david.white@example.com',
+            'department_id' => 5,  
+            'designation_id' => 5,  
+        ]);
+
+      
+        $employee1->assigned_to = $employee2->id; 
         $employee1->save();
 
-        $employee2->assigned_to = $employee1->id; // Assign Employee 1 to Employee 2
+        $employee2->assigned_to = $employee1->id;
         $employee2->save();
+
+        $employee3->assigned_to = $employee4->id; 
+        $employee3->save();
+
+        $employee4->assigned_to = $employee3->id; 
+        $employee4->save();
+
+        $employee5->assigned_to = $employee1->id; 
+        $employee5->save();
     }
 }

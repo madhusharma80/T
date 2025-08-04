@@ -4,13 +4,7 @@
     <table class="table">
       <thead>
         <tr>
-          <!-- Employee ID -->
-          <th>
-            <select v-model="newEmployee.id">
-              <option value="">Select Id</option>
-              <option v-for="id in employeeIds" :key="id" :value="id">{{ id }}</option>
-            </select>
-          </th>
+          <th>S.No.</th>
 
           <!-- Employee Email -->
           <th>
@@ -23,7 +17,7 @@
           <!-- Department -->
           <th>
             <select v-model="newEmployee.department_id">
-              <option value="">Select Department</option>
+              <option value=""> Department</option>
               <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
           </th>
@@ -44,6 +38,11 @@
             </select>
           </th>
 
+          <!-- Description -->
+          <th>
+            <input v-model="newEmployee.description" type="text" placeholder="Enter Description" />
+          </th>
+
           <!-- Add Button -->
           <th>
             <button class="btn btn-primary add_btn" @click="addEmployee" :disabled="isAddDisabled">Add</button>
@@ -53,14 +52,9 @@
 
       <tbody>
         <!-- Employee Table Rows -->
-        <tr v-for="(employee, index) in employees" :key="employee.id">
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.id }}</span>
-            <select v-else v-model="employee.id">
-              <option value="">Select Id</option>
-              <option v-for="id in employeeIds" :key="id" :value="id">{{ id }}</option>
-            </select>
-          </td>
+        <tr v-for="(employee, index) in employees" :key="index">
+          <!-- Serial Number -->
+          <td>{{ index + 1 }}</td>
 
           <td>
             <span v-if="!employee.isEditing">{{ employee.email }}</span>
@@ -87,11 +81,16 @@
           </td>
 
           <td>
-            <span v-if="!employee.isEditing">{{ employee.assigned_to.name }}</span>
+            <span v-if="!employee.isEditing">{{ getAssignedToName(employee.assigned_to) }}</span>
             <select v-else v-model="employee.assigned_to">
               <option value="">Assigned To</option>
               <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}</option>
             </select>
+          </td>
+
+          <td>
+            <span v-if="!employee.isEditing">{{ employee.description }}</span>
+            <input v-else v-model="employee.description" type="text" placeholder="Enter Description" />
           </td>
 
           <td>
@@ -114,20 +113,19 @@ import { ref, computed, onMounted } from 'vue';
 const employees = ref([]); // Only users' added employees
 const departments = ref([]);
 const designations = ref([]);
-const employeeIds = ref([]);
 const employeeEmails = ref([]);
 const assignedTo = ref([]);
 const newEmployee = ref({
-  id: '',
   email: '',
   department_id: '',
   designation_id: '',
-  assigned_to: ''
+  assigned_to: '',
+  description: ''
 });
 
 // Define the state for disabling the Add button
 const isAddDisabled = computed(() => {
-  return !newEmployee.value.id || !newEmployee.value.email || !newEmployee.value.department_id || !newEmployee.value.designation_id || !newEmployee.value.assigned_to;
+  return !newEmployee.value.email || !newEmployee.value.department_id || !newEmployee.value.designation_id || !newEmployee.value.assigned_to || !newEmployee.value.description;
 });
 
 // Fetch data when component is mounted
@@ -147,7 +145,6 @@ onMounted(async () => {
     designations.value = data.designations;
 
     // Populate missing properties for employee dropdowns (we won't load employees yet)
-    employeeIds.value = data.employees.map(employee => employee.id);
     employeeEmails.value = data.employees.map(employee => employee.email);
 
     // Populate the assignedTo field with employee names and ids (not showing pre-loaded employees)
@@ -169,19 +166,25 @@ const addEmployee = () => {
 
   // Push the new employee to the list with default "isEditing" as false
   employees.value.push({
-    id: newEmployee.value.id,
     email: newEmployee.value.email,
     department_id: newEmployee.value.department_id,
     designation_id: newEmployee.value.designation_id,
-    assigned_to: newEmployee.value.assigned_to,  // Ensure the correct value is added
+    assigned_to: newEmployee.value.assigned_to,
+    description: newEmployee.value.description,
     department: departments.value.find(department => department.id === newEmployee.value.department_id),
     designation: designations.value.find(designation => designation.id === newEmployee.value.designation_id),
-    assigned_to_name: assignedTo.value.find(assigned => assigned.id === newEmployee.value.assigned_to).name,
+    assigned_to_name: assignedTo.value.find(assigned => assigned.id === newEmployee.value.assigned_to).name, // Added name for display
     isEditing: false, // New employee is not in editing mode
   });
 
   // Reset the form fields after adding the employee
   resetForm();
+};
+
+// Get the assigned "name" from the assignedTo array using the ID
+const getAssignedToName = (assignedToId) => {
+  const assignedEmployee = assignedTo.value.find(assigned => assigned.id === assignedToId);
+  return assignedEmployee ? assignedEmployee.name : '';
 };
 
 // Edit employee - set `isEditing` to true to enable editing mode
@@ -190,11 +193,11 @@ const editEmployee = (employee) => {
 
   // Populate form with the employee's current values
   newEmployee.value = {
-    id: employee.id,
     email: employee.email,
     department_id: employee.department_id,
     designation_id: employee.designation_id,
     assigned_to: employee.assigned_to,
+    description: employee.description,
   };
 };
 
@@ -210,23 +213,20 @@ const saveEmployee = (employee, index) => {
     assigned_to_name: assignedTo.value.find(assigned => assigned.id === employee.assigned_to)?.name
   };
 
-  // Reset form after saving the edited employee
   resetForm();
 };
 
-// Delete an employee from the list
 const deleteEmployee = (index) => {
-  employees.value.splice(index, 1); // Remove employee at the specified index
+  employees.value.splice(index, 1);
 };
 
-// Reset the form fields
 const resetForm = () => {
   newEmployee.value = {
-    id: '',
     email: '',
     department_id: '',
     designation_id: '',
-    assigned_to: ''
+    assigned_to: '',
+    description: ''
   };
 };
 </script>
@@ -241,57 +241,104 @@ const resetForm = () => {
   font-family: serif;
 }
 .container {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 100px auto;
   background-color: #f8f9fa;
-  padding: 80px;
+  padding: 40px;
   border-radius: 8px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   border: 1px solid rgb(118, 165, 209);
 }
+
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed; 
 }
-th, td {
-  padding: 12px;
+th {
+  padding: 8px;
   border: 2px solid #ddd;
   background: linear-gradient(to bottom, #3a699b, #8daeca);
-  color:white;
+  color: white;
+  width: 14%; 
 }
-select {
+
+th:first-child, td:first-child {
+  width: 3%; 
+
+}
+
+th:nth-child(2), td:nth-child(2) {
+  width: 11%;
+  padding-left: 15px;
+}
+
+th:nth-child(3), td:nth-child(3),
+th:nth-child(4), td:nth-child(4),
+th:nth-child(5), td:nth-child(5),
+th:nth-child(6), td:nth-child(6) {
+width: 10%; 
+
+}
+
+th:nth-child(6), td:nth-child(6) {
+  width: 11%; 
+  text-align: left;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+th:nth-child(7), td:nth-child(7) {
+  width:10%;
+}
+td {
+  padding: 12px;
+  border: 2px solid #ddd;
+  overflow: hidden;
+  word-wrap: break-word;
+  white-space: normal;
+  background: linear-gradient(to bottom, #3a699b, #8daeca);
+  color:white;
+  font-size: 15px;
+}
+
+select, input {
   width: 100%;
   padding: 5px;
   border: 1px solid #ddd;
   margin-top: 5px;
+  box-sizing: border-box; 
 }
+
 button {
   padding: 5px 10px;
   cursor: pointer;
   margin-top: 5px;
 }
+
 button:disabled {
   cursor: not-allowed;
   background-color: #ddd;
 }
+
 .button-group {
   display: flex;
   gap: 10px;
   justify-content: flex-start;
 }
+
 .button-group button {
   flex: 1 1 auto;
 }
+
 .add_btn {
   width: 100%;
-  background-color: #ddd;
+  background-color: #244a92;
 }
+
 button:hover {
   background-color: #f4f4f4;
-  color:black;
+  color: black;
 }
-input {
-  padding: 5px;
-  width: 100%;
-}
+
 </style>
