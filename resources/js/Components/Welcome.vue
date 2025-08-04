@@ -14,37 +14,29 @@
           <router-link
             to="/menu"
             active-class="active-link"
-            class="sidebar-link"
-          >
-            <i class="fas fa-home"></i> MENU
-          </router-link>
+            class="sidebar-link">
+            <i class="fas fa-home"></i> MENU</router-link>
         </li>
         <li>
           <router-link
             to="/user"
             active-class="active-link"
-            class="sidebar-link"
-          >
-            <i class="fas fa-user"></i> USER
-          </router-link>
+            class="sidebar-link">
+            <i class="fas fa-user"></i> USER</router-link>
         </li>
         <li>
           <router-link
             to="/todolist"
             active-class="active-link"
-            class="sidebar-link"
-          >
-            <i class="fas fa-check-square"></i> TODO
-          </router-link>
+            class="sidebar-link">
+            <i class="fas fa-check-square"></i> TODO</router-link>
         </li>
         <li>
           <router-link
             to="/setting"
             active-class="active-link"
-            class="sidebar-link"
-          >
-            <i class="fas fa-cogs"></i> SETTINGS
-          </router-link>
+            class="sidebar-link">
+            <i class="fas fa-cogs"></i> SETTINGS</router-link>
         </li>
       </ul>
       <div class="sidebar-footer">
@@ -182,6 +174,7 @@ const logout = () => {
 
 .sidebar-link i {
   font-size: 18px;
+ 
 }
 
 .sidebar-link:hover {
@@ -193,8 +186,8 @@ const logout = () => {
 .active-link {
   background-color: #fffefe; 
  color: #726b6b;
-}
 
+}
 .sidebar-footer {
   margin-top: auto;
   text-align: center;

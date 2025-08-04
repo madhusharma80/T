@@ -5,7 +5,6 @@
       <thead>
         <tr>
           <th>S.No.</th>
-
           <!-- Employee Email -->
           <th>
             <select v-model="newEmployee.email">
@@ -25,7 +24,7 @@
           <!-- Designation -->
           <th>
             <select v-model="newEmployee.designation_id">
-              <option value="">Select Designation</option>
+              <option value=""> Designation</option>
               <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
             </select>
           </th>
@@ -45,7 +44,7 @@
 
           <!-- Add Button -->
           <th>
-            <button class="btn btn-primary add_btn" @click="addEmployee" :disabled="isAddDisabled">Add</button>
+            <button class="btn btn-primary add_btn w-100" @click="addEmployee" :disabled="isAddDisabled"><i class="fas fa-plus"></i>Add</button>
           </th>
         </tr>
       </thead>
@@ -95,9 +94,9 @@
 
           <td>
             <div class="button-group">
-              <button v-if="!employee.isEditing" class="btn btn-secondary" @click="editEmployee(employee)">Edit</button>
-              <button v-if="employee.isEditing" class="btn btn-success" @click="saveEmployee(employee, index)">Save</button>
-              <button class="btn btn-danger" @click="deleteEmployee(index)">Delete</button>
+              <button v-if="!employee.isEditing" class="btn btn-secondary" @click="editEmployee(employee)"><i class="fas fa-edit"></i></button>
+              <button v-if="employee.isEditing" class="btn btn-success" @click="saveEmployee(employee, index)"><i class="fas fa-save"></i></button>
+              <button class="btn btn-danger" @click="deleteEmployee(index)">  <i class="fas fa-trash"></i></button>
             </div>
           </td>
         </tr>
@@ -235,18 +234,21 @@ const resetForm = () => {
 .title {
   border-bottom: 1px solid #679fd8;
   text-align: center;
-  color: #333;
-  font-size: 1.7em;
+  color: #2c2a2a;
+  font-size: 1.5em;
   font-weight: 600;
   font-family: serif;
 }
 .container {
-  max-width: 1100px;
+  width:100%;
+  max-width: 1040px;
   background-color: #f8f9faa1;
   padding: 40px;
   border-radius: 4px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   border: 1px solid rgb(118, 165, 209);
+  margin-left: 137px;
+  margin-top: 100px;
 }
 
 table {
@@ -263,8 +265,9 @@ th {
 }
 
 th:first-child, td:first-child {
-  width: 3%; 
-
+  width: 3.5%; 
+  padding:12px 11px;
+  
 }
 
 th:nth-child(2), td:nth-child(2) {
@@ -298,7 +301,7 @@ td {
   white-space: normal;
   background: linear-gradient(to bottom, #3a699b, #8daeca);
   color:white;
-  font-size: 15px;
+  font-size: 15.4px;
 }
 
 select, input {
@@ -339,5 +342,4 @@ button:hover {
   background-color: #f4f4f4;
   color: black;
 }
-
 </style>

@@ -41,6 +41,7 @@
           </button>
           <button @click="deleteTodo(todo.id)" class="delete-button">
             <i class="fas fa-trash"></i>
+            
           </button>
         </li>
       </ul>
@@ -161,16 +162,18 @@ const deleteTodo = async (id) => {
 
 <style scoped>
 .todo-container {
-  max-width: 600px;
-  background-color:  #f9f9f9b0;
+  width: 50%;  /* You can adjust this value to control the container width */
+  max-width: 800px; /* Max width to prevent it from becoming too large */
+  background-color: #f8f9faa1;
+  padding: 40px;
   border-radius: 4px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  font-family: 'Arial', sans-serif;
-  /* margin-left: 550px; */
-  margin-top: 80px;
-  flex-grow: 1;
-  padding: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   border: 1px solid rgb(118, 165, 209);
+  overflow: hidden; /* To prevent scrollbars if content overflows */
+  box-sizing: border-box; /* Ensure padding is included in the width */
+  height: auto;
+  margin-left: 137px;
+  margin-top: 100px;
 }
 
 .sub-container {
@@ -184,14 +187,17 @@ const deleteTodo = async (id) => {
   color: #333;
   font-size: 2em;
   margin-top: 8px;
+
+  
 }
 
 h1 {
   text-align: center;
   color: #333;
-  font-size: 1.7em;
+  font-size: 1.5em;
   font-weight: 600;
   font-family: serif;
+  border-bottom: 1px solid #679fd8;
 }
 
 .add-todo {

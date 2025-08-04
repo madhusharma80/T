@@ -235,10 +235,11 @@ const updatePassword = async () => {
 .settings-container {
   max-width: 1000px;
   background-color: #f8f9fa70;
-  padding: 30px;
+  padding: 40px;
   border-radius: 4px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   border:1px solid rgb(124, 170, 230);
+  margin-left: 117px;
 }
 
 .settings-header {
