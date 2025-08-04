@@ -242,10 +242,9 @@ const resetForm = () => {
 }
 .container {
   max-width: 1100px;
-  margin: 100px auto;
-  background-color: #f8f9fa;
+  background-color: #f8f9faa1;
   padding: 40px;
-  border-radius: 8px;
+  border-radius: 4px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   border: 1px solid rgb(118, 165, 209);
 }

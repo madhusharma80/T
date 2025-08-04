@@ -226,7 +226,7 @@ const updatePassword = async () => {
 }
 
 .content-area {
-  margin-left: 250px;
+  /* margin-left: 250px; */
   margin-top: 80px;
   flex-grow: 1;
   padding: 20px;
@@ -234,12 +234,11 @@ const updatePassword = async () => {
 
 .settings-container {
   max-width: 1000px;
-  margin: 0 auto;
-  background-color: #f8f9fa;
+  background-color: #f8f9fa70;
   padding: 30px;
-  border-radius: 8px;
+  border-radius: 4px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  border:1px solid rgb(203, 203, 206);
+  border:1px solid rgb(124, 170, 230);
 }
 
 .settings-header {

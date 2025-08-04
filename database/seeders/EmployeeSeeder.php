@@ -25,14 +25,14 @@ class EmployeeSeeder extends Seeder
         ]);
 
         $employee3 = Employee::create([
-            'email' => 'mark.johnson@example.com',
+            'email' => 'abc.@example.com',
             'department_id' => 3, 
             'designation_id' => 3,  
           
         ]);
 
         $employee4 = Employee::create([
-            'email' => 'emily.brown@example.com',
+            'email' => 'admin@example.com',
             'department_id' => 4, 
             'designation_id' => 4,  
             

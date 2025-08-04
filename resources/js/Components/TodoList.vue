@@ -161,13 +161,12 @@ const deleteTodo = async (id) => {
 
 <style scoped>
 .todo-container {
-  width: 100%;
   max-width: 600px;
-  background-color: #f9f9f9;
-  border-radius: 10px;
+  background-color:  #f9f9f9b0;
+  border-radius: 4px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   font-family: 'Arial', sans-serif;
-  margin-left: 550px;
+  /* margin-left: 550px; */
   margin-top: 80px;
   flex-grow: 1;
   padding: 20px;
@@ -175,7 +174,6 @@ const deleteTodo = async (id) => {
 }
 
 .sub-container {
-  width: 100%;
   padding: 10px;
   background: linear-gradient(to bottom, #336597, #74aee0);
   box-shadow: 0 4px 8px rgba(15, 15, 15, 0.1);

@@ -1,7 +1,7 @@
 <template>
   <div class="page-container">
     <!-- Sidebar -->
-     <div class="sidebar" :class="{ 'sidebar-hidden': !sidebarOpen }">
+    <div class="sidebar" :class="{ 'sidebar-hidden': !sidebarOpen }">
       <div class="sidebar-header">
         <i class="fas fa-user-tie"></i>
         <div class="user-info">
@@ -10,16 +10,49 @@
         </div>
       </div>
       <ul>
-        <li><router-link to="/menu"><i class="fas fa-home"></i> MENU</router-link></li>
-        <li><router-link to="/user"><i class="fas fa-user"></i> USER</router-link></li>
-        <li><router-link to="/todolist"><i class="fas fa-check-square"></i> TODO</router-link></li>
-        <li><router-link to="/setting"><i class="fas fa-cogs"></i> SETTINGS</router-link></li>
+        <li>
+          <router-link
+            to="/menu"
+            active-class="active-link"
+            class="sidebar-link"
+          >
+            <i class="fas fa-home"></i> MENU
+          </router-link>
+        </li>
+        <li>
+          <router-link
+            to="/user"
+            active-class="active-link"
+            class="sidebar-link"
+          >
+            <i class="fas fa-user"></i> USER
+          </router-link>
+        </li>
+        <li>
+          <router-link
+            to="/todolist"
+            active-class="active-link"
+            class="sidebar-link"
+          >
+            <i class="fas fa-check-square"></i> TODO
+          </router-link>
+        </li>
+        <li>
+          <router-link
+            to="/setting"
+            active-class="active-link"
+            class="sidebar-link"
+          >
+            <i class="fas fa-cogs"></i> SETTINGS
+          </router-link>
+        </li>
       </ul>
       <div class="sidebar-footer">
         <button @click="logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
       </div>
     </div>
 
+    <!-- Main Content Area -->
     <div :class="{ 'content-area-expanded': sidebarOpen }" class="content">
       <!-- Background Overlay for Blur Effect -->
       <div v-if="showWelcomeCard" class="background-overlay"></div>
@@ -33,13 +66,11 @@
             </div>
             <h5 class="card-title">Welcome, {{ username }}!</h5>
             <p class="card-text">You are successfully logged in!</p>
-            <button class="btn" @click="closeWelcomeCard">
-           OK
-            </button>
+            <button class="btn" @click="closeWelcomeCard">OK</button>
           </div>
         </div>
       </div>
-      <router-view></router-view>
+
     </div>
   </div>
 </template>
@@ -47,10 +78,11 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
-const username = ref(localStorage.getItem('userName') || 'Guest');
-const email = ref(localStorage.getItem('userEmail') || 'No email');
+// User details from local storage
+const username = ref(localStorage.getItem('userName'));
+const email = ref(localStorage.getItem('userEmail'));
 
-// Sidebar visibility state
+// Sidebar visibility state (no need to hide it unless desired)
 const sidebarOpen = ref(true);
 
 // Show the success card only once after login
@@ -64,7 +96,7 @@ onMounted(() => {
   }
 });
 
-// Close the welcome card to click on  OK button and store the state
+// Close the welcome card to click on OK button and store the state
 const closeWelcomeCard = () => {
   showWelcomeCard.value = false;
   localStorage.setItem('hasSeenWelcomeCard', 'true');
@@ -137,7 +169,7 @@ const logout = () => {
   text-align: center;
 }
 
-.sidebar ul li a {
+.sidebar-link {
   color: #bebaba;
   text-decoration: none;
   display: block;
@@ -148,13 +180,19 @@ const logout = () => {
   gap: 10px;
 }
 
-.sidebar ul li a i {
+.sidebar-link i {
   font-size: 18px;
 }
 
-.sidebar ul li a:hover {
+.sidebar-link:hover {
   background-color: #fffefe;
   color: #726b6b;
+}
+
+/* Highlight the active link */
+.active-link {
+  background-color: #fffefe; 
+ color: #726b6b;
 }
 
 .sidebar-footer {
@@ -163,7 +201,6 @@ const logout = () => {
 }
 
 .sidebar-footer button {
- 
   width: 100%;
   padding: 10px 20px;
   cursor: pointer;
@@ -178,7 +215,7 @@ const logout = () => {
 }
 
 .sidebar-footer button:hover {
-  background-color:#183655; 
+  background-color: #183655;
 }
 
 .content {
@@ -214,26 +251,24 @@ const logout = () => {
   font-size: 25px;
   font-weight: bold;
   color: #4CAF50;
-
 }
 
 .card-text {
   font-size: 16px;
   color: #555;
-
 }
 
 .card button {
   margin-top: 15px;
-  width:100%;
+  width: 100%;
   border-color: #4CAF50;
-
 }
-.card button:hover{ 
-background-color: #4CAF50;
-color:white;
 
+.card button:hover {
+  background-color: #4CAF50;
+  color: white;
 }
+
 /* Background overlay style for blur effect */
 .background-overlay {
   position: absolute;
@@ -241,20 +276,19 @@ color:white;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); 
-  backdrop-filter: blur(3px); 
-  z-index: 998; 
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  z-index: 998;
 }
 
 /* Icon styles */
 .icon-container {
   text-align: center;
   margin-bottom: 15px;
-  
 }
 
 .success-icon {
   color: #4CAF50;
-  font-size: 65px; 
+  font-size: 65px;
 }
 </style>
