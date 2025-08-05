@@ -188,12 +188,12 @@ const addEmployee = () => {
   localStorage.setItem('employees', JSON.stringify(employees.value));
   resetForm();
 };
-
+//name of the assigned employee based on their id.
 const getAssignedToName = (assignedToId) => {
   const assignedEmployee = assignedTo.value.find(assigned => assigned.id === assignedToId);
   return assignedEmployee ? assignedEmployee.name : '';
 };
-
+//Edit button function 
 const editEmployee = (employee) => {
   employee.isEditing = true;
   newEmployee.value = {
@@ -205,7 +205,7 @@ const editEmployee = (employee) => {
     status: employee.status
   };
 };
-
+//Save button function 
 const saveEmployee = (employee, index) => {
   employee.isEditing = false;
   employees.value[index] = { 
@@ -218,7 +218,7 @@ const saveEmployee = (employee, index) => {
   localStorage.setItem('employees', JSON.stringify(employees.value));
   resetForm();
 };
-
+//Deletes a task from the employees array and updates localStorage.
 const deleteEmployee = (index) => {
   employees.value.splice(index, 1);
   if (employees.value.length === 0) {
@@ -227,7 +227,7 @@ const deleteEmployee = (index) => {
     localStorage.setItem('employees', JSON.stringify(employees.value));
   }
 };
-
+//clearing the form fields.Resets the newEmployee
 const resetForm = () => {
   newEmployee.value = {
     email: '',
@@ -277,7 +277,7 @@ table {
 th {
   padding: 6px;
   border: 2px solid #ddd;
-  background:  linear-gradient(to bottom, #275b8f, #a7bfd6);
+  background:  linear-gradient(to bottom, #275b8f, #b4cfe7);
   color: white;
   width: 14%;
 }
@@ -323,8 +323,8 @@ th:nth-child(8) ,td:nth-child(8){
   overflow: hidden;
   word-wrap: break-word;
   white-space: normal;
-  box-shadow: inset 0px 2px 10px rgba(95, 109, 131, 0.5);
-  color: rgb(61, 59, 59);
+  box-shadow: inset 2px 4px   19px rgba(85, 86, 87, 0.5);
+  color: rgb(43, 41, 41);
   font-size: 14px;
 }
 
@@ -402,7 +402,6 @@ select:focus, input:focus {
   display: flex;
   justify-content: center;
   align-items: center;
-
 
 }
 .delete-button:hover {
