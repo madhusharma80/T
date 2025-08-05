@@ -4,16 +4,14 @@
     <table class="table">
       <thead>
         <tr>
-          <th>S.no.</th>
-          <!-- Employee Email -->
+          <th>S.no</th>
           <th>
             <select v-model="newEmployee.email" class="custom-dropdown">
-              <option value="">Select Email</option>
+              <option value="">Email</option>
               <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
             </select>
           </th>
 
-          <!-- Department -->
           <th>
             <select v-model="newEmployee.department_id" class="custom-dropdown">
               <option value="">Department</option>
@@ -21,7 +19,6 @@
             </select>
           </th>
 
-          <!-- Designation -->
           <th>
             <select v-model="newEmployee.designation_id" class="custom-dropdown">
               <option value="">Designation</option>
@@ -29,7 +26,6 @@
             </select>
           </th>
 
-          <!-- Assigned To -->
           <th>
             <select v-model="newEmployee.assigned_to" class="custom-dropdown">
               <option value="">Assigned To</option>
@@ -37,23 +33,29 @@
             </select>
           </th>
 
-          <!-- Description -->
           <th>
             <input v-model="newEmployee.description" class="custom-input" type="text" placeholder="Enter Description" />
           </th>
 
-          <!-- Add Button -->
+          <!-- Status -->
           <th>
-            <button class="btn btn-primary w-100 " @click="addEmployee" :disabled="isAddDisabled"><i class="fas fa-plus"></i>Add</button>
+            <select v-model="newEmployee.status" class="custom-dropdown">
+              <option value="">Status</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Complete">Complete</option>
+            </select>
+          </th>
+
+          <th>
+            <button class="btn btn-primary w-100 add-button" @click="addEmployee" :disabled="isAddDisabled"><i class="fas fa-plus"></i>Add</button>
           </th>
         </tr>
       </thead>
 
       <tbody>
-        <!-- Employee Table Rows -->
         <tr v-for="(employee, index) in employees" :key="index">
-          <!-- Serial Number -->
-          <td>{{ index + 1 }}</td>
+          <td>{{ index + 1 }}.</td>
 
           <td>
             <span v-if="!employee.isEditing">{{ employee.email }}</span>
@@ -86,15 +88,28 @@
               <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}</option>
             </select>
           </td>
+
           <td>
             <span v-if="!employee.isEditing">{{ employee.description }}</span>
             <input v-else v-model="employee.description" class="custom-input" type="text" placeholder="Enter Description" />
           </td>
+
+          <!-- Task Status with background color -->
+          <td :class="statusClass(employee.status)">
+            <span v-if="!employee.isEditing">{{ employee.status }}</span>
+            <select v-else v-model="employee.status" class="custom-dropdown">
+              <option value="">Select Status</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Complete">Complete</option>
+            </select>
+          </td>
+
           <td>
             <div class="button-group">
-              <button v-if="!employee.isEditing" class="btn btn-secondary" @click="editEmployee(employee)"><i class="fas fa-edit"></i></button>
-              <button v-if="employee.isEditing" class="btn btn-success" @click="saveEmployee(employee, index)"><i class="fas fa-save"></i></button>
-              <button class="btn btn-danger" @click="deleteEmployee(index)">  <i class="fas fa-trash"></i></button>
+              <button v-if="!employee.isEditing" class="btn  edit-button " @click="editEmployee(employee)"><i class="fas fa-edit"></i></button>
+              <button v-if="employee.isEditing" class="btn btn-success save-button" @click="saveEmployee(employee, index)"><i class="fas fa-save"></i></button>
+              <button class="btn delete-button" @click="deleteEmployee(index)"><i class="fas fa-trash"></i></button>
             </div>
           </td>
         </tr>
@@ -103,11 +118,11 @@
   </div>
 </template>
 
+
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 
-// Define the reactive data
-const employees = ref([]); // Only users' added employees
+const employees = ref([]);
 const departments = ref([]);
 const designations = ref([]);
 const employeeEmails = ref([]);
@@ -117,15 +132,14 @@ const newEmployee = ref({
   department_id: '',
   designation_id: '',
   assigned_to: '',
-  description: ''
+  description: '',
+  status: ''
 });
 
-// Define the state for disabling the Add button
 const isAddDisabled = computed(() => {
-  return !newEmployee.value.email || !newEmployee.value.department_id || !newEmployee.value.designation_id || !newEmployee.value.assigned_to || !newEmployee.value.description;
+  return !newEmployee.value.email || !newEmployee.value.department_id || !newEmployee.value.designation_id || !newEmployee.value.assigned_to || !newEmployee.value.description || !newEmployee.value.status;
 });
 
-// Fetch data when component is mounted
 onMounted(async () => {
   try {
     const response = await fetch('/api/department-designation-data', {
@@ -137,20 +151,15 @@ onMounted(async () => {
 
     const data = await response.json();
 
-    // Set departments and designations (These are the only pre-loaded values)
     departments.value = data.departments;
     designations.value = data.designations;
 
-    // Populate missing properties for employee dropdowns (we won't load employees yet)
     employeeEmails.value = data.employees.map(employee => employee.email);
-
-    // Populate the assignedTo field with employee names and ids (not showing pre-loaded employees)
     assignedTo.value = data.employees.map(employee => ({
       id: employee.id,
-      name: employee.email // Or use employee.name if you want that
+      name: employee.email
     }));
 
-    // Load employees from localStorage if available
     const storedEmployees = localStorage.getItem('employees');
     if (storedEmployees) {
       employees.value = JSON.parse(storedEmployees);
@@ -161,60 +170,48 @@ onMounted(async () => {
   }
 });
 
-// Add a new employee to the employees array
 const addEmployee = () => {
   if (isAddDisabled.value) {
-    return; // Don't add if fields are incomplete
+    return;
   }
 
-  // Create a new employee object
   const newEmployeeData = {
     email: newEmployee.value.email,
     department_id: newEmployee.value.department_id,
     designation_id: newEmployee.value.designation_id,
     assigned_to: newEmployee.value.assigned_to,
     description: newEmployee.value.description,
+    status: newEmployee.value.status,  // Include status
     department: departments.value.find(department => department.id === newEmployee.value.department_id),
     designation: designations.value.find(designation => designation.id === newEmployee.value.designation_id),
-    assigned_to_name: assignedTo.value.find(assigned => assigned.id === newEmployee.value.assigned_to).name, // Added name for display
-    isEditing: false, // New employee is not in editing mode
+    assigned_to_name: assignedTo.value.find(assigned => assigned.id === newEmployee.value.assigned_to).name,
+    isEditing: false,
   };
 
-  // Push the new employee to the list
   employees.value.push(newEmployeeData);
-
-  // Save the new employees list to localStorage
   localStorage.setItem('employees', JSON.stringify(employees.value));
-
-  // Reset the form fields after adding the employee
   resetForm();
 };
 
-// Get the assigned "name" from the assignedTo array using the ID
 const getAssignedToName = (assignedToId) => {
   const assignedEmployee = assignedTo.value.find(assigned => assigned.id === assignedToId);
   return assignedEmployee ? assignedEmployee.name : '';
 };
 
-// Edit employee - set `isEditing` to true to enable editing mode
 const editEmployee = (employee) => {
   employee.isEditing = true;
-
-  // Populate form with the employee's current values
   newEmployee.value = {
     email: employee.email,
     department_id: employee.department_id,
     designation_id: employee.designation_id,
     assigned_to: employee.assigned_to,
     description: employee.description,
+    status: employee.status
   };
 };
 
-// Save employee after editing
 const saveEmployee = (employee, index) => {
   employee.isEditing = false;
-
-  // Update the employee data in the list with the newly edited values
   employees.value[index] = { 
     ...employee,
     department: departments.value.find(department => department.id === employee.department_id),
@@ -222,20 +219,15 @@ const saveEmployee = (employee, index) => {
     assigned_to_name: assignedTo.value.find(assigned => assigned.id === employee.assigned_to)?.name
   };
 
-  // Save the updated employees list to localStorage
   localStorage.setItem('employees', JSON.stringify(employees.value));
-
   resetForm();
 };
 
 const deleteEmployee = (index) => {
   employees.value.splice(index, 1);
-
-  // If no employees left, clear the localStorage
   if (employees.value.length === 0) {
     localStorage.removeItem('employees');
   } else {
-    // Save the updated employees list to localStorage
     localStorage.setItem('employees', JSON.stringify(employees.value));
   }
 };
@@ -246,8 +238,17 @@ const resetForm = () => {
     department_id: '',
     designation_id: '',
     assigned_to: '',
-    description: ''
+    description: '',
+    status: ''
   };
+};
+
+// Method to determine the background color class based on the status
+const statusClass = (status) => {
+  if (status === 'Pending') return 'status-pending';
+  if (status === 'In Progress') return 'status-in-progress';
+  if (status === 'Complete') return 'status-complete';
+  return '';
 };
 </script>
 
@@ -278,7 +279,7 @@ table {
   table-layout: fixed;
 }
 th {
-  padding: 8px;
+  padding: 6px;
   border: 2px solid #ddd;
   background: linear-gradient(to bottom, #3a699b, #8daeca);
   color: white;
@@ -286,8 +287,7 @@ th {
 }
 
 th:first-child, td:first-child {
-  width: 3.5%;
-  padding: 12px 11px;
+  width: 4.4%;
 }
 
 th:nth-child(2), td:nth-child(2) {
@@ -297,33 +297,48 @@ th:nth-child(2), td:nth-child(2) {
 
 th:nth-child(3), td:nth-child(3),
 th:nth-child(4), td:nth-child(4),
-th:nth-child(5), td:nth-child(5),
-th:nth-child(6), td:nth-child(6) {
-  width: 10%;
+th:nth-child(5), td:nth-child(5){
+  width: 11%;
 }
 
 th:nth-child(6), td:nth-child(6) {
-  width: 11%;
+  width: 13%;
   text-align: left;
   white-space: normal;
   word-wrap: break-word;
 }
 
 th:nth-child(7), td:nth-child(7) {
-  width: 10%;
-}
+  width: 8.5%;
 
-td {
-  padding: 12px;
-  border: 2px solid #ddd;
+}
+th:nth-child(8), td:nth-child(8) {
+  width:9%;
+}
+th:first-child, td:first-child,
+th:nth-child(2), td:nth-child(2),
+th:nth-child(3), td:nth-child(3),
+th:nth-child(4), td:nth-child(4),
+th:nth-child(5), td:nth-child(5),
+th:nth-child(6),td:nth-child(6),
+th:nth-child(8) ,td:nth-child(8){
+  padding: 10px;
+  border: 2px solid #cacaca;
   overflow: hidden;
   word-wrap: break-word;
   white-space: normal;
-  background: linear-gradient(to bottom, #3a699b, #8daeca);
-  color: white;
-  font-size: 15.6px;
+  background: linear-gradient(to bottom, #26609b, #789ab8);
+  color: rgb(238, 233, 233);
+  font-size: 14px;
 }
 
+th:nth-child(7) {
+  padding: 10px;
+  overflow: hidden;
+  word-wrap: break-word;
+  white-space: normal;
+  font-size: 14px;
+}
 select, input {
   width: 100%;
   padding: 8px 12px;
@@ -340,14 +355,93 @@ select:focus, input:focus {
   outline: none;
 }
 
-button {
-  padding: 8px 15px;
+.add-button {
+  width: 20%;
+  padding: 8px;
+  border-color: #4396f5;
+  color: rgb(48, 45, 45);
+  border-radius: 5px;
   cursor: pointer;
-  margin-top: 5px;
-  font-size: 14px;
-  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+.add-button:hover {
+  background-color: #1675e2;
+  color: rgb(247, 246, 246);
 }
 
+.delete-button {
+  padding: 8px 12px;
+   background-color:white ;
+  color: white;
+  border-color: #d34a14;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.edit-button {
+  padding: 8px 12px;
+  background-color:white ;
+  color: white;
+  border-color:  #347537;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.save-button{
+ padding: 8px 12px;
+  background-color:white ;
+  color: white;
+  border-color: #717271;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+
+}
+.delete-button:hover {
+  background-color: rgb(245, 38, 38);
+  color: #f9f9f9
+}
+
+.edit-button:hover {
+  background-color: #319131;
+  color: #f9f9f9
+}
+.save-button:hover {
+  background-color: #4e644e;
+  color: #f9f9f9
+}
+
+.edit-button:hover i {
+  color: #f9f9f9;
+}
+
+.delete-button:hover i {
+  color: #f9f9f9;
+
+}
+.save-button:hover i {
+  color: #f9f9f9;
+
+}
+
+.delete-button i,
+.edit-button i,
+.save-button i {
+  font-size: 15px;
+  color: #333;
+}
 button:disabled {
   cursor: not-allowed;
   background-color: #ddd;
@@ -368,17 +462,39 @@ button:hover {
   color: black;
 }
 
+.status-pending {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #ec2748;
+  font-size: 14px;
+}
+
+.status-in-progress {
+  background-color: #fff3cd; 
+  color: #856404;
+  border: 1px solid  #daac24;
+  font-size: 14px;
+
+}
+
+.status-complete {
+  background-color: #d4edda; 
+  color: #155724;
+  border: 1px solid #2ac54e;
+  font-size: 14px;
+
+}
 .custom-dropdown {
   width: 100%;
   padding: 8px 12px;
   border-radius: 4px;
   background-color: #fff;
-  border: 1px solid #ddd;
-  transition: border 0.3s ease;
+  border: 1px solid #59b3e7;
+ 
 }
 
 .custom-dropdown:focus {
-  border-color: #007bff;
+  border-color: #4e9bec;
 }
 
 .custom-input {
