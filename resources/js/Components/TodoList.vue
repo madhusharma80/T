@@ -161,7 +161,7 @@ const deleteTodo = async (id) => {
 <style scoped>
 .todo-container {
   width: 50%; 
-  max-width: 800px; 
+  max-width: 600px; 
   background-color: #f8f9faa1;
   padding: 40px;
   border-radius: 4px;
@@ -205,7 +205,7 @@ h1 {
 .todo-input {
   width: 76%;
   padding: 10px;
-  font-size: 16px;
+  font-size: 15px;
   border: 2px solid #ddd;
   border-radius: 5px;
   outline: none;
@@ -235,7 +235,7 @@ h1 {
 }
 
 .add-button i {
-  font-size: 15px;
+  font-size: 13px;
 }
 
 .todo-list {
@@ -261,7 +261,7 @@ h1 {
 
 .todo-title {
   flex-grow: 1;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .todo-title.completed {

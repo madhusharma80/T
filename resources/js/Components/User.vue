@@ -4,7 +4,7 @@
     <table class="table">
       <thead>
         <tr>
-          <th>S.no</th>
+          <th>s.no</th>
           <th>
             <select v-model="newEmployee.email" class="custom-dropdown">
               <option value="">Email</option>
@@ -25,18 +25,15 @@
               <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
             </select>
           </th>
-
           <th>
             <select v-model="newEmployee.assigned_to" class="custom-dropdown">
               <option value="">Assigned To</option>
               <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}</option>
             </select>
           </th>
-
           <th>
             <input v-model="newEmployee.description" class="custom-input" type="text" placeholder="Enter Description" />
           </th>
-
           <!-- Status -->
           <th>
             <select v-model="newEmployee.status" class="custom-dropdown">
@@ -117,7 +114,6 @@
     </table>
   </div>
 </template>
-
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
@@ -281,7 +277,7 @@ table {
 th {
   padding: 6px;
   border: 2px solid #ddd;
-  background: linear-gradient(to bottom, #3a699b, #8daeca);
+  background:  linear-gradient(to bottom, #275b8f, #a7bfd6);
   color: white;
   width: 14%;
 }
@@ -327,8 +323,8 @@ th:nth-child(8) ,td:nth-child(8){
   overflow: hidden;
   word-wrap: break-word;
   white-space: normal;
-  background: linear-gradient(to bottom, #26609b, #789ab8);
-  color: rgb(238, 233, 233);
+  box-shadow: inset 0px 2px 10px rgba(95, 109, 131, 0.5);
+  color: rgb(61, 59, 59);
   font-size: 14px;
 }
 
@@ -433,7 +429,6 @@ select:focus, input:focus {
 }
 .save-button:hover i {
   color: #f9f9f9;
-
 }
 
 .delete-button i,
@@ -463,26 +458,24 @@ button:hover {
 }
 
 .status-pending {
-  background-color: #f8d7da;
+  background-color: #fadadd;
   color: #721c24;
   border: 1px solid #ec2748;
   font-size: 14px;
 }
 
 .status-in-progress {
-  background-color: #fff3cd; 
+  background-color: #fff5d4; 
   color: #856404;
   border: 1px solid  #daac24;
   font-size: 14px;
-
 }
 
 .status-complete {
-  background-color: #d4edda; 
+  background-color: #d2ffdd; 
   color: #155724;
   border: 1px solid #2ac54e;
   font-size: 14px;
-
 }
 .custom-dropdown {
   width: 100%;
@@ -490,7 +483,6 @@ button:hover {
   border-radius: 4px;
   background-color: #fff;
   border: 1px solid #59b3e7;
- 
 }
 
 .custom-dropdown:focus {
