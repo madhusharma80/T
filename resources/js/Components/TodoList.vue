@@ -41,7 +41,6 @@
           </button>
           <button @click="deleteTodo(todo.id)" class="delete-button">
             <i class="fas fa-trash"></i>
-            
           </button>
         </li>
       </ul>
@@ -117,7 +116,6 @@ const updateTodo = async (todo) => {
 const editTodo = (todo) => {
   todo.isEditing = true;
 
-
 };
 
 // Save edited todo
@@ -162,15 +160,15 @@ const deleteTodo = async (id) => {
 
 <style scoped>
 .todo-container {
-  width: 50%;  /* You can adjust this value to control the container width */
-  max-width: 800px; /* Max width to prevent it from becoming too large */
+  width: 50%; 
+  max-width: 800px; 
   background-color: #f8f9faa1;
   padding: 40px;
   border-radius: 4px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   border: 1px solid rgb(118, 165, 209);
-  overflow: hidden; /* To prevent scrollbars if content overflows */
-  box-sizing: border-box; /* Ensure padding is included in the width */
+  overflow: hidden;
+  box-sizing: border-box; 
   height: auto;
   margin-left: 137px;
   margin-top: 100px;
@@ -187,8 +185,6 @@ const deleteTodo = async (id) => {
   color: #333;
   font-size: 2em;
   margin-top: 8px;
-
-  
 }
 
 h1 {
@@ -204,7 +200,6 @@ h1 {
   display: flex;
   justify-content: space-between;
   margin-bottom: 5px;
-  /* Reduced margin to make space for error message */
 }
 
 .todo-input {
@@ -339,7 +334,6 @@ h1 {
   border-color: #4CAF50;
 }
 
-/* New styles for validation error */
 .error-message {
   color: #a32d20;
   font-size: 0.9em;
@@ -347,7 +341,6 @@ h1 {
   margin-bottom: 15px;
 
 }
-
 .input-error {
   border-color: #e74c3c !important;
 }

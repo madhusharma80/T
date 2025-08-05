@@ -4,10 +4,10 @@
     <table class="table">
       <thead>
         <tr>
-          <th>S.No.</th>
+          <th>S.no.</th>
           <!-- Employee Email -->
           <th>
-            <select v-model="newEmployee.email">
+            <select v-model="newEmployee.email" class="custom-dropdown">
               <option value="">Select Email</option>
               <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
             </select>
@@ -15,23 +15,23 @@
 
           <!-- Department -->
           <th>
-            <select v-model="newEmployee.department_id">
-              <option value=""> Department</option>
+            <select v-model="newEmployee.department_id" class="custom-dropdown">
+              <option value="">Department</option>
               <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
           </th>
 
           <!-- Designation -->
           <th>
-            <select v-model="newEmployee.designation_id">
-              <option value=""> Designation</option>
+            <select v-model="newEmployee.designation_id" class="custom-dropdown">
+              <option value="">Designation</option>
               <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
             </select>
           </th>
 
           <!-- Assigned To -->
           <th>
-            <select v-model="newEmployee.assigned_to">
+            <select v-model="newEmployee.assigned_to" class="custom-dropdown">
               <option value="">Assigned To</option>
               <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}</option>
             </select>
@@ -39,12 +39,12 @@
 
           <!-- Description -->
           <th>
-            <input v-model="newEmployee.description" type="text" placeholder="Enter Description" />
+            <input v-model="newEmployee.description" class="custom-input" type="text" placeholder="Enter Description" />
           </th>
 
           <!-- Add Button -->
           <th>
-            <button class="btn btn-primary add_btn w-100" @click="addEmployee" :disabled="isAddDisabled"><i class="fas fa-plus"></i>Add</button>
+            <button class="btn btn-primary w-100 " @click="addEmployee" :disabled="isAddDisabled"><i class="fas fa-plus"></i>Add</button>
           </th>
         </tr>
       </thead>
@@ -57,7 +57,7 @@
 
           <td>
             <span v-if="!employee.isEditing">{{ employee.email }}</span>
-            <select v-else v-model="employee.email">
+            <select v-else v-model="employee.email" class="custom-dropdown">
               <option value="">Select Email</option>
               <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
             </select>
@@ -65,7 +65,7 @@
 
           <td>
             <span v-if="!employee.isEditing">{{ employee.department.name }}</span>
-            <select v-else v-model="employee.department_id">
+            <select v-else v-model="employee.department_id" class="custom-dropdown">
               <option value="">Select Department</option>
               <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
@@ -73,7 +73,7 @@
 
           <td>
             <span v-if="!employee.isEditing">{{ employee.designation.name }}</span>
-            <select v-else v-model="employee.designation_id">
+            <select v-else v-model="employee.designation_id" class="custom-dropdown">
               <option value="">Select Designation</option>
               <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
             </select>
@@ -81,17 +81,15 @@
 
           <td>
             <span v-if="!employee.isEditing">{{ getAssignedToName(employee.assigned_to) }}</span>
-            <select v-else v-model="employee.assigned_to">
+            <select v-else v-model="employee.assigned_to" class="custom-dropdown">
               <option value="">Assigned To</option>
               <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}</option>
             </select>
           </td>
-
           <td>
             <span v-if="!employee.isEditing">{{ employee.description }}</span>
-            <input v-else v-model="employee.description" type="text" placeholder="Enter Description" />
+            <input v-else v-model="employee.description" class="custom-input" type="text" placeholder="Enter Description" />
           </td>
-
           <td>
             <div class="button-group">
               <button v-if="!employee.isEditing" class="btn btn-secondary" @click="editEmployee(employee)"><i class="fas fa-edit"></i></button>
@@ -152,6 +150,12 @@ onMounted(async () => {
       name: employee.email // Or use employee.name if you want that
     }));
 
+    // Load employees from localStorage if available
+    const storedEmployees = localStorage.getItem('employees');
+    if (storedEmployees) {
+      employees.value = JSON.parse(storedEmployees);
+    }
+
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -163,8 +167,8 @@ const addEmployee = () => {
     return; // Don't add if fields are incomplete
   }
 
-  // Push the new employee to the list with default "isEditing" as false
-  employees.value.push({
+  // Create a new employee object
+  const newEmployeeData = {
     email: newEmployee.value.email,
     department_id: newEmployee.value.department_id,
     designation_id: newEmployee.value.designation_id,
@@ -174,7 +178,13 @@ const addEmployee = () => {
     designation: designations.value.find(designation => designation.id === newEmployee.value.designation_id),
     assigned_to_name: assignedTo.value.find(assigned => assigned.id === newEmployee.value.assigned_to).name, // Added name for display
     isEditing: false, // New employee is not in editing mode
-  });
+  };
+
+  // Push the new employee to the list
+  employees.value.push(newEmployeeData);
+
+  // Save the new employees list to localStorage
+  localStorage.setItem('employees', JSON.stringify(employees.value));
 
   // Reset the form fields after adding the employee
   resetForm();
@@ -212,11 +222,22 @@ const saveEmployee = (employee, index) => {
     assigned_to_name: assignedTo.value.find(assigned => assigned.id === employee.assigned_to)?.name
   };
 
+  // Save the updated employees list to localStorage
+  localStorage.setItem('employees', JSON.stringify(employees.value));
+
   resetForm();
 };
 
 const deleteEmployee = (index) => {
   employees.value.splice(index, 1);
+
+  // If no employees left, clear the localStorage
+  if (employees.value.length === 0) {
+    localStorage.removeItem('employees');
+  } else {
+    // Save the updated employees list to localStorage
+    localStorage.setItem('employees', JSON.stringify(employees.value));
+  }
 };
 
 const resetForm = () => {
@@ -240,7 +261,7 @@ const resetForm = () => {
   font-family: serif;
 }
 .container {
-  width:100%;
+  width: 100%;
   max-width: 1040px;
   background-color: #f8f9faa1;
   padding: 40px;
@@ -254,20 +275,19 @@ const resetForm = () => {
 table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed; 
+  table-layout: fixed;
 }
 th {
   padding: 8px;
   border: 2px solid #ddd;
   background: linear-gradient(to bottom, #3a699b, #8daeca);
   color: white;
-  width: 14%; 
+  width: 14%;
 }
 
 th:first-child, td:first-child {
-  width: 3.5%; 
-  padding:12px 11px;
-  
+  width: 3.5%;
+  padding: 12px 11px;
 }
 
 th:nth-child(2), td:nth-child(2) {
@@ -279,20 +299,20 @@ th:nth-child(3), td:nth-child(3),
 th:nth-child(4), td:nth-child(4),
 th:nth-child(5), td:nth-child(5),
 th:nth-child(6), td:nth-child(6) {
-width: 10%; 
-
+  width: 10%;
 }
 
 th:nth-child(6), td:nth-child(6) {
-  width: 11%; 
+  width: 11%;
   text-align: left;
   white-space: normal;
   word-wrap: break-word;
 }
 
 th:nth-child(7), td:nth-child(7) {
-  width:10%;
+  width: 10%;
 }
+
 td {
   padding: 12px;
   border: 2px solid #ddd;
@@ -300,22 +320,32 @@ td {
   word-wrap: break-word;
   white-space: normal;
   background: linear-gradient(to bottom, #3a699b, #8daeca);
-  color:white;
-  font-size: 15.4px;
+  color: white;
+  font-size: 15.6px;
 }
 
 select, input {
   width: 100%;
-  padding: 5px;
+  padding: 8px 12px;
   border: 1px solid #ddd;
-  margin-top: 5px;
-  box-sizing: border-box; 
+  border-radius: 4px;
+  background-color: #ffffff;
+  font-size: 14px;
+  font-family: 'Arial', sans-serif;
+  transition: border-color 0.3s ease;
+}
+
+select:focus, input:focus {
+  border-color: #2c87f0;
+  outline: none;
 }
 
 button {
-  padding: 5px 10px;
+  padding: 8px 15px;
   cursor: pointer;
   margin-top: 5px;
+  font-size: 14px;
+  border-radius: 4px;
 }
 
 button:disabled {
@@ -333,13 +363,28 @@ button:disabled {
   flex: 1 1 auto;
 }
 
-.add_btn {
-  width: 100%;
-  background-color: #244a92;
-}
-
 button:hover {
   background-color: #f4f4f4;
   color: black;
+}
+
+.custom-dropdown {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  transition: border 0.3s ease;
+}
+
+.custom-dropdown:focus {
+  border-color: #007bff;
+}
+
+.custom-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 </style>
