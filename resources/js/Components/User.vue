@@ -146,6 +146,7 @@ onMounted(async () => {
     });
 
     const data = await response.json();
+    console.log(data);
 
     departments.value = data.departments;
     designations.value = data.designations;
@@ -153,7 +154,7 @@ onMounted(async () => {
     employeeEmails.value = data.employees.map(employee => employee.email);
     assignedTo.value = data.employees.map(employee => ({
       id: employee.id,
-      name: employee.email
+      name: employee.name
     }));
 
     const storedEmployees = localStorage.getItem('employees');
@@ -177,10 +178,10 @@ const addEmployee = () => {
     designation_id: newEmployee.value.designation_id,
     assigned_to: newEmployee.value.assigned_to,
     description: newEmployee.value.description,
-    status: newEmployee.value.status,  // Include status
+    status: newEmployee.value.status,
     department: departments.value.find(department => department.id === newEmployee.value.department_id),
     designation: designations.value.find(designation => designation.id === newEmployee.value.designation_id),
-    assigned_to_name: assignedTo.value.find(assigned => assigned.id === newEmployee.value.assigned_to).name,
+    assigned_to_name: assignedTo.value.find(assigned => assigned.id === newEmployee.value.assigned_to)?.name, // Add the name of the assigned employee
     isEditing: false,
   };
 
@@ -188,11 +189,13 @@ const addEmployee = () => {
   localStorage.setItem('employees', JSON.stringify(employees.value));
   resetForm();
 };
+
 //name of the assigned employee based on their id.
 const getAssignedToName = (assignedToId) => {
   const assignedEmployee = assignedTo.value.find(assigned => assigned.id === assignedToId);
-  return assignedEmployee ? assignedEmployee.name : '';
+  return assignedEmployee ? assignedEmployee.name : ''; // Return the employee's name
 };
+
 //Edit button function 
 const editEmployee = (employee) => {
   employee.isEditing = true;
@@ -323,7 +326,7 @@ th:nth-child(8) ,td:nth-child(8){
   overflow: hidden;
   word-wrap: break-word;
   white-space: normal;
-  box-shadow: inset 2px 4px   19px rgba(85, 86, 87, 0.5);
+  box-shadow: inset 2px 4px   11px rgba(85, 86, 87, 0.5);
   color: rgb(43, 41, 41);
   font-size: 14px;
 }

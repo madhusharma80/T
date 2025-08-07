@@ -83,6 +83,8 @@ const showWelcomeCard = ref(false);
 // Check if the user has already closed the success card
 onMounted(() => {
   const hasSeenWelcomeCard = localStorage.getItem('hasSeenWelcomeCard');
+  
+  // Show the card if it's the user's first login (has not seen the card)
   if (!hasSeenWelcomeCard) {
     showWelcomeCard.value = true;
   }
@@ -91,6 +93,7 @@ onMounted(() => {
 // Close the welcome card to click on OK button and store the state
 const closeWelcomeCard = () => {
   showWelcomeCard.value = false;
+  // Mark that the user has seen the welcome card
   localStorage.setItem('hasSeenWelcomeCard', 'true');
 };
 
@@ -174,7 +177,6 @@ const logout = () => {
 
 .sidebar-link i {
   font-size: 18px;
- 
 }
 
 .sidebar-link:hover {
@@ -185,9 +187,9 @@ const logout = () => {
 /* Highlight the active link */
 .active-link {
   background-color: #fffefe; 
- color: #726b6b;
-
+  color: #726b6b;
 }
+
 .sidebar-footer {
   margin-top: auto;
   text-align: center;
