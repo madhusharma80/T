@@ -23,11 +23,11 @@ class EmployeeController extends Controller
                 
                 // Return the employee object with the full name and relevant details
                 return [
-                    'id' => $employee->id,  // Use the employee ID
-                    'name' => $employee->name, // Full name
-                    'email' => $employee->email, // Optional: Add email if needed for other parts of the UI
-                    'department' => $employee->department, // Include department information if necessary
-                    'designation' => $employee->designation, // Include designation if needed
+                    'id' => $employee->id,  
+                    'name' => $employee->name, 
+                    'email' => $employee->email, 
+                    'department' => $employee->department,
+                    'designation' => $employee->designation, 
                 ];
             });
 
@@ -35,7 +35,7 @@ class EmployeeController extends Controller
         return response()->json([
             'departments' => $departments,
             'designations' => $designations,
-            'employees' => $employees,  // Provide employees with necessary details
+            'employees' => $employees,  
         ]);
     }
 }

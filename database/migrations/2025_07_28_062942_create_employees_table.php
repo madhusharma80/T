@@ -11,10 +11,10 @@ class CreateEmployeesTable extends Migration
        Schema::create('employees', function (Blueprint $table) {
     $table->id();
     $table->string('email');
-     $table->string('first_name');
+    $table->string('first_name');
     $table->string('last_name');
     $table->unsignedBigInteger('department_id'); // This links to the Department
-    $table->unsignedBigInteger('designation_id');
+    $table->unsignedBigInteger('designation_id'); // This links to the Designation 
     $table->foreign('department_id')->references('id')->on('departments')->onDelete('cascade');
     $table->timestamps();
 });

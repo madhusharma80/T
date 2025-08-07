@@ -326,7 +326,7 @@ th:nth-child(8) ,td:nth-child(8){
   overflow: hidden;
   word-wrap: break-word;
   white-space: normal;
-  box-shadow: inset 2px 4px   11px rgba(85, 86, 87, 0.5);
+  box-shadow: inset 2px  4px  11px rgba(46, 134, 221, 0.5);
   color: rgb(43, 41, 41);
   font-size: 14px;
 }

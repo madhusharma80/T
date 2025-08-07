@@ -12,7 +12,7 @@ class EmployeeSeeder extends Seeder
     
         $employee1 = Employee::create([
             'email' => 'john.doe@example.com',
-             'first_name' => 'John',  
+            'first_name' => 'John',  
             'last_name' => 'Doe',    
             'department_id' => 1,  
             'designation_id' => 1, 
@@ -21,7 +21,7 @@ class EmployeeSeeder extends Seeder
       
         $employee2 = Employee::create([
             'email' => 'jane.smith@example.com',
-             'first_name' => 'Jane',  
+            'first_name' => 'Jane',  
             'last_name' => 'Doe',    
             'department_id' => 2,  
             'designation_id' => 2,  
@@ -30,7 +30,7 @@ class EmployeeSeeder extends Seeder
 
         $employee3 = Employee::create([
             'email' => 'abc.@example.com',
-             'first_name' => 'Abc',  
+            'first_name' => 'Abc',  
             'last_name' => 'Doe',  
             'department_id' => 3, 
             'designation_id' => 3,  
@@ -39,7 +39,7 @@ class EmployeeSeeder extends Seeder
 
         $employee4 = Employee::create([
             'email' => 'admin@example.com',
-             'first_name' => 'Admine', 
+            'first_name' => 'Admine', 
             'last_name' => 'Doe',   
             'department_id' => 4, 
             'designation_id' => 4,  
@@ -48,7 +48,7 @@ class EmployeeSeeder extends Seeder
 
         $employee5 = Employee::create([
             'email' => 'david.white@example.com',
-             'first_name' => 'David',  
+            'first_name' => 'David',  
             'last_name' => 'Doe',   
             'department_id' => 5,  
             'designation_id' => 5,  
