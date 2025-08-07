@@ -3,14 +3,8 @@
     <h1>TODO LIST</h1>
     <div class="sub-container">
       <div class="add-todo">
-        <input
-          v-model="newTodo"
-          type="text"
-          placeholder="Add a new task"
-          @keyup.enter="addTodo"
-          @input="showError = false"
-          class="todo-input"
-          :class="{ 'input-error': showError }"/>
+        <input v-model="newTodo" type="text" placeholder="Add a new task" @keyup.enter="addTodo"
+          @input="showError = false" class="todo-input" :class="{ 'input-error': showError }" />
         <button @click="addTodo" class="add-button">
           <i class="fas fa-plus"></i> Add
         </button>
@@ -19,22 +13,14 @@
       <p v-if="showError" class="error-message">Task cannot be empty!</p>
       <ul class="todo-list">
         <li v-for="todo in todos" :key="todo.id" class="todo-item">
-          <input
-            type="checkbox"
-            v-model="todo.completed"
-            @change="updateTodo(todo)"
-            class="todo-checkbox"/>
-          
+          <input type="checkbox" v-model="todo.completed" @change="updateTodo(todo)" class="todo-checkbox" />
+
           <!-- Display title or input field based on editing state -->
           <span v-if="!todo.isEditing" :class="{ completed: todo.completed }" class="todo-title">
             {{ todo.title }}
           </span>
-          <input
-            v-if="todo.isEditing"
-            v-model="todo.title"
-            @keyup.enter="saveEditedTodo(todo)"
-            @blur="saveEditedTodo(todo)"
-            class="edit-input"/>
+          <input v-if="todo.isEditing" v-model="todo.title" @keyup.enter="saveEditedTodo(todo)"
+            @blur="saveEditedTodo(todo)" class="edit-input" />
           <!-- Edit and Delete buttons -->
           <button @click="editTodo(todo)" v-if="!todo.isEditing" class="edit-button">
             <i class="fas fa-edit"></i>
@@ -77,10 +63,10 @@ const fetchTodos = async () => {
 // Add a new todo
 const addTodo = async () => {
   if (!newTodo.value.trim()) {
-    showError.value = true; 
+    showError.value = true;
     return;
   }
-  showError.value = false; 
+  showError.value = false;
   try {
     const response = await axios.post('/api/todos', {
       title: newTodo.value
@@ -160,15 +146,15 @@ const deleteTodo = async (id) => {
 
 <style scoped>
 .todo-container {
-  width: 50%; 
-  max-width: 600px; 
+  width: 50%;
+  max-width: 600px;
   background-color: #f8f9faa1;
   padding: 40px;
   border-radius: 4px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   border: 1px solid rgb(118, 165, 209);
   overflow: hidden;
-  box-sizing: border-box; 
+  box-sizing: border-box;
   height: auto;
   margin-left: 137px;
   margin-top: 100px;
@@ -341,6 +327,7 @@ h1 {
   margin-bottom: 15px;
 
 }
+
 .input-error {
   border-color: #e74c3c !important;
 }

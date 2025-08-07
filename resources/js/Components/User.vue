@@ -15,20 +15,23 @@
           <th>
             <select v-model="newEmployee.department_id" class="custom-dropdown">
               <option value="">Department</option>
-              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
+              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name
+                }}</option>
             </select>
           </th>
 
           <th>
             <select v-model="newEmployee.designation_id" class="custom-dropdown">
               <option value="">Designation</option>
-              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
+              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
+                designation.name }}</option>
             </select>
           </th>
           <th>
             <select v-model="newEmployee.assigned_to" class="custom-dropdown">
               <option value="">Assigned To</option>
-              <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}</option>
+              <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}
+              </option>
             </select>
           </th>
           <th>
@@ -45,7 +48,8 @@
           </th>
 
           <th>
-            <button class="btn btn-primary w-100 add-button" @click="addEmployee" :disabled="isAddDisabled"><i class="fas fa-plus"></i>Add</button>
+            <button class="btn btn-primary w-100 add-button" @click="addEmployee" :disabled="isAddDisabled"><i
+                class="fas fa-plus"></i>Add</button>
           </th>
         </tr>
       </thead>
@@ -66,7 +70,8 @@
             <span v-if="!employee.isEditing">{{ employee.department.name }}</span>
             <select v-else v-model="employee.department_id" class="custom-dropdown">
               <option value="">Select Department</option>
-              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
+              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name
+                }}</option>
             </select>
           </td>
 
@@ -74,7 +79,8 @@
             <span v-if="!employee.isEditing">{{ employee.designation.name }}</span>
             <select v-else v-model="employee.designation_id" class="custom-dropdown">
               <option value="">Select Designation</option>
-              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
+              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
+                designation.name }}</option>
             </select>
           </td>
 
@@ -82,13 +88,15 @@
             <span v-if="!employee.isEditing">{{ getAssignedToName(employee.assigned_to) }}</span>
             <select v-else v-model="employee.assigned_to" class="custom-dropdown">
               <option value="">Assigned To</option>
-              <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}</option>
+              <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}
+              </option>
             </select>
           </td>
 
           <td>
             <span v-if="!employee.isEditing">{{ employee.description }}</span>
-            <input v-else v-model="employee.description" class="custom-input" type="text" placeholder="Enter Description" />
+            <input v-else v-model="employee.description" class="custom-input" type="text"
+              placeholder="Enter Description" />
           </td>
 
           <!-- Task Status with background color -->
@@ -104,8 +112,10 @@
 
           <td>
             <div class="button-group">
-              <button v-if="!employee.isEditing" class="btn  edit-button " @click="editEmployee(employee)"><i class="fas fa-edit"></i></button>
-              <button v-if="employee.isEditing" class="btn btn-success save-button" @click="saveEmployee(employee, index)"><i class="fas fa-save"></i></button>
+              <button v-if="!employee.isEditing" class="btn  edit-button " @click="editEmployee(employee)"><i
+                  class="fas fa-edit"></i></button>
+              <button v-if="employee.isEditing" class="btn btn-success save-button"
+                @click="saveEmployee(employee, index)"><i class="fas fa-save"></i></button>
               <button class="btn delete-button" @click="deleteEmployee(index)"><i class="fas fa-trash"></i></button>
             </div>
           </td>
@@ -146,7 +156,7 @@ onMounted(async () => {
     });
 
     const data = await response.json();
-    console.log(data);
+    // console.log(data);
 
     departments.value = data.departments;
     designations.value = data.designations;
@@ -211,7 +221,7 @@ const editEmployee = (employee) => {
 //Save button function 
 const saveEmployee = (employee, index) => {
   employee.isEditing = false;
-  employees.value[index] = { 
+  employees.value[index] = {
     ...employee,
     department: departments.value.find(department => department.id === employee.department_id),
     designation: designations.value.find(designation => designation.id === employee.designation_id),
@@ -260,6 +270,7 @@ const statusClass = (status) => {
   font-weight: 600;
   font-family: serif;
 }
+
 .container {
   width: 100%;
   max-width: 1040px;
@@ -277,56 +288,74 @@ table {
   border-collapse: collapse;
   table-layout: fixed;
 }
+
 th {
   padding: 6px;
   border: 2px solid #ddd;
-  background:  linear-gradient(to bottom, #275b8f, #b4cfe7);
+  background: linear-gradient(to bottom, #275b8f, #b4cfe7);
   color: white;
   width: 14%;
 }
 
-th:first-child, td:first-child {
+th:first-child,
+td:first-child {
   width: 4.4%;
 }
 
-th:nth-child(2), td:nth-child(2) {
+th:nth-child(2),
+td:nth-child(2) {
   width: 11%;
   padding-left: 15px;
 }
 
-th:nth-child(3), td:nth-child(3),
-th:nth-child(4), td:nth-child(4),
-th:nth-child(5), td:nth-child(5){
+th:nth-child(3),
+td:nth-child(3),
+th:nth-child(4),
+td:nth-child(4),
+th:nth-child(5),
+td:nth-child(5) {
   width: 11%;
 }
 
-th:nth-child(6), td:nth-child(6) {
+th:nth-child(6),
+td:nth-child(6) {
   width: 13%;
   text-align: left;
   white-space: normal;
   word-wrap: break-word;
 }
 
-th:nth-child(7), td:nth-child(7) {
+th:nth-child(7),
+td:nth-child(7) {
   width: 8.5%;
 
 }
-th:nth-child(8), td:nth-child(8) {
-  width:9%;
+
+th:nth-child(8),
+td:nth-child(8) {
+  width: 9%;
 }
-th:first-child, td:first-child,
-th:nth-child(2), td:nth-child(2),
-th:nth-child(3), td:nth-child(3),
-th:nth-child(4), td:nth-child(4),
-th:nth-child(5), td:nth-child(5),
-th:nth-child(6),td:nth-child(6),
-th:nth-child(8) ,td:nth-child(8){
+
+th:first-child,
+td:first-child,
+th:nth-child(2),
+td:nth-child(2),
+th:nth-child(3),
+td:nth-child(3),
+th:nth-child(4),
+td:nth-child(4),
+th:nth-child(5),
+td:nth-child(5),
+th:nth-child(6),
+td:nth-child(6),
+th:nth-child(8),
+td:nth-child(8) {
   padding: 10px;
   border: 2px solid #cacaca;
   overflow: hidden;
   word-wrap: break-word;
   white-space: normal;
-  box-shadow: inset 2px  4px  11px rgba(46, 134, 221, 0.5);
+  box-shadow: inset 2px 4px 11px rgba(46, 134, 221, 0.5);
   color: rgb(43, 41, 41);
   font-size: 14px;
 }
@@ -338,7 +367,9 @@ th:nth-child(7) {
   white-space: normal;
   font-size: 14px;
 }
-select, input {
+
+select,
+input {
   width: 100%;
   padding: 8px 12px;
   border: 1px solid #ddd;
@@ -349,7 +380,8 @@ select, input {
   transition: border-color 0.3s ease;
 }
 
-select:focus, input:focus {
+select:focus,
+input:focus {
   border-color: #2c87f0;
   outline: none;
 }
@@ -366,6 +398,7 @@ select:focus, input:focus {
   align-items: center;
   gap: 16px;
 }
+
 .add-button:hover {
   background-color: #1675e2;
   color: rgb(247, 246, 246);
@@ -373,7 +406,7 @@ select:focus, input:focus {
 
 .delete-button {
   padding: 8px 12px;
-   background-color:white ;
+  background-color: white;
   color: white;
   border-color: #d34a14;
   border-radius: 4px;
@@ -385,9 +418,9 @@ select:focus, input:focus {
 
 .edit-button {
   padding: 8px 12px;
-  background-color:white ;
+  background-color: white;
   color: white;
-  border-color:  #347537;
+  border-color: #347537;
   border-radius: 4px;
   cursor: pointer;
   display: flex;
@@ -395,9 +428,9 @@ select:focus, input:focus {
   align-items: center;
 }
 
-.save-button{
- padding: 8px 12px;
-  background-color:white ;
+.save-button {
+  padding: 8px 12px;
+  background-color: white;
   color: white;
   border-color: #717271;
   border-radius: 4px;
@@ -407,6 +440,7 @@ select:focus, input:focus {
   align-items: center;
 
 }
+
 .delete-button:hover {
   background-color: rgb(245, 38, 38);
   color: #f9f9f9
@@ -416,6 +450,7 @@ select:focus, input:focus {
   background-color: #319131;
   color: #f9f9f9
 }
+
 .save-button:hover {
   background-color: #4e644e;
   color: #f9f9f9
@@ -429,6 +464,7 @@ select:focus, input:focus {
   color: #f9f9f9;
 
 }
+
 .save-button:hover i {
   color: #f9f9f9;
 }
@@ -439,6 +475,7 @@ select:focus, input:focus {
   font-size: 15px;
   color: #333;
 }
+
 button:disabled {
   cursor: not-allowed;
   background-color: #ddd;
@@ -467,18 +504,19 @@ button:hover {
 }
 
 .status-in-progress {
-  background-color: #fff5d4; 
+  background-color: #fff5d4;
   color: #856404;
-  border: 1px solid  #daac24;
+  border: 1px solid #daac24;
   font-size: 14px;
 }
 
 .status-complete {
-  background-color: #d2ffdd; 
+  background-color: #d2ffdd;
   color: #155724;
   border: 1px solid #2ac54e;
   font-size: 14px;
 }
+
 .custom-dropdown {
   width: 100%;
   padding: 8px 12px;

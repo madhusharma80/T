@@ -12,24 +12,16 @@
               <label for="name">
                 <i class="fas fa-user"></i> Name
               </label>
-              <input 
-                type="text" 
-                id="name" 
-                v-model="form.name" 
-                placeholder="Enter your name"
-                @input="clearError('name')"/>
+              <input type="text" id="name" v-model="form.name" placeholder="Enter your name"
+                @input="clearError('name')" />
               <span v-if="errors.name" class="error-message">{{ errors.name }}</span>
             </div>
             <div class="form-group">
               <label for="email">
                 <i class="fas fa-envelope"></i> Email
               </label>
-              <input 
-                type="email" 
-                id="email" 
-                v-model="form.email" 
-                placeholder="Enter your email"
-                @input="clearError('email')"/>
+              <input type="email" id="email" v-model="form.email" placeholder="Enter your email"
+                @input="clearError('email')" />
               <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
             </div>
             <button type="submit" class="btn button_primary">
@@ -47,36 +39,24 @@
               <label for="currentPassword">
                 <i class="fas fa-key"></i> Current Password
               </label>
-              <input 
-                type="password" 
-                id="currentPassword" 
-                v-model="form.currentPassword" 
-                placeholder="Enter your current password"
-                @input="clearError('currentPassword')"/>
+              <input type="password" id="currentPassword" v-model="form.currentPassword"
+                placeholder="Enter your current password" @input="clearError('currentPassword')" />
               <span v-if="errors.currentPassword" class="error-message">{{ errors.currentPassword }}</span>
             </div>
             <div class="form-group">
               <label for="newPassword">
                 <i class="fas fa-key"></i> New Password
               </label>
-              <input 
-                type="password" 
-                id="newPassword" 
-                v-model="form.newPassword" 
-                placeholder="Enter new password"
-                @input="clearError('newPassword')"/>
+              <input type="password" id="newPassword" v-model="form.newPassword" placeholder="Enter new password"
+                @input="clearError('newPassword')" />
               <span v-if="errors.newPassword" class="error-message">{{ errors.newPassword }}</span>
             </div>
             <div class="form-group">
               <label for="confirmPassword">
                 <i class="fas fa-key"></i> Confirm New Password
               </label>
-              <input 
-                type="password" 
-                id="confirmPassword" 
-                v-model="form.confirmPassword"
-                placeholder="Confirm new password"
-                @input="clearError('confirmPassword')"/>
+              <input type="password" id="confirmPassword" v-model="form.confirmPassword"
+                placeholder="Confirm new password" @input="clearError('confirmPassword')" />
               <span v-if="errors.confirmPassword" class="error-message">{{ errors.confirmPassword }}</span>
             </div>
             <button type="submit" class="btn btn-secondary">
@@ -92,7 +72,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router'; 
+import { useRouter } from 'vue-router';
 const router = useRouter();
 
 
@@ -147,7 +127,7 @@ const updateProfile = async () => {
         email: form.value.email,
       },
       {
-        headers: {Authorization: `Bearer ${token}`, },
+        headers: { Authorization: `Bearer ${token}`, },
       }
     );
     localStorage.setItem('userName', form.value.name);
@@ -193,11 +173,11 @@ const updatePassword = async () => {
         },
       }
     );
-    
+
     alert('Password updated successfully!');
     // Redirect to login page
     router.push({ name: 'login' });
-                                                   
+
   } catch (error) {
     console.error('Password update failed:', error);
     alert('There was an error updating your password.');
@@ -238,7 +218,7 @@ const updatePassword = async () => {
   padding: 40px;
   border-radius: 4px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  border:1px solid rgb(124, 170, 230);
+  border: 1px solid rgb(124, 170, 230);
   margin-left: 117px;
 }
 
@@ -262,7 +242,7 @@ const updatePassword = async () => {
   border-radius: 10px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
   width: 48%;
-  border:1px solid rgb(226, 220, 220);
+  border: 1px solid rgb(226, 220, 220);
 }
 
 .section-title {
@@ -289,6 +269,7 @@ const updatePassword = async () => {
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  box-shadow: inset 4px 2px  6px rgba(62, 144, 226, 0.5);
 }
 
 .form-group input:focus {
@@ -311,10 +292,12 @@ button[type="submit"] {
   border-radius: 5px;
   cursor: pointer;
   margin-top: 20px;
+  box-shadow: inset 2px 2px 11px rgba(17, 17, 17, 0.5);
 }
 
 .btn-secondary:hover {
   background-color: #5a6268;
+
 }
 
 .button_primary {

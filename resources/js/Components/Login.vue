@@ -92,7 +92,6 @@ const login = async () => {
   message.value = '';
   messageType.value = '';
 
-
   if (!validateForm()) {
     return;
   }
@@ -101,17 +100,15 @@ const login = async () => {
     const response = await axios.post('/api/login', {
       email: email.value,
       password: password.value,
-     
     });
 
     if (response.data.token) {
-  
       localStorage.setItem('token', response.data.token);
-
       localStorage.setItem('userName', response.data.user.name); 
       localStorage.setItem('userEmail', response.data.user.email);
       localStorage.setItem('userPassword', response.data.user.password);
 
+      // Set the Bearer token for all axios requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       
       router.push('/welcome');
@@ -131,6 +128,7 @@ const goToSignup = () => {
   router.push('/register');
 };
 </script>
+
 
 <style scoped>
 .text-danger {

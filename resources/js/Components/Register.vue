@@ -5,12 +5,14 @@
         <form @submit.prevent="register">
           <h4>REGISTER</h4>
           <div class="mb-4">
-            <input type="text" class="form-control" id="name" placeholder="Name" v-model="form.name" @input="validateForm" />
+            <input type="text" class="form-control" id="name" placeholder="Name" v-model="form.name"
+              @input="validateForm" />
             <span v-if="errors.name" class="text-danger">{{ errors.name[0] }}</span>
           </div>
 
           <div class="mb-4">
-            <input type="email" class="form-control" id="email" placeholder="Email Address" v-model="form.email" @input="validateForm" />
+            <input type="email" class="form-control" id="email" placeholder="Email Address" v-model="form.email"
+              @input="validateForm" />
             <span v-if="errors.email" class="text-danger">{{ errors.email[0] }}</span>
           </div>
 
@@ -51,7 +53,7 @@ const form = reactive({
   name: '',
   email: '',
   password: '',
-  password_confirmation: '' 
+  password_confirmation: ''
 });
 
 const errors = ref({});
@@ -95,7 +97,7 @@ const register = async () => {
 
     messageType.value = 'success';
     message.value = 'Registration successful!';
-    router.push('/login'); 
+    router.push('/login');
   } catch (e) {
     errors.value = e.response?.data?.errors || {};
     message.value = e.response?.data?.message || 'Registration failed.';
@@ -108,7 +110,7 @@ const goToLogin = () => {
 };
 
 const validateForm = () => {
-  errors.value = {};  
+  errors.value = {};
 
   if (!form.name) errors.value.name = ['Name is required'];
   else if (form.name.length < 3) errors.value.name = ['Name must be between 3 and 15 characters'];
@@ -116,7 +118,7 @@ const validateForm = () => {
 
   if (!form.email) errors.value.email = ['Email is required'];
   else if (!/^\S+@\S+\.\S+$/.test(form.email)) errors.value.email = ['Enter a valid email address'];
-  
+
   if (!form.password) errors.value.password = ['Password is required'];
   else if (form.password.length < 8) errors.value.password = ['Password must be at least 8 characters'];
 
@@ -128,15 +130,15 @@ const validateForm = () => {
 
 <style scoped>
 form {
-  position: fixed; 
-  top: 40%; 
-  left: 50%; 
+  position: fixed;
+  top: 40%;
+  left: 50%;
   width: 400px;
   padding: 40px;
-  transform: translate(-50%,-50%); 
-  background-color: rgba(5, 5, 5, 0.7); 
+  transform: translate(-50%, -50%);
+  background-color: rgba(5, 5, 5, 0.7);
   box-sizing: border-box;
-  box-shadow: 0 15px 50px rgba(0,0,0,0.6); 
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
   border-radius: 10px;
 }
 
@@ -146,30 +148,30 @@ form input {
   outline: none;
   background: transparent;
   color: #fff;
-}  
+}
 
 input::placeholder,
 textarea::placeholder {
-  color: rgba(255, 255, 255, 0.5); 
-  transition: color 0.3s ease; 
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.3s ease;
   font-size: 14px;
-}    
+}
 
 input:focus {
-  border: none;           
-  outline: none;          
+  border: none;
+  outline: none;
   box-shadow: none;
 }
 
 .text-danger {
-  font-size: 12px; 
+  font-size: 12px;
   text-align: left;
   margin-left: 14px;
 }
 
 h4 {
   text-align: center;
-  color:#fff;
+  color: #fff;
 }
 
 .mt-4 {
@@ -188,28 +190,29 @@ h4 {
   background-color: #cccccc;
   cursor: not-allowed;
 }
+
 @media (max-width: 576px) {
   form {
-    width: 90%; 
-    padding: 20px; 
+    width: 90%;
+    padding: 20px;
   }
 
   h4 {
-    font-size: 18px; 
+    font-size: 18px;
   }
 
   .w-100 {
-    width: 100%; 
+    width: 100%;
   }
 
   .btn-link {
-    font-size: 14px; 
+    font-size: 14px;
   }
 }
 
 @media (max-width: 768px) and (min-width: 577px) {
   form {
-    width: 80%; 
+    width: 80%;
   }
 }
 </style>
