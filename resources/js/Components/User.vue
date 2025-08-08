@@ -501,7 +501,7 @@ button:hover {
   color: #721c24;
   border: 1px solid #ec2748;
   font-size: 14px; 
-  box-shadow: inset 2px 4px 11px rgba(170, 23, 23, 0.5);
+  box-shadow: inset 2px 4px 11px #721c24;
 }
 
 .status-in-progress {
@@ -509,7 +509,7 @@ button:hover {
   color: #856404;
   border: 1px solid #ecba24;
   font-size: 14px;
-  box-shadow: inset 2px 4px 11px rgba(160, 123, 0, 0.5);
+  box-shadow: inset 2px 4px 11px  #856404;
 }
 
 .status-complete {
@@ -517,7 +517,7 @@ button:hover {
   color: #155724;
   border: 1px solid #2ac54e;
   font-size: 14px;
-   box-shadow: inset 2px 4px 11px rgba(50, 158, 23, 0.5);
+   box-shadow: inset 2px 4px 11px #155724;
 }
 
 .custom-dropdown {
