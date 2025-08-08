@@ -388,7 +388,7 @@ input:focus {
 
 .add-button {
   width: 20%;
-  padding: 8px;
+  padding: 5px;
   border-color: #4396f5;
   color: rgb(48, 45, 45);
   border-radius: 5px;
@@ -500,14 +500,16 @@ button:hover {
   background-color: #fadadd;
   color: #721c24;
   border: 1px solid #ec2748;
-  font-size: 14px;
+  font-size: 14px; 
+  box-shadow: inset 2px 4px 11px rgba(170, 23, 23, 0.5);
 }
 
 .status-in-progress {
   background-color: #fff5d4;
   color: #856404;
-  border: 1px solid #daac24;
+  border: 1px solid #ecba24;
   font-size: 14px;
+  box-shadow: inset 2px 4px 11px rgba(160, 123, 0, 0.5);
 }
 
 .status-complete {
@@ -515,6 +517,7 @@ button:hover {
   color: #155724;
   border: 1px solid #2ac54e;
   font-size: 14px;
+   box-shadow: inset 2px 4px 11px rgba(50, 158, 23, 0.5);
 }
 
 .custom-dropdown {
@@ -531,7 +534,7 @@ button:hover {
 
 .custom-input {
   width: 100%;
-  padding: 8px 12px;
+  padding: 6px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
