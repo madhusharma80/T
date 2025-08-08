@@ -5,6 +5,14 @@
       <thead>
         <tr>
           <th>s.no</th>
+           <th>
+            <input v-model="newEmployee.first_name" class="custom-input" type="text" placeholder="First Name" />
+          </th>
+
+          <th>
+            <input v-model="newEmployee.last_name" class="custom-input" type="text" placeholder="Last Name" />
+          </th>
+
           <th>
             <select v-model="newEmployee.email" class="custom-dropdown">
               <option value="">Email</option>
@@ -15,41 +23,21 @@
           <th>
             <select v-model="newEmployee.department_id" class="custom-dropdown">
               <option value="">Department</option>
-              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name
-                }}</option>
+              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
           </th>
 
           <th>
             <select v-model="newEmployee.designation_id" class="custom-dropdown">
               <option value="">Designation</option>
-              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
-                designation.name }}</option>
-            </select>
-          </th>
-          <th>
-            <select v-model="newEmployee.assigned_to" class="custom-dropdown">
-              <option value="">Assigned To</option>
-              <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}
-              </option>
-            </select>
-          </th>
-          <th>
-            <input v-model="newEmployee.description" class="custom-input" type="text" placeholder="Enter Description" />
-          </th>
-          <!-- Status -->
-          <th>
-            <select v-model="newEmployee.status" class="custom-dropdown">
-              <option value="">Status</option>
-              <option value="Pending">Pending</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Complete">Complete</option>
+              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
             </select>
           </th>
 
+          <!-- New Fields: First Name and Last Name -->
+         
           <th>
-            <button class="btn btn-primary w-100 add-button" @click="addEmployee" :disabled="isAddDisabled"><i
-                class="fas fa-plus"></i>Add</button>
+            <button class="btn btn-primary w-100 add-button" @click="addEmployee" :disabled="isAddDisabled"><i class="fas fa-plus"></i>Add</button>
           </th>
         </tr>
       </thead>
@@ -70,8 +58,7 @@
             <span v-if="!employee.isEditing">{{ employee.department.name }}</span>
             <select v-else v-model="employee.department_id" class="custom-dropdown">
               <option value="">Select Department</option>
-              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name
-                }}</option>
+              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
           </td>
 
@@ -79,43 +66,25 @@
             <span v-if="!employee.isEditing">{{ employee.designation.name }}</span>
             <select v-else v-model="employee.designation_id" class="custom-dropdown">
               <option value="">Select Designation</option>
-              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
-                designation.name }}</option>
+              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
             </select>
+          </td>
+
+          <!-- New Fields: First Name and Last Name -->
+          <td>
+            <span v-if="!employee.isEditing">{{ employee.first_name }}</span>
+            <input v-else v-model="employee.first_name" class="custom-input" type="text" placeholder="First Name" />
           </td>
 
           <td>
-            <span v-if="!employee.isEditing">{{ getAssignedToName(employee.assigned_to) }}</span>
-            <select v-else v-model="employee.assigned_to" class="custom-dropdown">
-              <option value="">Assigned To</option>
-              <option v-for="assigned in assignedTo" :key="assigned.id" :value="assigned.id">{{ assigned.name }}
-              </option>
-            </select>
-          </td>
-
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.description }}</span>
-            <input v-else v-model="employee.description" class="custom-input" type="text"
-              placeholder="Enter Description" />
-          </td>
-
-          <!-- Task Status with background color -->
-          <td :class="statusClass(employee.status)">
-            <span v-if="!employee.isEditing">{{ employee.status }}</span>
-            <select v-else v-model="employee.status" class="custom-dropdown">
-              <option value="">Select Status</option>
-              <option value="Pending">Pending</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Complete">Complete</option>
-            </select>
+            <span v-if="!employee.isEditing">{{ employee.last_name }}</span>
+            <input v-else v-model="employee.last_name" class="custom-input" type="text" placeholder="Last Name" />
           </td>
 
           <td>
             <div class="button-group">
-              <button v-if="!employee.isEditing" class="btn  edit-button " @click="editEmployee(employee)"><i
-                  class="fas fa-edit"></i></button>
-              <button v-if="employee.isEditing" class="btn btn-success save-button"
-                @click="saveEmployee(employee, index)"><i class="fas fa-save"></i></button>
+              <button v-if="!employee.isEditing" class="btn edit-button" @click="editEmployee(employee)"><i class="fas fa-edit"></i></button>
+              <button v-if="employee.isEditing" class="btn btn-success save-button" @click="saveEmployee(employee, index)"><i class="fas fa-save"></i></button>
               <button class="btn delete-button" @click="deleteEmployee(index)"><i class="fas fa-trash"></i></button>
             </div>
           </td>
@@ -132,18 +101,16 @@ const employees = ref([]);
 const departments = ref([]);
 const designations = ref([]);
 const employeeEmails = ref([]);
-const assignedTo = ref([]);
 const newEmployee = ref({
   email: '',
   department_id: '',
   designation_id: '',
-  assigned_to: '',
-  description: '',
-  status: ''
+  first_name: '',
+  last_name: ''
 });
 
 const isAddDisabled = computed(() => {
-  return !newEmployee.value.email || !newEmployee.value.department_id || !newEmployee.value.designation_id || !newEmployee.value.assigned_to || !newEmployee.value.description || !newEmployee.value.status;
+  return !newEmployee.value.email || !newEmployee.value.department_id || !newEmployee.value.designation_id || !newEmployee.value.first_name || !newEmployee.value.last_name;
 });
 
 onMounted(async () => {
@@ -156,16 +123,11 @@ onMounted(async () => {
     });
 
     const data = await response.json();
-    // console.log(data);
 
     departments.value = data.departments;
     designations.value = data.designations;
 
     employeeEmails.value = data.employees.map(employee => employee.email);
-    assignedTo.value = data.employees.map(employee => ({
-      id: employee.id,
-      name: employee.name
-    }));
 
     const storedEmployees = localStorage.getItem('employees');
     if (storedEmployees) {
@@ -186,12 +148,10 @@ const addEmployee = () => {
     email: newEmployee.value.email,
     department_id: newEmployee.value.department_id,
     designation_id: newEmployee.value.designation_id,
-    assigned_to: newEmployee.value.assigned_to,
-    description: newEmployee.value.description,
-    status: newEmployee.value.status,
+    first_name: newEmployee.value.first_name,
+    last_name: newEmployee.value.last_name,
     department: departments.value.find(department => department.id === newEmployee.value.department_id),
     designation: designations.value.find(designation => designation.id === newEmployee.value.designation_id),
-    assigned_to_name: assignedTo.value.find(assigned => assigned.id === newEmployee.value.assigned_to)?.name, // Add the name of the assigned employee
     isEditing: false,
   };
 
@@ -200,38 +160,29 @@ const addEmployee = () => {
   resetForm();
 };
 
-//name of the assigned employee based on their id.
-const getAssignedToName = (assignedToId) => {
-  const assignedEmployee = assignedTo.value.find(assigned => assigned.id === assignedToId);
-  return assignedEmployee ? assignedEmployee.name : ''; // Return the employee's name
-};
-
-//Edit button function 
 const editEmployee = (employee) => {
   employee.isEditing = true;
   newEmployee.value = {
     email: employee.email,
     department_id: employee.department_id,
     designation_id: employee.designation_id,
-    assigned_to: employee.assigned_to,
-    description: employee.description,
-    status: employee.status
+    first_name: employee.first_name,
+    last_name: employee.last_name
   };
 };
-//Save button function 
+
 const saveEmployee = (employee, index) => {
   employee.isEditing = false;
   employees.value[index] = {
     ...employee,
     department: departments.value.find(department => department.id === employee.department_id),
     designation: designations.value.find(designation => designation.id === employee.designation_id),
-    assigned_to_name: assignedTo.value.find(assigned => assigned.id === employee.assigned_to)?.name
   };
 
   localStorage.setItem('employees', JSON.stringify(employees.value));
   resetForm();
 };
-//Deletes a task from the employees array and updates localStorage.
+
 const deleteEmployee = (index) => {
   employees.value.splice(index, 1);
   if (employees.value.length === 0) {
@@ -240,24 +191,15 @@ const deleteEmployee = (index) => {
     localStorage.setItem('employees', JSON.stringify(employees.value));
   }
 };
-//clearing the form fields.Resets the newEmployee
+
 const resetForm = () => {
   newEmployee.value = {
     email: '',
     department_id: '',
     designation_id: '',
-    assigned_to: '',
-    description: '',
-    status: ''
+    first_name: '',
+    last_name: ''
   };
-};
-
-// Method to determine the background color class based on the status
-const statusClass = (status) => {
-  if (status === 'Pending') return 'status-pending';
-  if (status === 'In Progress') return 'status-in-progress';
-  if (status === 'Complete') return 'status-complete';
-  return '';
 };
 </script>
 
@@ -328,7 +270,6 @@ td:nth-child(6) {
 th:nth-child(7),
 td:nth-child(7) {
   width: 8.5%;
-
 }
 
 th:nth-child(8),
@@ -357,14 +298,6 @@ td:nth-child(8) {
   white-space: normal;
   box-shadow: inset 2px 4px 11px rgba(46, 134, 221, 0.5);
   color: rgb(43, 41, 41);
-  font-size: 14px;
-}
-
-th:nth-child(7) {
-  padding: 10px;
-  overflow: hidden;
-  word-wrap: break-word;
-  white-space: normal;
   font-size: 14px;
 }
 
@@ -438,7 +371,6 @@ input:focus {
   display: flex;
   justify-content: center;
   align-items: center;
-
 }
 
 .delete-button:hover {
@@ -462,7 +394,6 @@ input:focus {
 
 .delete-button:hover i {
   color: #f9f9f9;
-
 }
 
 .save-button:hover i {
@@ -496,46 +427,4 @@ button:hover {
   color: black;
 }
 
-.status-pending {
-  background-color: #fadadd;
-  color: #721c24;
-  border: 1px solid #ec2748;
-  font-size: 14px; 
-  box-shadow: inset 2px 4px 11px #721c24;
-}
-
-.status-in-progress {
-  background-color: #fff5d4;
-  color: #856404;
-  border: 1px solid #ecba24;
-  font-size: 14px;
-  box-shadow: inset 2px 4px 11px  #856404;
-}
-
-.status-complete {
-  background-color: #d2ffdd;
-  color: #155724;
-  border: 1px solid #2ac54e;
-  font-size: 14px;
-   box-shadow: inset 2px 4px 11px #155724;
-}
-
-.custom-dropdown {
-  width: 100%;
-  padding: 8px 12px;
-  border-radius: 4px;
-  background-color: #fff;
-  border: 1px solid #59b3e7;
-}
-
-.custom-dropdown:focus {
-  border-color: #4e9bec;
-}
-
-.custom-input {
-  width: 100%;
-  padding: 6px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
 </style>

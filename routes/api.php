@@ -10,21 +10,23 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/welcome', [AuthController::class, 'welcome']);
 
+// Logout and authenticated user routes
 Route::middleware('auth:sanctum')->group(function () {
-    // Logout and authenticated user routes
+    Route::prefix('user')->group(function () {
+        
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', [AuthController::class, 'user']);
-
+    Route::get('/', [AuthController::class, 'user']);
     // Update profile and change password routes
-    Route::put('/user/update', [AuthController::class, 'updateProfile']);
-    Route::put('/user/change-password', [AuthController::class, 'changePassword']);
-
+    Route::put('/update', [AuthController::class, 'updateProfile']);
+    Route::put('/change-password', [AuthController::class, 'changePassword']);
+    });
     // Todo routes
-    Route::get('/todos', [TodoController::class, 'index']);  // Get all todos
-    Route::post('/todos', [TodoController::class, 'store']);  // Create a new todo
-    Route::put('/todos/{id}', [TodoController::class, 'update']);  // Update a specific todo
-    Route::delete('/todos/{id}', [TodoController::class, 'destroy']);  // Delete a specific todo
-
+    Route::prefix('todos')->group(function () {
+    Route::get('/', [TodoController::class, 'index']);  
+    Route::post('/', [TodoController::class, 'store']);  
+    Route::put('/{id}', [TodoController::class, 'update']);  
+    Route::delete('/{id}', [TodoController::class, 'destroy']);  
+ });
     // Department and designation data for dropdown (this is assuming it's for employee data)
     Route::get('/department-designation-data', [EmployeeController::class, 'fetchDropdownData']);
 });

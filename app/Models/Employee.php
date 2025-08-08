@@ -17,10 +17,4 @@ class Employee extends Model
     {
         return $this->belongsTo(Designation::class);
     }
-
-    // Define the relationship for the employee that this employee is "assigned to" (e.g., a manager)
-    public function assignedTo()
-    {
-        return $this->belongsTo(Employee::class, 'assigned_to');
-    }
 }
