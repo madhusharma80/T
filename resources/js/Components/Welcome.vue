@@ -169,7 +169,7 @@ const logout = () => {
   text-decoration: none;
   display: block;
   padding: 10px;
-  font-size: 14px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   gap: 10px;

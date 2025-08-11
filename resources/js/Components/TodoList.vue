@@ -9,6 +9,7 @@
           <i class="fas fa-plus"></i> Add
         </button>
       </div>
+      <!-- Start writing error remove -->
       <p v-if="showError" class="error-message">Task cannot be empty!</p>
       <ul class="todo-list">
         <li v-for="todo in todos" :key="todo.id" class="todo-item">
@@ -20,20 +21,6 @@
           </span>
           <input v-if="todo.isEditing" v-model="todo.title" @keyup.enter="saveEditedTodo(todo)"
             @blur="saveEditedTodo(todo)" class="edit-input" />
-
-          <!-- Employee Assignment Dropdown -->
-          <select v-if="!todo.isEditing && !todo.employee_id" v-model="todo.employee_id" @change="assignEmployeeToTask(todo)" class="assign-dropdown">
-            <option value="">Assign to...</option>
-            <option v-for="employee in employees" :key="employee.id" :value="employee.id">
-              {{ employee.email }}
-            </option>
-          </select>
-
-          <!-- Display Assigned Employee Email -->
-          <p v-if="todo.employee_id" class="assigned-to">
-            Assigned to: {{ getEmployeeEmail(todo.employee_id) }}
-          </p>
-
           <!-- Edit and Delete buttons -->
           <button @click="editTodo(todo)" v-if="!todo.isEditing" class="edit-button">
             <i class="fas fa-edit"></i>
@@ -54,15 +41,12 @@ import axios from 'axios';
 const todos = ref([]);
 const newTodo = ref("");
 const showError = ref(false);
-const employees = ref([]);
 
-// Fetch existing todos and employees when component mounts
+// Fetch existing todos when component mounts
 onMounted(() => {
   fetchTodos();
-  fetchEmployees();
 });
 
-// Fetch all todos from the API
 const fetchTodos = async () => {
   try {
     const response = await axios.get('/api/todos', {
@@ -73,20 +57,6 @@ const fetchTodos = async () => {
     todos.value = response.data;
   } catch (error) {
     console.error('Error fetching todos:', error);
-  }
-};
-
-// Fetch all employees for assignment
-const fetchEmployees = async () => {
-  try {
-    const response = await axios.get('/api/employees', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-    employees.value = response.data;
-  } catch (error) {
-    console.error('Error fetching employees:', error);
   }
 };
 
@@ -131,6 +101,7 @@ const updateTodo = async (todo) => {
 // Set task to edit mode
 const editTodo = (todo) => {
   todo.isEditing = true;
+
 };
 
 // Save edited todo
@@ -171,46 +142,7 @@ const deleteTodo = async (id) => {
     console.error('Error deleting todo:', error);
   }
 };
-
-// Assign employee to task
-const assignEmployeeToTask = async (todo) => {
-  try {
-    await axios.put(`/api/todos/${todo.id}`, {
-      employee_id: todo.employee_id  // Assign employee to task
-    }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-  } catch (error) {
-    console.error('Error assigning employee to task:', error);
-  }
-};
-
-// Get employee email by ID
-const getEmployeeEmail = (employeeId) => {
-  const employee = employees.value.find(emp => emp.id === employeeId);
-  return employee ? employee.email : 'Not Assigned';
-};
 </script>
-
-<style scoped>
-
-.assign-dropdown {
-  padding: 8px;
-  font-size: 14px;
-  margin-right: 10px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-}
-
-.assigned-to {
-  color: #333;
-  font-size: 14px;
-  margin-top: 5px;
-}
-</style>
-
 
 <style scoped>
 .todo-container {

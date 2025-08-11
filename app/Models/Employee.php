@@ -17,4 +17,19 @@ class Employee extends Model
     {
         return $this->belongsTo(Designation::class);
     }
+
+     public function fetchEmployees()
+    {
+        $employees = Employee::all(); // Fetch all employees
+
+        // Return the employees as JSON
+        return response()->json($employees);
+    }
+    // app/Models/Employee.php
+public function tasks()
+{
+    return $this->hasMany(Task::class);
 }
+
+}
+

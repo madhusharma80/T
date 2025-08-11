@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\EmployeeController;
 use Illuminate\Http\Request;
+use App\Http\Controllers\TaskController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -30,8 +31,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Department and designation data for dropdown (this is assuming it's for employee data)
 Route::middleware('auth:sanctum')->post('/add-employee', [EmployeeController::class, 'addEmployee']);
 Route::middleware('auth:sanctum')->get('/department-designation-data', [EmployeeController::class, 'fetchDropdownData']);
+Route::middleware('auth:sanctum')->get('/employees', [EmployeeController::class, 'fetchEmployees']);
+Route::put('/tasks/{task_id}/assign', [TaskController::class, 'assignTask']);
 
 });
+
+
 
 
 

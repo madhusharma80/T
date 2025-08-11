@@ -38,7 +38,16 @@ class EmployeeController extends Controller
             'employees' => $employees,  
         ]);
     }
+
+      public function fetchEmployees()
+    {
+        $employees = Employee::all(); // Fetch all employees
+
+        // Return the employees as JSON
+        return response()->json($employees);
+    }
 }
+
 
 
 
