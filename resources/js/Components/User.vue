@@ -5,7 +5,8 @@
       <thead>
         <tr>
           <th>s.no</th>
-           <th>
+        
+          <th>
             <input v-model="newEmployee.first_name" class="custom-input" type="text" placeholder="First Name" />
           </th>
 
@@ -34,7 +35,6 @@
             </select>
           </th>
 
-          <!-- New Fields: First Name and Last Name -->
          
           <th>
             <button class="btn btn-primary w-100 add-button" @click="addEmployee" :disabled="isAddDisabled"><i class="fas fa-plus"></i>Add</button>
@@ -45,7 +45,14 @@
       <tbody>
         <tr v-for="(employee, index) in employees" :key="index">
           <td>{{ index + 1 }}.</td>
-
+          <td>
+            <span v-if="!employee.isEditing">{{ employee.first_name }}</span>
+            <input v-else v-model="employee.first_name" class="custom-input" type="text" placeholder="First Name" />
+          </td>
+          <td>
+            <span v-if="!employee.isEditing">{{ employee.last_name }}</span>
+            <input v-else v-model="employee.last_name" class="custom-input" type="text" placeholder="Last Name" />
+          </td>
           <td>
             <span v-if="!employee.isEditing">{{ employee.email }}</span>
             <select v-else v-model="employee.email" class="custom-dropdown">
@@ -53,7 +60,6 @@
               <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
             </select>
           </td>
-
           <td>
             <span v-if="!employee.isEditing">{{ employee.department.name }}</span>
             <select v-else v-model="employee.department_id" class="custom-dropdown">
@@ -61,7 +67,6 @@
               <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
           </td>
-
           <td>
             <span v-if="!employee.isEditing">{{ employee.designation.name }}</span>
             <select v-else v-model="employee.designation_id" class="custom-dropdown">
@@ -69,18 +74,6 @@
               <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
             </select>
           </td>
-
-          <!-- New Fields: First Name and Last Name -->
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.first_name }}</span>
-            <input v-else v-model="employee.first_name" class="custom-input" type="text" placeholder="First Name" />
-          </td>
-
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.last_name }}</span>
-            <input v-else v-model="employee.last_name" class="custom-input" type="text" placeholder="Last Name" />
-          </td>
-
           <td>
             <div class="button-group">
               <button v-if="!employee.isEditing" class="btn edit-button" @click="editEmployee(employee)"><i class="fas fa-edit"></i></button>
@@ -96,6 +89,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import axios from 'axios'; 
 
 const employees = ref([]);
 const departments = ref([]);
@@ -129,7 +123,7 @@ onMounted(async () => {
 
     employeeEmails.value = data.employees.map(employee => employee.email);
 
-    const storedEmployees = localStorage.getItem('employees');
+const storedEmployees = localStorage.getItem('employees');
     if (storedEmployees) {
       employees.value = JSON.parse(storedEmployees);
     }
@@ -139,10 +133,33 @@ onMounted(async () => {
   }
 });
 
-const addEmployee = () => {
+const addEmployee = async () => {
   if (isAddDisabled.value) {
     return;
   }
+   const employeeData = {
+    email: newEmployee.value.email,
+    department_id: newEmployee.value.department_id,
+    designation_id: newEmployee.value.designation_id,
+    first_name: newEmployee.value.first_name,
+    last_name: newEmployee.value.last_name,
+  };
+
+    try {
+    // Make a POST request to add the new employee
+    const response = await axios.post('/api/add-employee', employeeData);
+    
+    // After successful addition, update the employees list
+    employees.value.push(response.data.employee);
+    localStorage.setItem('employees', JSON.stringify(employees.value));
+
+    resetForm();
+    alert('Employee added successfully!');
+  } catch (error) {
+    console.error('Error adding employee:', error);
+    alert('Failed to add employee.');
+  }
+
 
   const newEmployeeData = {
     email: newEmployee.value.email,
@@ -426,5 +443,4 @@ button:hover {
   background-color: #f4f4f4;
   color: black;
 }
-
 </style>

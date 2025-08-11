@@ -28,6 +28,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/{id}', [TodoController::class, 'destroy']);  
  });
     // Department and designation data for dropdown (this is assuming it's for employee data)
-    Route::get('/department-designation-data', [EmployeeController::class, 'fetchDropdownData']);
+Route::middleware('auth:sanctum')->post('/add-employee', [EmployeeController::class, 'addEmployee']);
+Route::middleware('auth:sanctum')->get('/department-designation-data', [EmployeeController::class, 'fetchDropdownData']);
+
 });
+
+
+
 
