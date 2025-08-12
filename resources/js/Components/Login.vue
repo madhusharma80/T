@@ -142,7 +142,7 @@ form {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
-  max-width: 400px; /* Maximum width for form */
+  max-width: 450px; /* Maximum width for form */
   padding: 30px;
   background-color: rgba(3, 3, 3, 0.7);
   box-sizing: border-box;
@@ -183,11 +183,6 @@ h4 {
   margin-top: 20px;
   padding: 10px;
   border-radius: 5px;
-}
-
-.alert-success {
-  background-color: #d4edda;
-  color: #155724;
 }
 
 .alert-danger {

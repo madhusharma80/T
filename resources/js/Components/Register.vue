@@ -29,11 +29,11 @@
           </div>
 
           <div class="mt-4 text-center">
-            <button :disabled="isFormInvalid" type="submit" class="btn btn-primary w-100">Sign Up</button>
+            <button type="submit" class="btn btn-primary w-100">Sign Up</button>
             <button @click="goToLogin" type="button" class="btn btn-link mt-3">Already have an account? Login</button>
           </div>
 
-          <div v-if="message" :class="['alert', messageType === 'success' ? 'alert-success' : 'alert-danger', 'mt-3']">
+          <div v-if="message" :class="['alert', messageType === 'success' ? 'alert-success' : 'alert-danger', ]">
             {{ message }}
           </div>
         </form>
@@ -87,7 +87,6 @@ const register = async () => {
   }
 
   if (Object.keys(errors.value).length > 0) {
-    message.value = 'Please fix the validation errors.';
     messageType.value = 'error';
     return;
   }
@@ -164,7 +163,7 @@ input:focus {
 }
 
 .text-danger {
-  font-size: 12px;
+  font-size: 14px;
   text-align: left;
   margin-left: 14px;
 }
@@ -184,11 +183,6 @@ h4 {
   color: #007bff;
   padding: 0;
   text-decoration: underline;
-}
-
-.btn-primary:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
 }
 
 @media (max-width: 576px) {

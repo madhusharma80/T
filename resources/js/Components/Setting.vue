@@ -269,7 +269,7 @@ const updatePassword = async () => {
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  box-shadow: inset 4px 2px  6px rgba(62, 144, 226, 0.5);
+  box-shadow: inset 4px 2px  6px rgba(201, 224, 248, 0.5);
 }
 
 .form-group input:focus {
@@ -292,7 +292,7 @@ button[type="submit"] {
   border-radius: 5px;
   cursor: pointer;
   margin-top: 20px;
-  box-shadow: inset 2px 2px 11px rgba(17, 17, 17, 0.5);
+  box-shadow: inset 2px 2px 8px rgba(17, 17, 17, 0.5);
 }
 
 .btn-secondary:hover {

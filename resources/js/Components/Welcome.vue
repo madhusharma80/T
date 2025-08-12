@@ -15,7 +15,7 @@
             to="/menu"
             active-class="active-link"
             class="sidebar-link">
-            <i class="fas fa-home"></i> MENU</router-link>
+            <i class="fas fa-home"></i> HOME</router-link>
         </li>
         <li>
           <router-link
@@ -112,8 +112,6 @@ const logout = () => {
   display: flex;
   height: 100vh;
 }
-
-/* Sidebar styles */
 .sidebar {
   position: fixed;
   width: 230px;
@@ -169,7 +167,7 @@ const logout = () => {
   text-decoration: none;
   display: block;
   padding: 10px;
-  font-size: 13px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   gap: 10px;

@@ -6,33 +6,27 @@
         <tr>
           <th>s.no</th>
           <th>
-            <input v-model="newEmployee.first_name" class="custom-input" type="text" placeholder="First Name" />
+            <input v-model="newEmployee.first_name" class="custom_nameInput" type="text" placeholder="First Name" />
           </th>
           <th>
-            <input v-model="newEmployee.last_name" class="custom-input" type="text" placeholder="Last Name" />
+            <input v-model="newEmployee.last_name" class="custom_nameInput" type="text" placeholder="Last Name" />
           </th>
           <th>
-            <select v-model="newEmployee.email" class="custom-dropdown">
+            <select v-model="newEmployee.email" class="custom_dropdown">
               <option value="">Email</option>
               <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
             </select>
           </th>
           <th>
-            <select v-model="newEmployee.department_id" class="custom-dropdown">
+            <select v-model="newEmployee.department_id" class="custom_dropdown">
               <option value="">Department</option>
               <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
           </th>
           <th>
-            <select v-model="newEmployee.designation_id" class="custom-dropdown">
+            <select v-model="newEmployee.designation_id" class="custom_dropdown">
               <option value="">Designation</option>
               <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
-            </select>
-          </th>
-          <th>
-            <select v-model="newEmployee.task_id" class="custom-dropdown">
-              <option value="">Assign Task</option>
-              <option v-for="task in tasks" :key="task.id" :value="task.id">{{ task.title }}</option>
             </select>
           </th>
           <th>
@@ -46,40 +40,31 @@
           <td>{{ index + 1 }}.</td>
           <td>
             <span v-if="!employee.isEditing">{{ employee.first_name }}</span>
-            <input v-else v-model="employee.first_name" class="custom-input" type="text" placeholder="First Name" />
+            <input v-else v-model="employee.first_name" class="custom_input" type="text" placeholder="First Name" />
           </td>
           <td>
             <span v-if="!employee.isEditing">{{ employee.last_name }}</span>
-            <input v-else v-model="employee.last_name" class="custom-input" type="text" placeholder="Last Name" />
+            <input v-else v-model="employee.last_name" class="custom_input" type="text" placeholder="Last Name" />
           </td>
           <td>
             <span v-if="!employee.isEditing">{{ employee.email }}</span>
-            <select v-else v-model="employee.email" class="custom-dropdown">
+            <select v-else v-model="employee.email" class="custom_dropdown">
               <option value="">Select Email</option>
               <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
             </select>
           </td>
           <td>
             <span v-if="!employee.isEditing">{{ employee.department.name }}</span>
-            <select v-else v-model="employee.department_id" class="custom-dropdown">
+            <select v-else v-model="employee.department_id" class="custom_dropdown">
               <option value="">Select Department</option>
               <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
           </td>
           <td>
             <span v-if="!employee.isEditing">{{ employee.designation.name }}</span>
-            <select v-else v-model="employee.designation_id" class="custom-dropdown">
+            <select v-else v-model="employee.designation_id" class="custom_dropdown">
               <option value="">Select Designation</option>
               <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
-            </select>
-          </td>
-          <td>
-            <span v-if="!employee.isEditing">
-              {{ employee.task ? employee.task.title : 'No task assigned' }}
-            </span>
-            <select v-else v-model="employee.task_id" class="custom-dropdown">
-              <option value="">Assign Task</option>
-              <option v-for="task in tasks" :key="task.id" :value="task.id">{{ task.title }}</option>
             </select>
           </td>
           <td>
@@ -318,7 +303,7 @@ td:nth-child(8) {
   overflow: hidden;
   word-wrap: break-word;
   white-space: normal;
-  box-shadow: inset 2px 4px 11px rgba(46, 134, 221, 0.5);
+  box-shadow: inset 2px 4px 11px rgba(134, 187, 240, 0.5);
   color: rgb(43, 41, 41);
   font-size: 14px;
 }
@@ -330,7 +315,7 @@ input {
   border: 1px solid #ddd;
   border-radius: 4px;
   background-color: #ffffff;
-  font-size: 14px;
+  font-size: 16px;
   font-family: 'Arial', sans-serif;
   transition: border-color 0.3s ease;
 }
@@ -340,7 +325,7 @@ input:focus {
   border-color: #2c87f0;
   outline: none;
 }
-
+.custom_input 
 .add-button {
   width: 20%;
   padding: 5px;
@@ -353,7 +338,10 @@ input:focus {
   align-items: center;
   gap: 16px;
 }
+.custom_nameInput{
 
+height:35px;
+}
 .add-button:hover {
   background-color: #1675e2;
   color: rgb(247, 246, 246);
