@@ -77,20 +77,22 @@
   </div>
 </template>
 
+
+
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 
-const todos = ref([]);
-const newTodo = ref("");
+const todos = ref([]); // List of todos
+const newTodo = ref(""); // New task input
 const showErrorTask = ref(false);  // For task input error (only show after clicking Add Task)
 const showErrorEmployee = ref(false);  // For employee dropdown error (only show after clicking Assign Task)
-const assignModalOpen = ref(false);
-const selectedEmployee = ref(null);
-const selectedDepartment = ref(null);
-const employees = ref([]);
-const departments = ref([]);
-const selectedTasks = ref([]);
+const assignModalOpen = ref(false); // For showing the assign task modal
+const selectedEmployee = ref(null); // For storing selected employee ID
+const selectedDepartment = ref(null); // For storing selected department ID
+const employees = ref([]); // List of employees for dropdown
+const departments = ref([]); // List of departments for dropdown
+const selectedTasks = ref([]); // List of selected tasks for assignment
 const assignMode = ref(false);  // Track if the input field should show the dropdown or task input
 
 // Watchers for input validation (errors only trigger after clicking respective button)
@@ -107,15 +109,15 @@ watch(selectedEmployee, () => {
 });
 
 onMounted(() => {
-  fetchTodos();
-  fetchDropdownData();
+  fetchTodos(); // Fetch existing todos
+  fetchDropdownData(); // Fetch employee and department dropdown data
 });
 
 const fetchTodos = async () => {
   try {
     const response = await axios.get('/api/todos', {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+        Authorization: `Bearer ${localStorage.getItem('token')}` // Add token for authorization
       }
     });
     todos.value = response.data;
@@ -124,11 +126,12 @@ const fetchTodos = async () => {
   }
 };
 
+// Fetch employees and departments for dropdown
 const fetchDropdownData = async () => {
   try {
     const response = await axios.get('/api/fetchDropdownData');
-    employees.value = response.data.employees;
-    departments.value = response.data.departments;
+    employees.value = response.data.employees; // Set employee list for dropdown
+    departments.value = response.data.departments; // Set department list for dropdown
   } catch (error) {
     console.error('Error fetching dropdown data:', error);
   }
@@ -141,16 +144,17 @@ const addTodo = async () => {
     return;
   }
   showErrorTask.value = false;
+  
   try {
     const response = await axios.post('/api/todos', {
       title: newTodo.value
     }, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+        Authorization: `Bearer ${localStorage.getItem('token')}` // Add token for authorization
       }
     });
     todos.value.push(response.data);
-    newTodo.value = "";
+    newTodo.value = ""; // Clear the input field
   } catch (error) {
     console.error('Error adding todo:', error);
   }
@@ -163,20 +167,22 @@ const openAssignModal = () => {
     return;
   }
 
-  assignModalOpen.value = true;
+  assignModalOpen.value = true; // Open the modal
   assignMode.value = true;  // Switch to dropdown mode
 };
 
+// Close the assign modal
 const closeAssignModal = () => {
   assignModalOpen.value = false;
-  selectedEmployee.value = null;
-  selectedDepartment.value = null;
+  selectedEmployee.value = null;  // Reset employee selection
+  selectedDepartment.value = null;  // Reset department selection
   assignMode.value = false;  // Close the dropdown and return to task input field
 };
 
+// Assign tasks to the selected employee and department
 const assignTask = async () => {
   if (!selectedEmployee.value || !selectedDepartment.value) {
-    showErrorEmployee.value = true;  // Show error if employee or department is not selected when Assign Task is clicked
+    showErrorEmployee.value = true;  // Show error if employee or department is not selected
     alert('Please select both employee and department');
     return;
   }
@@ -188,13 +194,13 @@ const assignTask = async () => {
         department_id: selectedDepartment.value
       }, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${localStorage.getItem('token')}` // Add token for authorization
         }
       });
 
       alert(`Task with ID ${taskId} assigned successfully!`);
     }
-    closeAssignModal();
+    closeAssignModal(); // Close the modal after assignment
     fetchTodos();  // Refresh the todo list
   } catch (error) {
     console.error('Error assigning task:', error);
@@ -206,24 +212,21 @@ const deleteTodo = async (id) => {
   try {
     await axios.delete(`/api/todos/${id}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+        Authorization: `Bearer ${localStorage.getItem('token')}` // Add token for authorization
       }
     });
-    todos.value = todos.value.filter(todo => todo.id !== id);
+    todos.value = todos.value.filter(todo => todo.id !== id); // Remove deleted task from the list
   } catch (error) {
     console.error('Error deleting todo:', error);
   }
 };
 </script>
 
-
-
 <style scoped>
 .text-danger {
   font-size: 12px;
   margin-left: 14px;
 }
-
 form {
   position: fixed;
   top: 30%;
@@ -315,65 +318,6 @@ h4 {
   align-items: center;
 }
 
-
-.add-button:hover, .assign-button:hover {
-  background-color: #45a049;
-  color: rgb(247, 246, 246);
-}
-
-.add-button i, .assign-button i {
-  font-size: 14px;
-}
-
-.todo-input {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid #ddd;
-  border-radius: 5px;
-}
-
-.todo-list {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.todo-item {
-  display: flex;
-  background-color: #fff;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
-}
-
-.todo-checkbox {
-  margin-right: 17px;
-}
-
-.todo-title {
-  flex-grow: 1;
-  font-size: 14px;
-}
-
-.todo-title.completed {
-  text-decoration: line-through;
-  color: #888;
-}
-
-.error-message {
-  color: #a32d20;
-  font-size: 0.9em;
-  margin-top: 0px;
-  margin-bottom: 15px;
-}
-
-.input-error {
-  border-color: #e74c3c !important;
-}
-</style>
-
-<style scoped>
 .todo-container {
   width: 50%;
   max-width: 700px;
@@ -419,8 +363,7 @@ h1 {
 
 
 .todo-input {
-  width: 100%;
-
+  width: 230%;
   padding: 10px;
   font-size: 15px;
   border: 2px solid #ddd;

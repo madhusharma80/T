@@ -31,8 +31,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // Department and designation data for dropdown (this is assuming it's for employee data)
  Route::middleware('auth:sanctum')->post('/employee/add-employee', [EmployeeController::class, 'addEmployee']);
 Route::middleware('auth:sanctum')->post('/add-employee', [EmployeeController::class, 'addEmployee']);
-Route::middleware('auth:sanctum')->get('/department-designation-data', [EmployeeController::class, 'fetchDropdownData']);
+
+// In routes/api.php or routes/web.php
+Route::get('/fetchDropdownData', [EmployeeController::class, 'fetchDropdownData']);
+
 Route::middleware('auth:sanctum')->get('/employees', [EmployeeController::class, 'fetchEmployees']);
 Route::put('/tasks/{task_id}/assign', [TaskController::class, 'assignTask']);
+
+Route::middleware('auth:sanctum')->get('/fetchEmployees', [EmployeeController::class, 'fetchEmployees']);
 
 });
