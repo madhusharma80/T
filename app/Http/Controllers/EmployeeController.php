@@ -11,35 +11,34 @@ class EmployeeController extends Controller
 {
     // Method to fetch departments, designations, and employees for dropdowns
     public function fetchDropdownData()
-{
-    // Fetch departments and designations
-    $departments = Department::all();
-    $designations = Designation::all();
+    {
+        // Fetch departments and designations
+        $departments = Department::all();
+        $designations = Designation::all();
 
-    // Fetch employees with related department and designation data
-    $employees = Employee::with('department', 'designation')
-        ->get()
-        ->map(function ($employee) {
-            $employee->name = $employee->first_name . ' ' . $employee->last_name;
-            
-            // Return the employee object with the full name and relevant details
-            return [
-                'id' => $employee->id,
-                'name' => $employee->name,
-                'email' => $employee->email,
-                'department' => $employee->department,
-                'designation' => $employee->designation,
-            ];
-        });
+        // Fetch employees with related department and designation data
+        $employees = Employee::with('department', 'designation')
+            ->get()
+            ->map(function ($employee) {
+                $employee->name = $employee->first_name . ' ' . $employee->last_name;
+                
+                // Return the employee object with the full name and relevant details
+                return [
+                    'id' => $employee->id,
+                    'name' => $employee->name,
+                    'email' => $employee->email,
+                    'department' => $employee->department,
+                    'designation' => $employee->designation,
+                ];
+            });
 
-    // Return departments, designations, and the employee data in the response
-    return response()->json([
-        'departments' => $departments,
-        'designations' => $designations,
-        'employees' => $employees,
-    ]);
-}
-
+        // Return departments, designations, and the employee data in the response
+        return response()->json([
+            'departments' => $departments,
+            'designations' => $designations,
+            'employees' => $employees,
+        ]);
+    }
 
     // Method to fetch all employees (for displaying employee list)
     public function fetchEmployees()

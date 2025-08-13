@@ -363,8 +363,8 @@ h1 {
 
 
 .todo-input {
-  width: 230%;
-  padding: 10px;
+  width: 190%;
+  padding: 8px;
   font-size: 15px;
   border: 2px solid #ddd;
   border-radius: 5px;
@@ -381,7 +381,6 @@ h1 {
   color: rgb(10, 10, 10);
   border-radius: 5px;
   cursor: pointer;
-  display: flex;
   justify-content: center;
   align-items: center;
   gap: 16px;
@@ -455,7 +454,7 @@ h1 {
 }
 
 .delete-button:hover {
-  background-color: rgb(245, 38, 38);
+  background-color: rgb(199, 54, 54);
   color: #f9f9f9;
 }
 
@@ -487,7 +486,6 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: 7px; 
   border: 0px;
 }
 .assign-button:hover {
