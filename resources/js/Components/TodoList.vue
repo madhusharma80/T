@@ -10,7 +10,7 @@
                  placeholder="Add a new task"
                  class="todo-input"
                  :class="{ 'input-error': showErrorTask }" />
-          <!-- Error Message for Empty Task Input (only shows after clicking Add Task) -->
+          <!-- Error Message for Empty Task Input -->
           <p v-if="showErrorTask" class="error-message">Task cannot be empty!</p>
         </div>
 
@@ -22,11 +22,11 @@
               {{ employee.first_name }} {{ employee.last_name }} ({{ employee.email }})
             </option>
           </select>
-          <!-- Error Message for Empty Employee Selection (only shows after clicking Assign Task) -->
+          <!-- Error Message for Empty Employee Selection -->
           <p v-if="showErrorEmployee" class="error-message">Please select an employee!</p>
         </div>
-        
-        <!-- Add Task and Assign Task Buttons (aligned side by side) -->
+
+        <!-- Add Task and Assign Task Buttons -->
         <div class="buttons-container">
           <button @click="addTodo" class="add-button" :disabled="assignMode">
             <i class="fas fa-plus"></i> Add Task
@@ -55,7 +55,7 @@
     <div v-if="assignModalOpen" class="modal">
       <h3>Assign Task</h3>
       <label for="employee">Employee</label>
-      <select v-model="selectedEmployee" @change="validateEmployee" class="todo-input">
+      <select v-model="selectedEmployee" class="todo-input">
         <option value="" disabled>Select Employee</option>
         <option v-for="employee in employees" :key="employee.id" :value="employee.id">
           {{ employee.first_name }} {{ employee.last_name }} ({{ employee.email }})
@@ -77,47 +77,28 @@
   </div>
 </template>
 
-
-
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
-const todos = ref([]); // List of todos
-const newTodo = ref(""); // New task input
-const showErrorTask = ref(false);  // For task input error (only show after clicking Add Task)
-const showErrorEmployee = ref(false);  // For employee dropdown error (only show after clicking Assign Task)
-const assignModalOpen = ref(false); // For showing the assign task modal
-const selectedEmployee = ref(null); // For storing selected employee ID
-const selectedDepartment = ref(null); // For storing selected department ID
-const employees = ref([]); // List of employees for dropdown
-const departments = ref([]); // List of departments for dropdown
-const selectedTasks = ref([]); // List of selected tasks for assignment
-const assignMode = ref(false);  // Track if the input field should show the dropdown or task input
+const todos = ref([]);
+const newTodo = ref("");
+const showErrorTask = ref(false);
+const showErrorEmployee = ref(false);
+const assignModalOpen = ref(false);
+const selectedEmployee = ref(null);
+const selectedDepartment = ref(null);
+const employees = ref([]);
+const departments = ref([]);
+const selectedTasks = ref([]);
+const assignMode = ref(false);
 
-// Watchers for input validation (errors only trigger after clicking respective button)
-watch(newTodo, () => {
-  if (!newTodo.value.trim()) {
-    showErrorTask.value = false;  // Prevent error message while typing
-  }
-});
-
-watch(selectedEmployee, () => {
-  if (!selectedEmployee.value) {
-    showErrorEmployee.value = false;  // Prevent error message while typing or selecting
-  }
-});
-
-onMounted(() => {
-  fetchTodos(); // Fetch existing todos
-  fetchDropdownData(); // Fetch employee and department dropdown data
-});
-
+// Fetch existing todos
 const fetchTodos = async () => {
   try {
     const response = await axios.get('/api/todos', {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}` // Add token for authorization
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
     todos.value = response.data;
@@ -126,35 +107,34 @@ const fetchTodos = async () => {
   }
 };
 
-// Fetch employees and departments for dropdown
-const fetchDropdownData = async () => {
+// New function to fetch data for Todo list dropdown
+const fetchTodoDropdownData = async () => {
   try {
-    const response = await axios.get('/api/fetchDropdownData');
-    employees.value = response.data.employees; // Set employee list for dropdown
-    departments.value = response.data.departments; // Set department list for dropdown
+    const response = await axios.get('/api/fetchTodoDropdownData');
+    if (response.data) {
+      employees.value = response.data.employees;  // Bind employees data
+      departments.value = response.data.departments;  // Bind departments data
+    }
   } catch (error) {
-    console.error('Error fetching dropdown data:', error);
+    console.error('Error fetching Todo dropdown data:', error);
   }
 };
 
 // Add new task
 const addTodo = async () => {
   if (!newTodo.value.trim()) {
-    showErrorTask.value = true;  // Show error if task is empty when Add Task is clicked
+    showErrorTask.value = true;
     return;
   }
   showErrorTask.value = false;
-  
   try {
-    const response = await axios.post('/api/todos', {
-      title: newTodo.value
-    }, {
+    const response = await axios.post('/api/todos', { title: newTodo.value }, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}` // Add token for authorization
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
     todos.value.push(response.data);
-    newTodo.value = ""; // Clear the input field
+    newTodo.value = "";
   } catch (error) {
     console.error('Error adding todo:', error);
   }
@@ -163,26 +143,26 @@ const addTodo = async () => {
 // Open the assign modal when tasks are selected
 const openAssignModal = () => {
   if (selectedTasks.value.length === 0) {
-    alert('Please select at least one task');  // Show error if no task is selected
+    alert('Please select at least one task');
     return;
   }
 
-  assignModalOpen.value = true; // Open the modal
-  assignMode.value = true;  // Switch to dropdown mode
+  assignModalOpen.value = true;
+  assignMode.value = true;
 };
 
 // Close the assign modal
 const closeAssignModal = () => {
   assignModalOpen.value = false;
-  selectedEmployee.value = null;  // Reset employee selection
-  selectedDepartment.value = null;  // Reset department selection
-  assignMode.value = false;  // Close the dropdown and return to task input field
+  selectedEmployee.value = null;
+  selectedDepartment.value = null;
+  assignMode.value = false;
 };
 
-// Assign tasks to the selected employee and department
+// Assign task
 const assignTask = async () => {
   if (!selectedEmployee.value || !selectedDepartment.value) {
-    showErrorEmployee.value = true;  // Show error if employee or department is not selected
+    showErrorEmployee.value = true;
     alert('Please select both employee and department');
     return;
   }
@@ -194,13 +174,12 @@ const assignTask = async () => {
         department_id: selectedDepartment.value
       }, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}` // Add token for authorization
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-
       alert(`Task with ID ${taskId} assigned successfully!`);
     }
-    closeAssignModal(); // Close the modal after assignment
+    closeAssignModal();
     fetchTodos();  // Refresh the todo list
   } catch (error) {
     console.error('Error assigning task:', error);
@@ -212,15 +191,22 @@ const deleteTodo = async (id) => {
   try {
     await axios.delete(`/api/todos/${id}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}` // Add token for authorization
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
-    todos.value = todos.value.filter(todo => todo.id !== id); // Remove deleted task from the list
+    todos.value = todos.value.filter(todo => todo.id !== id);
   } catch (error) {
     console.error('Error deleting todo:', error);
   }
 };
+
+// Trigger fetch on mounted
+onMounted(() => {
+  fetchTodos();
+  fetchTodoDropdownData();  // Fetch data specifically for Todo dropdown
+});
 </script>
+
 
 <style scoped>
 .text-danger {

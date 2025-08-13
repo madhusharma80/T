@@ -35,54 +35,59 @@
         </tr>
       </thead>
 
-   <tbody>
-  <!-- Loop through the employees array and display employee data dynamically -->
-  <tr v-for="(employee, index) in employees" :key="employee.id"> <!-- Use employee.id as the key for better reactivity -->
-    <td>{{ index + 1 }}.</td>
-    <td>
-      <span v-if="!employee.isEditing">{{ employee.first_name }}</span>
-      <input v-else v-model="employee.first_name" class="custom_input" type="text" placeholder="First Name" />
-    </td>
-    <td>
-      <span v-if="!employee.isEditing">{{ employee.last_name }}</span>
-      <input v-else v-model="employee.last_name" class="custom_input" type="text" placeholder="Last Name" />
-    </td>
-    <td>
-      <span v-if="!employee.isEditing">{{ employee.email }}</span>
-      <select v-else v-model="employee.email" class="custom_dropdown">
-        <option value="">Select Email</option>
-        <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
-      </select>
-    </td>
-    <td>
-      <span v-if="!employee.isEditing">{{ employee.department?.name || 'No Department' }}</span>
-      <select v-else v-model="employee.department_id" class="custom_dropdown">
-        <option value="">Select Department</option>
-        <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
-      </select>
-    </td>
-    <td>
-      <span v-if="!employee.isEditing">{{ employee.designation?.name || 'No Designation' }}</span>
-      <select v-else v-model="employee.designation_id" class="custom_dropdown">
-        <option value="">Select Designation</option>
-        <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
-      </select>
-    </td>
-    <td>
-      <div class="button-group">
-        <button v-if="!employee.isEditing" class="btn edit-button" @click="editEmployee(employee)">
-          <i class="fas fa-edit"></i>
-        </button>
-        <button v-if="employee.isEditing" class="btn btn-success save-button" @click="saveEmployee(employee, index)">
-          <i class="fas fa-save"></i>
-        </button>
-        <button class="btn delete-button" @click="deleteEmployee(index)">
-          <i class="fas fa-trash"></i>
-        </button>
-      </div>
-    </td>
-  </tr>
-</tbody>
+      <tbody>
+        <!-- Loop through the employees array and display employee data dynamically -->
+        <tr v-for="(employee, index) in employees" :key="employee.id">
+          <td>{{ index + 1 }}.</td>
+          <td>
+            <span v-if="!employee.isEditing">{{ employee.first_name }}</span>
+            <input v-else v-model="employee.first_name" class="custom_input" type="text" placeholder="First Name" />
+          </td>
+          <td>
+            <span v-if="!employee.isEditing">{{ employee.last_name }}</span>
+            <input v-else v-model="employee.last_name" class="custom_input" type="text" placeholder="Last Name" />
+          </td>
+          <td>
+            <span v-if="!employee.isEditing">{{ employee.email }}</span>
+            <select v-else v-model="employee.email" class="custom_dropdown">
+              <option value="">Select Email</option>
+              <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
+            </select>
+          </td>
+         <td>
+  <span v-if="!employee.isEditing">{{ employee.department?.name || 'No Department' }}</span>
+  <select v-else v-model="employee.department_id" class="custom_dropdown">
+    <option value="">Select Department</option>
+    <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
+  </select>
+</td>
+
+<!-- Designation -->
+<td>
+  <span v-if="!employee.isEditing">{{ employee.designation?.name || 'No Designation' }}</span>
+  <select v-else v-model="employee.designation_id" class="custom_dropdown">
+    <option value="">Select Designation</option>
+    <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
+  </select>
+</td>
+          <td>
+            <div class="button-group">
+              <!-- Edit Button -->
+              <button v-if="!employee.isEditing" class="btn edit-button" @click="editEmployee(employee)">
+                <i class="fas fa-edit"></i>
+              </button>
+              <!-- Save Button -->
+              <button v-if="employee.isEditing" class="btn btn-success save-button" @click="saveEmployee(employee, index)">
+                <i class="fas fa-save"></i>
+              </button>
+              <!-- Delete Button -->
+              <button class="btn delete-button" @click="deleteEmployee(employee.id, index)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
 
     </table>
   </div>
@@ -115,6 +120,7 @@ const isAddDisabled = computed(() => {
          !newEmployee.value.last_name;
 });
 
+// On mounted, fetch departments, designations, and tasks
 onMounted(async () => {
   try {
     const response = await fetch('/api/department-designation-data', {
@@ -122,7 +128,6 @@ onMounted(async () => {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`  // Include token for authentication
       }
-      
     });
 
     const data = await response.json();
@@ -142,7 +147,6 @@ onMounted(async () => {
     console.error('Error fetching data:', error);
   }
 });
-
 
 // Add employee to the list dynamically
 const addEmployee = async () => {
@@ -179,49 +183,51 @@ const addEmployee = async () => {
     resetForm();
 
   } catch (error) {
-    console.error('Error adding employee:',error);
+    console.error('Error adding employee:', error);
     alert('Failed to add employee.');
   }
 };
 
-
-// Enable editing of employee
+// Edit employee details
 const editEmployee = (employee) => {
   employee.isEditing = true;
-  newEmployee.value = {
-    email: employee.email,
-    department_id: employee.department_id,
-    designation_id: employee.designation_id,
-    first_name: employee.first_name,
-    last_name: employee.last_name,
-    task_id: employee.task_id || '',  // Include task_id for editing employee
-  };
 };
 
-// Save the edited employee
+// Save the edited employee details
 const saveEmployee = (employee, index) => {
   // Mark the employee as not editing
   employee.isEditing = false;
 
-  // Create a new employee object with the updated fields
+  // Find the updated department and designation names
+  const updatedDepartment = departments.value.find(department => department.id === employee.department_id);
+  const updatedDesignation = designations.value.find(designation => designation.id === employee.designation_id);
+
+  // Update the employee object with the new department and designation names
   const updatedEmployee = {
     ...employee,  // Spread the existing employee data
-    department: departments.value.find(department => department.id === employee.department_id),
-    designation: designations.value.find(designation => designation.id === employee.designation_id),
-    task: tasks.value.find(task => task.id === employee.task_id) || null, // If no task assigned, set null
+    department: updatedDepartment, // Assign the full department object
+    designation: updatedDesignation, // Assign the full designation object
   };
 
   // Replace the old employee data in the array with the updated one
   employees.value.splice(index, 1, updatedEmployee);
 
-  // Optionally reset the form
+  // Optionally reset the form (if you want)
   resetForm();
 };
 
-
 // Delete an employee from the list
-const deleteEmployee = (index) => {
-  employees.value.splice(index, 1);
+const deleteEmployee = (employeeId, index) => {
+  axios.delete(`/api/employee/delete-employee/${employeeId}`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`  // Include token for authentication
+    }
+  }).then(() => {
+    // Remove from the employees array after successful deletion
+    employees.value.splice(index, 1);
+  }).catch((error) => {
+    console.error('Error deleting employee:', error);
+  });
 };
 
 // Reset the form fields
@@ -236,7 +242,6 @@ const resetForm = () => {
   };
 };
 </script>
-
 
 <style scoped>
 .title {
