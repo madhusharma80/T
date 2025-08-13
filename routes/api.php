@@ -33,6 +33,8 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->post('/add-employee', [EmployeeController::class, 'addEmployee']);
 Route::middleware('auth:sanctum')->get('/department-designation-data', [EmployeeController::class, 'fetchDropdownData']);
 Route::middleware('auth:sanctum')->get('/employees', [EmployeeController::class, 'fetchEmployees']);
+// In routes/api.php
+Route::delete('/employee/delete-employee/{id}', [EmployeeController::class, 'deleteEmployee']);
 
 
 Route::get('/api/fetchTodoDropdownData', [EmployeeController::class, 'fetchTodoDropdownData']);

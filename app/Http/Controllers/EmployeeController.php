@@ -46,41 +46,43 @@ class EmployeeController extends Controller
         // Fetch all employees and return them as JSON
         $employees = Employee::with('department', 'designation')->get();
 
-        // Map over employees to format their name and email for the dropdown
-        $formattedEmployees = $employees->map(function ($employee) {
-            return [
-                'id' => $employee->id,
-                'first_name' => $employee->first_name,
-                'last_name' => $employee->last_name,
-                'email' => $employee->email,
-                'name' => $employee->first_name . ' ' . $employee->last_name,
-                'department' => $employee->department->name,  // Assuming you have 'name' in department
-                'designation' => $employee->designation->name,  // Assuming you have 'name' in designation
-            ];
-        });
-
-        return response()->json($formattedEmployees);
+        return response()->json($employees);
     }
 
     // Method to add or update a new employee
-    public function addEmployee(Request $request)
-    {
-        // Validate the incoming request
-        $validatedData = $request->validate([
-            'email' => 'required|email',
-            'department_id' => 'required|exists:departments,id',
-            'designation_id' => 'required|exists:designations,id',
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-        ]);
+    // Method to add a new employee
+public function addEmployee(Request $request)
+{
+    // Validate the incoming request
+    $validatedData = $request->validate([
+        'email' => 'required|email',
+        'department_id' => 'required|exists:departments,id',
+        'designation_id' => 'required|exists:designations,id',
+        'first_name' => 'required|string',
+        'last_name' => 'required|string',
+    ]);
 
-        // Create a new employee
-        $employee = Employee::create($validatedData);
+    // Create a new employee
+    $employee = Employee::create($validatedData);
 
-        // Load department and designation details
-        $employee->load('department', 'designation'); // This ensures department and designation are included
+    // Load department and designation details
+    $employee->load('department', 'designation'); // This ensures department and designation are included
 
-        // Return the employee with department and designation
-        return response()->json(['employee' => $employee], 200);  // Send back the full employee object
+    // Return the employee with department and designation
+    return response()->json(['employee' => $employee], 200);  // Send back the full employee object
+}
+// In EmployeeController.php
+public function deleteEmployee($id)
+{
+    $employee = Employee::find($id);
+
+    if (!$employee) {
+        return response()->json(['message' => 'Employee not found.'], 404);
     }
+
+    $employee->delete();  // Delete the employee from the database
+    return response()->json(['message' => 'Employee deleted successfully.'], 200);
+}
+
+
 }

@@ -81,9 +81,10 @@
                 <i class="fas fa-save"></i>
               </button>
               <!-- Delete Button -->
-              <button class="btn delete-button" @click="deleteEmployee(employee.id, index)">
-                <i class="fas fa-trash"></i>
-              </button>
+              <button @click="deleteEmployee(index, employee.id)" class="delete-button">
+  <i class="fas fa-trash"></i>
+</button>
+
             </div>
           </td>
         </tr>
@@ -216,19 +217,27 @@ const saveEmployee = (employee, index) => {
   resetForm();
 };
 
-// Delete an employee from the list
-const deleteEmployee = (employeeId, index) => {
-  axios.delete(`/api/employee/delete-employee/${employeeId}`, {
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`  // Include token for authentication
+const deleteEmployee = async (index, employeeId) => {
+  try {
+    // Send DELETE request to Laravel API
+    const response = await axios.delete(`/api/employee/delete-employee/${employeeId}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}` // Include token for authentication
+      }
+    });
+
+    // On successful deletion, remove the employee from the employees array
+    if (response.status === 200) {
+      employees.value.splice(index, 1);
+      // alert('Employee deleted successfully!');
     }
-  }).then(() => {
-    // Remove from the employees array after successful deletion
-    employees.value.splice(index, 1);
-  }).catch((error) => {
+  } catch (error) {
     console.error('Error deleting employee:', error);
-  });
+    alert('Failed to delete employee.');
+  }
 };
+
+
 
 // Reset the form fields
 const resetForm = () => {
