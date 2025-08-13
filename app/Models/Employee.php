@@ -2,10 +2,23 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Employee extends Model
 {
+    use HasFactory;
+
+    // Add the fields you want to allow mass assignment
+    protected $fillable = [
+        'email',
+        'first_name',
+        'last_name',
+        'department_id',
+        'designation_id',
+        'task_id', // Include task_id if you're assigning tasks to employees
+    ];
+
     // Define the relationship between Employee and Department
     public function department()
     {
@@ -18,18 +31,9 @@ class Employee extends Model
         return $this->belongsTo(Designation::class);
     }
 
-     public function fetchEmployees()
+    // Define the relationship with Task (one-to-many)
+    public function tasks()
     {
-        $employees = Employee::all(); // Fetch all employees
-
-        // Return the employees as JSON
-        return response()->json($employees);
+        return $this->hasMany(Task::class);
     }
-    // app/Models/Employee.php
-public function tasks()
-{
-    return $this->hasMany(Task::class);
 }
-
-}
-

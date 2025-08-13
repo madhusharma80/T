@@ -35,61 +35,68 @@
         </tr>
       </thead>
 
-      <tbody>
-        <tr v-for="(employee, index) in employees" :key="index">
-          <td>{{ index + 1 }}.</td>
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.first_name }}</span>
-            <input v-else v-model="employee.first_name" class="custom_input" type="text" placeholder="First Name" />
-          </td>
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.last_name }}</span>
-            <input v-else v-model="employee.last_name" class="custom_input" type="text" placeholder="Last Name" />
-          </td>
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.email }}</span>
-            <select v-else v-model="employee.email" class="custom_dropdown">
-              <option value="">Select Email</option>
-              <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
-            </select>
-          </td>
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.department.name }}</span>
-            <select v-else v-model="employee.department_id" class="custom_dropdown">
-              <option value="">Select Department</option>
-              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
-            </select>
-          </td>
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.designation.name }}</span>
-            <select v-else v-model="employee.designation_id" class="custom_dropdown">
-              <option value="">Select Designation</option>
-              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
-            </select>
-          </td>
-          <td>
-            <div class="button-group">
-              <button v-if="!employee.isEditing" class="btn edit-button" @click="editEmployee(employee)"><i class="fas fa-edit"></i></button>
-              <button v-if="employee.isEditing" class="btn btn-success save-button" @click="saveEmployee(employee, index)"><i class="fas fa-save"></i></button>
-              <button class="btn delete-button" @click="deleteEmployee(index)"><i class="fas fa-trash"></i></button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
+   <tbody>
+  <!-- Loop through the employees array and display employee data dynamically -->
+  <tr v-for="(employee, index) in employees" :key="employee.id"> <!-- Use employee.id as the key for better reactivity -->
+    <td>{{ index + 1 }}.</td>
+    <td>
+      <span v-if="!employee.isEditing">{{ employee.first_name }}</span>
+      <input v-else v-model="employee.first_name" class="custom_input" type="text" placeholder="First Name" />
+    </td>
+    <td>
+      <span v-if="!employee.isEditing">{{ employee.last_name }}</span>
+      <input v-else v-model="employee.last_name" class="custom_input" type="text" placeholder="Last Name" />
+    </td>
+    <td>
+      <span v-if="!employee.isEditing">{{ employee.email }}</span>
+      <select v-else v-model="employee.email" class="custom_dropdown">
+        <option value="">Select Email</option>
+        <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
+      </select>
+    </td>
+    <td>
+      <span v-if="!employee.isEditing">{{ employee.department?.name || 'No Department' }}</span>
+      <select v-else v-model="employee.department_id" class="custom_dropdown">
+        <option value="">Select Department</option>
+        <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
+      </select>
+    </td>
+    <td>
+      <span v-if="!employee.isEditing">{{ employee.designation?.name || 'No Designation' }}</span>
+      <select v-else v-model="employee.designation_id" class="custom_dropdown">
+        <option value="">Select Designation</option>
+        <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
+      </select>
+    </td>
+    <td>
+      <div class="button-group">
+        <button v-if="!employee.isEditing" class="btn edit-button" @click="editEmployee(employee)">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button v-if="employee.isEditing" class="btn btn-success save-button" @click="saveEmployee(employee, index)">
+          <i class="fas fa-save"></i>
+        </button>
+        <button class="btn delete-button" @click="deleteEmployee(index)">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </td>
+  </tr>
+</tbody>
+
     </table>
   </div>
 </template>
 
-
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import axios from 'axios'; 
+import axios from 'axios';
 
-const employees = ref([]);
-const departments = ref([]);
-const designations = ref([]);
-const employeeEmails = ref([]);
-const tasks = ref([]);  // To store tasks
+const employees = ref([]);  // Dynamically populated employees list
+const departments = ref([]);  // List of departments
+const designations = ref([]);  // List of designations
+const employeeEmails = ref([]);  // List of employee emails for dropdown
+const tasks = ref([]);  // Store tasks
 const newEmployee = ref({
   email: '',
   department_id: '',
@@ -100,7 +107,12 @@ const newEmployee = ref({
 });
 
 const isAddDisabled = computed(() => {
-  return !newEmployee.value.email || !newEmployee.value.department_id || !newEmployee.value.designation_id || !newEmployee.value.first_name || !newEmployee.value.last_name;
+  // Disable the Add button if any field is missing
+  return !newEmployee.value.email || 
+         !newEmployee.value.department_id || 
+         !newEmployee.value.designation_id || 
+         !newEmployee.value.first_name || 
+         !newEmployee.value.last_name;
 });
 
 onMounted(async () => {
@@ -110,6 +122,7 @@ onMounted(async () => {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`  // Include token for authentication
       }
+      
     });
 
     const data = await response.json();
@@ -120,25 +133,25 @@ onMounted(async () => {
     // Fetch tasks data
     const taskResponse = await axios.get('/api/tasks', {  // Make sure your API has a route for fetching tasks
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('token')}` 
       }
     });
     tasks.value = taskResponse.data;
-
-    const storedEmployees = localStorage.getItem('employees');
-    if (storedEmployees) {
-      employees.value = JSON.parse(storedEmployees);
-    }
 
   } catch (error) {
     console.error('Error fetching data:', error);
   }
 });
 
+
+// Add employee to the list dynamically
 const addEmployee = async () => {
+  // Check if the form fields are valid
   if (isAddDisabled.value) {
     return;
   }
+
+  // Prepare the employee data to be sent to the API
   const employeeData = {
     email: newEmployee.value.email,
     department_id: newEmployee.value.department_id,
@@ -149,20 +162,30 @@ const addEmployee = async () => {
   };
 
   try {
-    const response = await axios.post('/api/add-employee', employeeData);
-    
-    // After successful addition, update the employees list
-    employees.value.push(response.data.employee);
-    localStorage.setItem('employees', JSON.stringify(employees.value));
+    // Send the data to the API to add the employee
+    const response = await axios.post('/api/employee/add-employee', employeeData, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}` // Include token for authentication
+      }
+    });
 
+    // Log the response to check if the employee was added successfully
+    console.log(response.data.employee);  // This logs the new employee object from the API response
+
+    // Dynamically add the new employee to the employees array
+    employees.value.push(response.data.employee);  // Add the employee to the employees array
+
+    // Reset the form fields for the next entry
     resetForm();
-    alert('Employee added successfully!');
+
   } catch (error) {
-    console.error('Error adding employee:', error);
+    console.error('Error adding employee:',error);
     alert('Failed to add employee.');
   }
 };
 
+
+// Enable editing of employee
 const editEmployee = (employee) => {
   employee.isEditing = true;
   newEmployee.value = {
@@ -175,29 +198,33 @@ const editEmployee = (employee) => {
   };
 };
 
+// Save the edited employee
 const saveEmployee = (employee, index) => {
+  // Mark the employee as not editing
   employee.isEditing = false;
-  employees.value[index] = {
-    ...employee,
-       department: departments.value.find(department => department.id === employee.department_id),
+
+  // Create a new employee object with the updated fields
+  const updatedEmployee = {
+    ...employee,  // Spread the existing employee data
+    department: departments.value.find(department => department.id === employee.department_id),
     designation: designations.value.find(designation => designation.id === employee.designation_id),
-    task: tasks.value.find(task => task.id === employee.task_id) || null,  // Assign task to employee
+    task: tasks.value.find(task => task.id === employee.task_id) || null, // If no task assigned, set null
   };
 
-  // Update the local storage with the new employee data
-  localStorage.setItem('employees', JSON.stringify(employees.value));
+  // Replace the old employee data in the array with the updated one
+  employees.value.splice(index, 1, updatedEmployee);
+
+  // Optionally reset the form
   resetForm();
 };
 
+
+// Delete an employee from the list
 const deleteEmployee = (index) => {
   employees.value.splice(index, 1);
-  if (employees.value.length === 0) {
-    localStorage.removeItem('employees');
-  } else {
-    localStorage.setItem('employees', JSON.stringify(employees.value));
-  }
 };
 
+// Reset the form fields
 const resetForm = () => {
   newEmployee.value = {
     email: '',
@@ -205,10 +232,11 @@ const resetForm = () => {
     designation_id: '',
     first_name: '',
     last_name: '',
-    task_id: ''  // Reset task_id when form is cleared
+    task_id: '',  // Reset task_id when form is cleared
   };
 };
 </script>
+
 
 <style scoped>
 .title {
