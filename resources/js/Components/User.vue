@@ -131,7 +131,7 @@ onMounted(async () => {
     const response = await fetch('/api/department-designation-data', {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`  // Include token for authentication
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
     });
 
@@ -140,51 +140,54 @@ onMounted(async () => {
     designations.value = data.designations;
     employeeEmails.value = data.employees.map(employee => employee.email);
 
-    // Fetch tasks data
-    const taskResponse = await axios.get('/api/tasks', {  // Make sure your API has a route for fetching tasks
+    const taskResponse = await axios.get('/api/tasks', {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
     });
     tasks.value = taskResponse.data;
 
+    // Load employees from localStorage if available
+    const savedEmployees = localStorage.getItem('employees');
+    if (savedEmployees) {
+      employees.value = JSON.parse(savedEmployees);
+    }
+
   } catch (error) {
     console.error('Error fetching data:', error);
   }
 });
 
+
+
 // Add employee to the list dynamically
 const addEmployee = async () => {
-  // Check if the form fields are valid
   if (isAddDisabled.value) {
     return;
   }
 
-  // Prepare the employee data to be sent to the API
   const employeeData = {
     email: newEmployee.value.email,
     department_id: newEmployee.value.department_id,
     designation_id: newEmployee.value.designation_id,
     first_name: newEmployee.value.first_name,
     last_name: newEmployee.value.last_name,
-    task_id: newEmployee.value.task_id,  // Include task_id here
+    task_id: newEmployee.value.task_id,
   };
 
   try {
-    // Send the data to the API to add the employee
     const response = await axios.post('/api/employee/add-employee', employeeData, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}` // Include token for authentication
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
     });
 
-    // Log the response to check if the employee was added successfully
-    console.log(response.data.employee);  // This logs the new employee object from the API response
+    // Add the new employee to the array
+    employees.value.push(response.data.employee);
 
-    // Dynamically add the new employee to the employees array
-    employees.value.push(response.data.employee);  // Add the employee to the employees array
+    // Store the updated employee list in localStorage
+    localStorage.setItem('employees', JSON.stringify(employees.value));
 
-    // Reset the form fields for the next entry
     resetForm();
 
   } catch (error) {
@@ -200,46 +203,40 @@ const editEmployee = (employee) => {
 
 // Save the edited employee details
 const saveEmployee = (employee, index) => {
-  // Mark the employee as not editing
   employee.isEditing = false;
 
-  // Find the updated department and designation names
-  const updatedDepartment = departments.value.find(department => department.id === employee.department_id);
-  const updatedDesignation = designations.value.find(designation => designation.id === employee.designation_id);
-
-  // Update the employee object with the new department and designation names
   const updatedEmployee = {
-    ...employee,  // Spread the existing employee data
-    department: updatedDepartment, // Assign the full department object
-    designation: updatedDesignation, // Assign the full designation object
+    ...employee,
+    department: departments.value.find(dep => dep.id === employee.department_id),
+    designation: designations.value.find(desig => desig.id === employee.designation_id)
   };
 
-  // Replace the old employee data in the array with the updated one
   employees.value.splice(index, 1, updatedEmployee);
 
-  // Optionally reset the form (if you want)
-  resetForm();
+  // Update localStorage after editing
+  localStorage.setItem('employees', JSON.stringify(employees.value));
 };
 
 const deleteEmployee = async (index, employeeId) => {
   try {
-    // Send DELETE request to Laravel API
     const response = await axios.delete(`/api/employee/delete-employee/${employeeId}`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}` // Include token for authentication
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
     });
 
-    // On successful deletion, remove the employee from the employees array
     if (response.status === 200) {
       employees.value.splice(index, 1);
-      // alert('Employee deleted successfully!');
+
+      // Update localStorage after deletion
+      localStorage.setItem('employees', JSON.stringify(employees.value));
     }
   } catch (error) {
     console.error('Error deleting employee:', error);
     alert('Failed to delete employee.');
   }
 };
+
 
 
 
@@ -268,7 +265,7 @@ const resetForm = () => {
 
 .container {
   width: 100%;
-  max-width: 1040px;
+  max-width: 950px;
   background-color: #f8f9faa1;
   padding: 40px;
   border-radius: 4px;
@@ -294,12 +291,12 @@ th {
 
 th:first-child,
 td:first-child {
-  width: 4.4%;
+  width: 4.3%;
 }
 
 th:nth-child(2),
 td:nth-child(2) {
-  width: 11%;
+  width: 10%;
   padding-left: 15px;
 }
 
@@ -309,7 +306,7 @@ th:nth-child(4),
 td:nth-child(4),
 th:nth-child(5),
 td:nth-child(5) {
-  width: 11%;
+  width: 10%;
 }
 
 th:nth-child(6),

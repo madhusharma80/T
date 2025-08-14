@@ -38,6 +38,8 @@ Route::delete('/employee/delete-employee/{id}', [EmployeeController::class, 'del
 
 // In routes/api.php
 Route::get('employees/emails', [EmployeeController::class, 'getEmployeeEmails']);
+Route::post('/todos/{todo}/assign', [EmployeeController::class, 'assignTask']);
+
 
 
 

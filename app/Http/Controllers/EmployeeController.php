@@ -39,7 +39,6 @@ class EmployeeController extends Controller
             'employees' => $employees,
         ]);
     }
-
     // Method to fetch all employees (for displaying employee list)
     public function fetchEmployees()
     {
@@ -49,7 +48,6 @@ class EmployeeController extends Controller
         return response()->json($employees);
     }
 
-    // Method to add or update a new employee
     // Method to add a new employee
 public function addEmployee(Request $request)
 {
@@ -92,4 +90,40 @@ public function deleteEmployee($id)
         // Return employees data in JSON format
         return response()->json(['employees' => $employees]);
     }
+
+public function assignTask(Request $request, $taskId)
+{
+    $request->validate([
+        'assigned_to' => 'required|exists:employees,id',  // Ensure the selected employee exists
+    ]);
+
+    // Find the task by ID
+    $task = Todo::find($taskId);
+
+    if (!$task) {
+        return response()->json(['error' => 'Task not found'], 404);
+    }
+
+    // Assign task to employee
+    $task->assigned_to = $request->assigned_to;
+    $task->save();
+
+    // Fetch the assigned employee
+    $employee = Employee::find($request->assigned_to);
+
+    // Add the task to the employee's task list (optional)
+    $employee->tasks()->attach($task);  // Or simply use $employee->tasks()->save($task);
+
+    return response()->json(['message' => 'Task assigned successfully!', 'assigned_task' => $task]);
+}
+
+
+public function getEmployeesWithTasks()
+{
+    // Fetch employees along with their assigned tasks
+    $employees = Employee::with('tasks')->get();  // Assuming Employee has a tasks relationship
+
+    return response()->json($employees);
+}
+
 }

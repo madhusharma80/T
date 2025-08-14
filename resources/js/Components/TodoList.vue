@@ -4,7 +4,7 @@
     <div class="sub-container">
       <div class="add-todo">
         <!-- Task input or dropdown based on assignMode -->
-        <div v-if="!assignMode">
+        <div v-if="!assignMode"class="w-50">
           <input v-model="newTodo"
                  type="text"
                  placeholder="Add a new task"
@@ -194,7 +194,7 @@ const closeAssignModal = () => {
 // Assign task
 const assignTask = async () => {
   if (!selectedEmployee.value || !selectedDepartment.value) {
-    showErrorEmployee.value = true;  // Show error if employee or department is not selected when Assign Task is clicked
+    showErrorEmployee.value = true;
     alert('Please select both employee and department');
     return;
   }
@@ -202,13 +202,22 @@ const assignTask = async () => {
   try {
     for (let taskId of selectedTasks.value) {
       const response = await axios.post(`/api/todos/${taskId}/assign`, {
-        assigned_to: selectedEmployee.value,
-        department_id: selectedDepartment.value
+        assigned_to: selectedEmployee.value,  // Selected employee's ID
+        department_id: selectedDepartment.value  // Selected department's ID
       }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
+
+      // Now update the assigned task in the employee list
+      const assignedTask = response.data; // This contains task info and assigned employee
+
+      // Update the employees array to reflect the task assignment in the employee task list
+      const employeeIndex = employees.value.findIndex(employee => employee.email === assignedTask.email);
+      if (employeeIndex !== -1) {
+        employees.value[employeeIndex].tasks.push(assignedTask);  // Add the assigned task to the employee's task list
+      }
 
       alert(`Task with ID ${taskId} assigned successfully!`);
     }
@@ -218,6 +227,7 @@ const assignTask = async () => {
     console.error('Error assigning task:', error);
   }
 };
+
 
 // Delete task
 const deleteTodo = async (id) => {
@@ -333,7 +343,7 @@ h4 {
 
 .todo-container {
   width: 100%;
-  max-width: 700px;
+  max-width: 600px;
   background-color: #f8f9faa1;
   padding: 40px;
   border-radius: 4px;
@@ -371,7 +381,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 20px;
 }
 
 

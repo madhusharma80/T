@@ -31,9 +31,10 @@ class Employee extends Model
         return $this->belongsTo(Designation::class);
     }
 
-    // Define the relationship with Task (one-to-many)
     public function tasks()
     {
-        return $this->hasMany(Task::class);
+        return $this->hasMany(Todo::class, 'assigned_to'); // Assuming 'assigned_to' is the foreign key
     }
 }
+
+
