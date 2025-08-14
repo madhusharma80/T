@@ -36,8 +36,9 @@ Route::middleware('auth:sanctum')->get('/employees', [EmployeeController::class,
 // In routes/api.php
 Route::delete('/employee/delete-employee/{id}', [EmployeeController::class, 'deleteEmployee']);
 
+// In routes/api.php
+Route::get('employees/emails', [EmployeeController::class, 'getEmployeeEmails']);
 
-Route::get('/api/fetchTodoDropdownData', [EmployeeController::class, 'fetchTodoDropdownData']);
 
 
 });

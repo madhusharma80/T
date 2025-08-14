@@ -10,7 +10,6 @@
                  placeholder="Add a new task"
                  class="todo-input"
                  :class="{ 'input-error': showErrorTask }" />
-          <!-- Error Message for Empty Task Input (only shows after clicking Add Task) -->
           <p v-if="showErrorTask" class="error-message">Task cannot be empty!</p>
         </div>
 
@@ -22,7 +21,6 @@
               {{ employee.first_name }} {{ employee.last_name }} ({{ employee.email }})
             </option>
           </select>
-          <!-- Error Message for Empty Employee Selection (only shows after clicking Assign Task) -->
           <p v-if="showErrorEmployee" class="error-message">Please select an employee!</p>
         </div>
         
@@ -111,19 +109,21 @@ onMounted(() => {
   fetchDropdownData();
 });
 
+// Fetch todos from API
 const fetchTodos = async () => {
   try {
     const response = await axios.get('/api/todos', {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
-    }); 
+    });
     todos.value = response.data;
   } catch (error) {
     console.error('Error fetching todos:', error);
   }
 };
 
+// Fetch employees and departments from the backend
 const fetchDropdownData = async () => {
   try {
     const response = await axios.get('/api/fetchDropdownData');
@@ -165,7 +165,24 @@ const openAssignModal = () => {
 
   assignModalOpen.value = true;
   assignMode.value = true;  // Switch to dropdown mode
+  fetchEmployeeEmails();  // Fetch employee emails when modal is opened
 };
+
+// Fetch employee emails for the assign modal dropdown
+const fetchEmployeeEmails = async () => {
+  try {
+    const response = await axios.get('/api/employees/emails', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    console.log('Fetched employee data:', response.data);  // Log to check response
+    employees.value = response.data.employees;  // Populate employees list
+  } catch (error) {
+    console.error('Error fetching employee emails:', error);
+  }
+};
+
 
 const closeAssignModal = () => {
   assignModalOpen.value = false;
@@ -174,6 +191,7 @@ const closeAssignModal = () => {
   assignMode.value = false;  // Close the dropdown and return to task input field
 };
 
+// Assign task
 const assignTask = async () => {
   if (!selectedEmployee.value || !selectedDepartment.value) {
     showErrorEmployee.value = true;  // Show error if employee or department is not selected when Assign Task is clicked
@@ -215,6 +233,7 @@ const deleteTodo = async (id) => {
   }
 };
 </script>
+
 
 <style scoped>
 .text-danger {
@@ -313,7 +332,7 @@ h4 {
 }
 
 .todo-container {
-  width: 50%;
+  width: 100%;
   max-width: 700px;
   background-color: #f8f9faa1;
   padding: 40px;
@@ -357,7 +376,7 @@ h1 {
 
 
 .todo-input {
-  width: 190%;
+  width: 100%;
   padding: 8px;
   font-size: 15px;
   border: 2px solid #ddd;

@@ -84,5 +84,12 @@ public function deleteEmployee($id)
     return response()->json(['message' => 'Employee deleted successfully.'], 200);
 }
 
-
+  public function getEmployeeEmails()
+    {
+        // Fetch only the necessary columns (id, first_name, last_name, email)
+        $employees = Employee::select('id', 'email')->get();
+        
+        // Return employees data in JSON format
+        return response()->json(['employees' => $employees]);
+    }
 }

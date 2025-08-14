@@ -20,17 +20,20 @@
           <th>
             <select v-model="newEmployee.department_id" class="custom_dropdown">
               <option value="">Department</option>
-              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
+              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name
+                }}</option>
             </select>
           </th>
           <th>
             <select v-model="newEmployee.designation_id" class="custom_dropdown">
               <option value="">Designation</option>
-              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
+              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
+                designation.name }}</option>
             </select>
           </th>
           <th>
-            <button class="btn btn-primary w-100 add-button" @click="addEmployee" :disabled="isAddDisabled"><i class="fas fa-plus"></i>Add</button>
+            <button class="btn btn-primary w-100 add-button" @click="addEmployee" :disabled="isAddDisabled"><i
+                class="fas fa-plus"></i>Add</button>
           </th>
         </tr>
       </thead>
@@ -54,22 +57,24 @@
               <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
             </select>
           </td>
-         <td>
-  <span v-if="!employee.isEditing">{{ employee.department?.name || 'No Department' }}</span>
-  <select v-else v-model="employee.department_id" class="custom_dropdown">
-    <option value="">Select Department</option>
-    <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
-  </select>
-</td>
+          <td>
+            <span v-if="!employee.isEditing">{{ employee.department?.name || 'No Department' }}</span>
+            <select v-else v-model="employee.department_id" class="custom_dropdown">
+              <option value="">Select Department</option>
+              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name
+                }}</option>
+            </select>
+          </td>
 
-<!-- Designation -->
-<td>
-  <span v-if="!employee.isEditing">{{ employee.designation?.name || 'No Designation' }}</span>
-  <select v-else v-model="employee.designation_id" class="custom_dropdown">
-    <option value="">Select Designation</option>
-    <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
-  </select>
-</td>
+          <!-- Designation -->
+          <td>
+            <span v-if="!employee.isEditing">{{ employee.designation?.name || 'No Designation' }}</span>
+            <select v-else v-model="employee.designation_id" class="custom_dropdown">
+              <option value="">Select Designation</option>
+              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
+                designation.name }}</option>
+            </select>
+          </td>
           <td>
             <div class="button-group">
               <!-- Edit Button -->
@@ -77,19 +82,18 @@
                 <i class="fas fa-edit"></i>
               </button>
               <!-- Save Button -->
-              <button v-if="employee.isEditing" class="btn btn-success save-button" @click="saveEmployee(employee, index)">
+              <button v-if="employee.isEditing" class="btn btn-success save-button"
+                @click="saveEmployee(employee, index)">
                 <i class="fas fa-save"></i>
               </button>
               <!-- Delete Button -->
               <button @click="deleteEmployee(index, employee.id)" class="delete-button">
-  <i class="fas fa-trash"></i>
-</button>
-
+                <i class="fas fa-trash"></i>
+              </button>
             </div>
           </td>
         </tr>
       </tbody>
-
     </table>
   </div>
 </template>
@@ -114,11 +118,11 @@ const newEmployee = ref({
 
 const isAddDisabled = computed(() => {
   // Disable the Add button if any field is missing
-  return !newEmployee.value.email || 
-         !newEmployee.value.department_id || 
-         !newEmployee.value.designation_id || 
-         !newEmployee.value.first_name || 
-         !newEmployee.value.last_name;
+  return !newEmployee.value.email ||
+    !newEmployee.value.department_id ||
+    !newEmployee.value.designation_id ||
+    !newEmployee.value.first_name ||
+    !newEmployee.value.last_name;
 });
 
 // On mounted, fetch departments, designations, and tasks
@@ -139,7 +143,7 @@ onMounted(async () => {
     // Fetch tasks data
     const taskResponse = await axios.get('/api/tasks', {  // Make sure your API has a route for fetching tasks
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}` 
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
     });
     tasks.value = taskResponse.data;
@@ -367,8 +371,8 @@ input:focus {
   border-color: #2c87f0;
   outline: none;
 }
-.custom_input 
-.add-button {
+
+.custom_input .add-button {
   width: 20%;
   padding: 5px;
   border-color: #4396f5;
@@ -380,10 +384,12 @@ input:focus {
   align-items: center;
   gap: 16px;
 }
-.custom_nameInput{
 
-height:35px;
+.custom_nameInput {
+
+  height: 35px;
 }
+
 .add-button:hover {
   background-color: #1675e2;
   color: rgb(247, 246, 246);
