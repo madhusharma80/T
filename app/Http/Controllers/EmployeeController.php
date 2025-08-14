@@ -69,7 +69,7 @@ public function addEmployee(Request $request)
     // Return the employee with department and designation
     return response()->json(['employee' => $employee], 200);  // Send back the full employee object
 }
-// In EmployeeController.php
+// function for  delete button which is place in the Employee task management  list 
 public function deleteEmployee($id)
 {
     $employee = Employee::find($id);
@@ -91,39 +91,42 @@ public function deleteEmployee($id)
         return response()->json(['employees' => $employees]);
     }
 
-public function assignTask(Request $request, $taskId)
-{
-    $request->validate([
-        'assigned_to' => 'required|exists:employees,id',  // Ensure the selected employee exists
-    ]);
+    //assign task  
+   public function assignTask(Request $request, $taskId)
+    {
+        // Validate input
+        $validated = $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+        ]);
 
-    // Find the task by ID
-    $task = Todo::find($taskId);
+        // Find the task
+        $task = Task::findOrFail($taskId);
 
-    if (!$task) {
-        return response()->json(['error' => 'Task not found'], 404);
+        // Check if the task is already assigned to this employee
+        $existingAssignment = EmployeeTask::where('task_id', $taskId)
+                                          ->where('employee_id', $validated['employee_id'])
+                                          ->first();
+        if ($existingAssignment) {
+            return response()->json(['message' => 'Task is already assigned to this employee.'], 400);
+        }
+
+        // Assign the task to the employee
+        $employeeTask = new EmployeeTask();
+        $employeeTask->employee_id = $validated['employee_id'];
+        $employeeTask->task_id = $taskId;
+        $employeeTask->save();
+
+        // Return success message
+        return response()->json(['message' => 'Task assigned successfully!'], 200);
     }
 
-    // Assign task to employee
-    $task->assigned_to = $request->assigned_to;
-    $task->save();
-
-    // Fetch the assigned employee
-    $employee = Employee::find($request->assigned_to);
-
-    // Add the task to the employee's task list (optional)
-    $employee->tasks()->attach($task);  // Or simply use $employee->tasks()->save($task);
-
-    return response()->json(['message' => 'Task assigned successfully!', 'assigned_task' => $task]);
+    // Fetch tasks assigned to an employee
+    public function fetchEmployeeTasks($employeeId)
+    {
+        // Fetch tasks related to the employee
+        $employee = Employee::with('tasks')->findOrFail($employeeId);
+        return response()->json($employee->tasks);
+    }
 }
 
 
-public function getEmployeesWithTasks()
-{
-    // Fetch employees along with their assigned tasks
-    $employees = Employee::with('tasks')->get();  // Assuming Employee has a tasks relationship
-
-    return response()->json($employees);
-}
-
-}

@@ -63,4 +63,21 @@ class TodoController extends Controller
 
         return response()->json(['message' => 'Todo deleted successfully'], Response::HTTP_OK);
     }
+    public function addTodo(Request $request)
+{
+    // Validate the incoming request
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+    ]);
+
+    // Create a new task
+    $todo = Todo::create([
+        'title' => $validated['title'],
+        'completed' => false, // default to false
+    ]);
+
+    // Return the created task in the response
+    return response()->json($todo, 201);
+}
+
 }

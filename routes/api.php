@@ -38,9 +38,13 @@ Route::delete('/employee/delete-employee/{id}', [EmployeeController::class, 'del
 
 // In routes/api.php
 Route::get('employees/emails', [EmployeeController::class, 'getEmployeeEmails']);
-Route::post('/todos/{todo}/assign', [EmployeeController::class, 'assignTask']);
+// Route::post('/todos/{todo}/assign', [EmployeeController::class, 'assignTask']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/tasks/{taskId}/assign', [EmployeeTaskController::class, 'assignTask']);
+    Route::get('/employee/{employeeId}/tasks', [EmployeeTaskController::class, 'fetchEmployeeTasks']);
+});
 
 
-
-
+Route::middleware('auth:sanctum')->post('/todos', [TodoController::class, 'addTodo']);
 });

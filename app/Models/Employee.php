@@ -31,10 +31,14 @@ class Employee extends Model
         return $this->belongsTo(Designation::class);
     }
 
-    public function tasks()
+
+
+
+    public function todos()
     {
-        return $this->hasMany(Todo::class, 'assigned_to'); // Assuming 'assigned_to' is the foreign key
+        return $this->hasMany(Todo::class, 'assigned_to');
     }
+    
 }
 
 

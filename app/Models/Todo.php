@@ -2,13 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Todo extends Model
 {
-    use HasFactory;
+    protected $fillable = ['title', 'assigned_to', 'department_id'];
 
-    protected $fillable = ['title', 'completed'];
+    public function assignedEmployee()
+    {
+        return $this->belongsTo(Employee::class, 'assigned_to');
+    }
+
+    public function assignedDepartment()
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
 }
 
