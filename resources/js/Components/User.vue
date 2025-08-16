@@ -239,7 +239,7 @@ const editEmployee = (employee) => {
 };
 
 // Save the edited employee details
-const saveEmployee = (employee, index) => {
+const saveEmployee = async (employee, index) => {
   employee.isEditing = false;
 
   const updatedEmployee = {
@@ -248,11 +248,25 @@ const saveEmployee = (employee, index) => {
     designation: designations.value.find(desig => desig.id === employee.designation_id)
   };
 
-  employees.value.splice(index, 1, updatedEmployee);
+  try {
+    const response = await axios.put(`/api/employee/update-employee/${employee.id}`, updatedEmployee, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
 
-  // Update employee list with pagination
-  fetchEmployees(paginatedEmployees.value.current_page);
+    if (response.status === 200) {
+      paginatedEmployees.value.data[index] = updatedEmployee;
+      fetchEmployees(paginatedEmployees.value.current_page);
+    }
+
+  } catch (error) {
+    console.error('Error saving employee:', error);
+    alert('Failed to save employee.');
+  }
 };
+
+
 
 // Delete employee
 const deleteEmployee = async (index, employeeId) => {

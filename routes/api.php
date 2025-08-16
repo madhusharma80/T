@@ -28,14 +28,16 @@ Route::prefix('todos')->group(function () {
     Route::put('/{id}', [TodoController::class, 'update']);  
     Route::delete('/{id}', [TodoController::class, 'destroy']);  
  });
-    // Department and designation data for dropdown
+    // Department and designation data for dropdown ETML
     Route::post('employee/add-employee', [EmployeeController::class, 'addEmployee']);
     Route::get('/department-designation-data', [EmployeeController::class, 'fetchDropdownData']);
     Route::get('/employees', [EmployeeController::class, 'fetchEmployees']);
     // In routes/api.php
     Route::delete('/employee/delete-employee/{id}', [EmployeeController::class, 'deleteEmployee']);
+    Route::put('/employee/update-employee/{id}', [EmployeeController::class, 'updateEmployee']);
 
-    // In routes/api.php
+
+    // Todo list routes
     Route::get('employees/emails', [EmployeeController::class, 'getEmployeeEmails']);
     Route::post('/tasks/{taskId}/assign', [EmployeeTaskController::class, 'assignTask']);
 
@@ -46,5 +48,3 @@ Route::prefix('todos')->group(function () {
 
  
 });
-
-

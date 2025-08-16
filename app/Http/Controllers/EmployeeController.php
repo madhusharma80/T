@@ -74,8 +74,34 @@ public function deleteEmployee($id)
     $employee->delete();  // Delete the employee from the database
     return response()->json(['message' => 'Employee deleted successfully.'], 200);
 }
+// In EmployeeController.php
+public function updateEmployee(Request $request, $id)
+{
+    // Fetch employee by ID
+    $employee = Employee::findOrFail($id);
 
-  public function getEmployeeEmails()
+    // If email is updated, apply unique validation
+    $emailValidation = $employee->email === $request->email
+        ? 'required|email'
+        : 'required|email|unique:employees,email';
+
+    // Validate the request data
+    $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => $emailValidation,
+        'department_id' => 'required|exists:departments,id',
+        'designation_id' => 'required|exists:designations,id',
+    ]);
+
+    // Update the employee details
+    $employee->update($request->all());
+
+    return response()->json($employee);
+}
+
+
+public function getEmployeeEmails()
     {
         // Fetch only the necessary columns (id, first_name, last_name, email)
         $employees = Employee::select('id', 'email')->get();
@@ -85,7 +111,7 @@ public function deleteEmployee($id)
     }
 
     //assign task  
-   public function assignTask(Request $request, $taskId)
+public function assignTask(Request $request, $taskId)
     {
         // Validate input
         $validated = $request->validate([
@@ -114,7 +140,7 @@ public function deleteEmployee($id)
     }
 
     
-   public function fetchEmployees(Request $request)
+public function fetchEmployees(Request $request)
 {
     // Paginate the results, limiting to 3 employees per page
     $employees = Employee::with('department', 'designation')
@@ -123,5 +149,3 @@ public function deleteEmployee($id)
     return response()->json($employees);
 }
 }
-
-
