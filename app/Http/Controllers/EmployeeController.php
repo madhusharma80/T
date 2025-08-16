@@ -39,14 +39,7 @@ class EmployeeController extends Controller
             'employees' => $employees,
         ]);
     }
-    // Method to fetch all employees (for displaying employee list)
-    public function fetchEmployees()
-    {
-        // Fetch all employees and return them as JSON
-        $employees = Employee::with('department', 'designation')->get();
 
-        return response()->json($employees);
-    }
 
     // Method to add a new employee
 public function addEmployee(Request $request)
@@ -104,8 +97,8 @@ public function deleteEmployee($id)
 
         // Check if the task is already assigned to this employee
         $existingAssignment = EmployeeTask::where('task_id', $taskId)
-                                          ->where('employee_id', $validated['employee_id'])
-                                          ->first();
+        ->where('employee_id', $validated['employee_id'])
+        ->first();
         if ($existingAssignment) {
             return response()->json(['message' => 'Task is already assigned to this employee.'], 400);
         }
@@ -120,13 +113,15 @@ public function deleteEmployee($id)
         return response()->json(['message' => 'Task assigned successfully!'], 200);
     }
 
-    // Fetch tasks assigned to an employee
-    public function fetchEmployeeTasks($employeeId)
-    {
-        // Fetch tasks related to the employee
-        $employee = Employee::with('tasks')->findOrFail($employeeId);
-        return response()->json($employee->tasks);
-    }
+    
+   public function fetchEmployees(Request $request)
+{
+    // Paginate the results, limiting to 3 employees per page
+    $employees = Employee::with('department', 'designation')
+        ->paginate(3);  // Limit to 3 employees per page
+
+    return response()->json($employees);
+}
 }
 
 

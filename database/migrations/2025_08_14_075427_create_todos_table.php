@@ -13,8 +13,8 @@ public function up()
 {
     Schema::create('todos', function (Blueprint $table) {
         $table->id(); // Auto-increment ID
-        $table->string('title'); // Task title
-        $table->unsignedBigInteger('assigned_to')->nullable(); // FK to Employee (nullable in case unassigned)
+        $table->string('Task'); // Task title
+        $table->unsignedBigInteger('assigned_to')->nullable(); 
         $table->unsignedBigInteger('department_id')->nullable(); // FK to Department (nullable in case unassigned)
         $table->timestamps(); // To track created_at and updated_at
 
@@ -28,6 +28,5 @@ public function down()
 {
     Schema::dropIfExists('todos');
 }
-
 
 };

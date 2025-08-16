@@ -39,9 +39,9 @@
       </thead>
 
       <tbody>
-        <!-- Loop through the employees array and display employee data dynamically -->
-        <tr v-for="(employee, index) in employees" :key="employee.id">
-          <td>{{ index + 1 }}.</td>
+        <!-- Loop through the paginated employees array and display employee data dynamically -->
+        <tr v-for="(employee, index) in paginatedEmployees.data" :key="employee.id">
+          <td>{{ index + 1 + ((paginatedEmployees.current_page - 1) * paginatedEmployees.per_page) }}.</td>
           <td>
             <span v-if="!employee.isEditing">{{ employee.first_name }}</span>
             <input v-else v-model="employee.first_name" class="custom_input" type="text" placeholder="First Name" />
@@ -95,6 +95,21 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+      <button @click="changePage(paginatedEmployees.current_page - 1)"
+        :disabled="paginatedEmployees.current_page === 1">
+        Previous
+      </button>
+
+      <span>Page {{ paginatedEmployees.current_page }} of {{ paginatedEmployees.last_page }}</span>
+
+      <button @click="changePage(paginatedEmployees.current_page + 1)"
+        :disabled="paginatedEmployees.current_page === paginatedEmployees.last_page">
+        Next
+      </button>
+    </div>
   </div>
 </template>
 
@@ -107,6 +122,13 @@ const departments = ref([]);  // List of departments
 const designations = ref([]);  // List of designations
 const employeeEmails = ref([]);  // List of employee emails for dropdown
 const tasks = ref([]);  // Store tasks
+const paginatedEmployees = ref({
+  data: [],
+  current_page: 1,
+  last_page: 1,
+  per_page: 3,  // Show 3 employees per page
+});  // Store paginated employee data
+
 const newEmployee = ref({
   email: '',
   department_id: '',
@@ -125,7 +147,7 @@ const isAddDisabled = computed(() => {
     !newEmployee.value.last_name;
 });
 
-// On mounted, fetch departments, designations, and tasks
+// On mounted, fetch departments, designations, tasks, and employees
 onMounted(async () => {
   try {
     const response = await fetch('/api/department-designation-data', {
@@ -147,18 +169,27 @@ onMounted(async () => {
     });
     tasks.value = taskResponse.data;
 
-    // Load employees from localStorage if available
-    const savedEmployees = localStorage.getItem('employees');
-    if (savedEmployees) {
-      employees.value = JSON.parse(savedEmployees);
-    }
+    // Load employees from API with pagination
+    fetchEmployees(1);
 
   } catch (error) {
     console.error('Error fetching data:', error);
   }
 });
 
-
+// Fetch paginated employees
+const fetchEmployees = async (page = 1) => {
+  try {
+    const response = await axios.get(`/api/employees?page=${page}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    paginatedEmployees.value = response.data;  // Store paginated employees
+  } catch (error) {
+    console.error('Error fetching employees:', error);
+  }
+};
 
 // Add employee to the list dynamically
 const addEmployee = async () => {
@@ -182,11 +213,8 @@ const addEmployee = async () => {
       }
     });
 
-    // Add the new employee to the array
-    employees.value.push(response.data.employee);
-
-    // Store the updated employee list in localStorage
-    localStorage.setItem('employees', JSON.stringify(employees.value));
+    // Add the new employee to the array and reload the list with pagination
+    fetchEmployees(paginatedEmployees.value.current_page); // Reload with current page
 
     resetForm();
 
@@ -213,10 +241,11 @@ const saveEmployee = (employee, index) => {
 
   employees.value.splice(index, 1, updatedEmployee);
 
-  // Update localStorage after editing
-  localStorage.setItem('employees', JSON.stringify(employees.value));
+  // Update employee list with pagination
+  fetchEmployees(paginatedEmployees.value.current_page);
 };
 
+// Delete employee
 const deleteEmployee = async (index, employeeId) => {
   try {
     const response = await axios.delete(`/api/employee/delete-employee/${employeeId}`, {
@@ -226,10 +255,7 @@ const deleteEmployee = async (index, employeeId) => {
     });
 
     if (response.status === 200) {
-      employees.value.splice(index, 1);
-
-      // Update localStorage after deletion
-      localStorage.setItem('employees', JSON.stringify(employees.value));
+      fetchEmployees(paginatedEmployees.value.current_page);
     }
   } catch (error) {
     console.error('Error deleting employee:', error);
@@ -237,8 +263,12 @@ const deleteEmployee = async (index, employeeId) => {
   }
 };
 
-
-
+// Change page for pagination
+const changePage = (page) => {
+  if (page > 0 && page <= paginatedEmployees.value.last_page) {
+    fetchEmployees(page);
+  }
+};
 
 // Reset the form fields
 const resetForm = () => {
@@ -348,7 +378,7 @@ td:nth-child(8) {
   white-space: normal;
   box-shadow: inset 2px 4px 11px rgba(134, 187, 240, 0.5);
   color: rgb(43, 41, 41);
-  font-size: 14px;
+  font-size: 14.7px;
 }
 
 select,
@@ -383,7 +413,6 @@ input:focus {
 }
 
 .custom_nameInput {
-
   height: 35px;
 }
 
@@ -481,20 +510,23 @@ button:hover {
   background-color: #f4f4f4;
   color: black;
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f1f1f1;
+}
+
+.pagination button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

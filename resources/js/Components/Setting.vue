@@ -269,7 +269,7 @@ const updatePassword = async () => {
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  box-shadow: inset 4px 2px  6px rgba(201, 224, 248, 0.5);
+  box-shadow: inset 4px 2px 6px rgba(201, 224, 248, 0.5);
 }
 
 .form-group input:focus {

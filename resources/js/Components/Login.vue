@@ -5,27 +5,19 @@
         <form @submit.prevent="login">
           <h4>LOGIN</h4>
           <div class="mb-4">
-            <input 
-              v-model="email" 
-              type="email" 
-              class="form-control" 
-              placeholder="Email"/>
+            <input v-model="email" type="email" class="form-control" placeholder="Email" />
             <span v-if="errors.email" class="text-danger">{{ errors.email[0] }}</span>
           </div>
           <div class="mb-4">
-            <input 
-              v-model="password" 
-              type="password" 
-              class="form-control" 
-              placeholder="Password"/>
+            <input v-model="password" type="password" class="form-control" placeholder="Password" />
             <span v-if="errors.password" class="text-danger">{{ errors.password[0] }}</span>
           </div>
           <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary w-48">Login</button>
             <button @click="goToSignup" type="button" class="btn btn-secondary w-48">Signup</button>
           </div>
-          <div v-if="message" :class="[ 
-            'alert', 
+          <div v-if="message" :class="[
+            'alert',
             messageType === 'success' ? 'alert-success' : 'alert-danger', 'mt-3']">
             {{ message }}
           </div>
@@ -49,7 +41,7 @@ const messageType = ref('');
 const router = useRouter();
 
 const validateForm = () => {
-  errors.value = {}; 
+  errors.value = {};
 
   let isValid = true;
 
@@ -76,7 +68,7 @@ watch(email, () => {
   if (email.value && !/\S+@\S+\.\S+/.test(email.value)) {
     errors.value.email = ['Please enter a valid email'];
   } else {
-    errors.value.email = null; 
+    errors.value.email = null;
   }
 });
 
@@ -84,7 +76,7 @@ watch(password, () => {
   if (password.value.length < 6) {
     errors.value.password = ['Password must be at least 6 characters'];
   } else {
-    errors.value.password = null; 
+    errors.value.password = null;
   }
 });
 
@@ -104,13 +96,13 @@ const login = async () => {
 
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('userName', response.data.user.name); 
+      localStorage.setItem('userName', response.data.user.name);
       localStorage.setItem('userEmail', response.data.user.email);
       localStorage.setItem('userPassword', response.data.user.password);
 
       // Set the Bearer token for all axios requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-      
+
       router.push('/welcome');
     } else {
       message.value = 'Login failed. Please check your credentials.';
@@ -142,7 +134,8 @@ form {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
-  max-width: 450px; /* Maximum width for form */
+  max-width: 450px;
+  /* Maximum width for form */
   padding: 30px;
   background-color: rgba(3, 3, 3, 0.7);
   box-sizing: border-box;
@@ -192,26 +185,26 @@ h4 {
 
 @media (max-width: 576px) {
   form {
-    padding: 20px; 
+    padding: 20px;
   }
 
   h4 {
-    font-size: 20px; 
+    font-size: 20px;
   }
 
   .w-48 {
-    width: 100%; 
-    margin-bottom: 10px; 
+    width: 100%;
+    margin-bottom: 10px;
   }
 
   .alert {
-    font-size: 12px; 
+    font-size: 12px;
   }
 }
 
 @media (max-width: 768px) and (min-width: 577px) {
   .w-48 {
-    width: 48%; 
+    width: 48%;
   }
 }
 </style>

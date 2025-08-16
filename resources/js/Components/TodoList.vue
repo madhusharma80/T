@@ -4,12 +4,9 @@
     <div class="sub-container">
       <div class="add-todo">
         <!-- Task input or dropdown based on assignMode -->
-        <div v-if="!assignMode"class="w-50">
-          <input v-model="newTodo"
-                 type="text"
-                 placeholder="Add a new task"
-                 class="todo-input"
-                 :class="{ 'input-error': showErrorTask }" />
+        <div v-if="!assignMode" class="w-50">
+          <input v-model="newTodo" type="text" placeholder="Add a new task" class="todo-input"
+            :class="{ 'input-error': showErrorTask }" />
           <p v-if="showErrorTask" class="error-message">Task cannot be empty!</p>
         </div>
 
@@ -23,14 +20,14 @@
           </select>
           <p v-if="showErrorEmployee" class="error-message">Please select an employee!</p>
         </div>
-        
+
         <!-- Add Task and Assign Task Buttons (aligned side by side) -->
         <div class="buttons-container">
           <button @click="addTodo" class="add-button" :disabled="assignMode">
             <i class="fas fa-plus"></i> Add Task
           </button>
           <button @click="openAssignModal" class="assign-button" :disabled="!selectedTasks.length">
-            <i class="fas fa-user-plus"></i> Assign 
+            <i class="fas fa-user-plus"></i> Assign
           </button>
         </div>
       </div>
@@ -74,6 +71,8 @@
     </div>
   </div>
 </template>
+
+
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
@@ -183,7 +182,6 @@ const fetchEmployeeEmails = async () => {
   }
 };
 
-
 const closeAssignModal = () => {
   assignModalOpen.value = false;
   selectedEmployee.value = null;
@@ -200,6 +198,7 @@ const assignTask = async () => {
   }
 
   try {
+    // Loop through the selected tasks to assign them one by one
     for (let taskId of selectedTasks.value) {
       const response = await axios.post(`/api/todos/${taskId}/assign`, {
         assigned_to: selectedEmployee.value,  // Selected employee's ID
@@ -221,8 +220,20 @@ const assignTask = async () => {
 
       alert(`Task with ID ${taskId} assigned successfully!`);
     }
+
+    // After assigning the task, set assignMode to false to show the input field
+    assignMode.value = false;  // Switch back to the task input field (hide dropdown)
+
+    // Close the modal
     closeAssignModal();
+
+    // Fetch the updated list of tasks
     fetchTodos();  // Refresh the todo list
+
+    // Clear the selected employee and department
+    selectedEmployee.value = null;
+    selectedDepartment.value = null;
+
   } catch (error) {
     console.error('Error assigning task:', error);
   }
@@ -250,13 +261,15 @@ const deleteTodo = async (id) => {
   font-size: 12px;
   margin-left: 14px;
 }
+
 form {
   position: fixed;
   top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
-  max-width: 450px; /* Maximum width for form */
+  max-width: 450px;
+  /* Maximum width for form */
   padding: 30px;
   background-color: rgba(3, 3, 3, 0.7);
   box-sizing: border-box;
@@ -306,26 +319,26 @@ h4 {
 
 @media (max-width: 576px) {
   form {
-    padding: 20px; 
+    padding: 20px;
   }
 
   h4 {
-    font-size: 20px; 
+    font-size: 20px;
   }
 
   .w-48 {
-    width: 100%; 
-    margin-bottom: 10px; 
+    width: 100%;
+    margin-bottom: 10px;
   }
 
   .alert {
-    font-size: 12px; 
+    font-size: 12px;
   }
 }
 
 @media (max-width: 768px) and (min-width: 577px) {
   .w-48 {
-    width: 48%; 
+    width: 48%;
   }
 }
 
@@ -343,7 +356,7 @@ h4 {
 
 .todo-container {
   width: 100%;
-  max-width: 600px;
+  max-width: 650px;
   background-color: #f8f9faa1;
   padding: 40px;
   border-radius: 4px;
@@ -377,6 +390,7 @@ h1 {
   font-family: serif;
   border-bottom: 1px solid #679fd8;
 }
+
 .add-todo {
   display: flex;
   justify-content: space-between;
@@ -398,18 +412,20 @@ h1 {
 .todo-input:focus {
   border-color: #4CAF50;
 }
+
 .add-button {
   padding: 8px;
-  border:0px;
+  border: 0px;
   color: rgb(10, 10, 10);
   border-radius: 5px;
   cursor: pointer;
   justify-content: center;
   align-items: center;
   gap: 16px;
- 
+
   background-color: #ddd;
 }
+
 .add-button:hover {
   background-color: #45a049;
   color: rgb(247, 246, 246);
@@ -441,7 +457,7 @@ h1 {
 
 .todo-title {
   flex-grow: 1;
-  font-size: 14px;
+  font-size: 14.7px;
 }
 
 .todo-title.completed {
@@ -450,7 +466,7 @@ h1 {
 }
 
 .delete-button {
-  
+
   padding: 8px 12px;
   color: white;
   border-color: #d34a14;
@@ -511,9 +527,10 @@ h1 {
   align-items: center;
   border: 0px;
 }
+
 .assign-button:hover {
   background-color: #45a049;
-  color:rgb(19, 18, 18);
+  color: rgb(19, 18, 18);
 }
 
 .assign-button i {

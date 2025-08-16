@@ -27,7 +27,7 @@ import Welcome from './Welcome.vue';
 }
 
 .sidebar {
-  width: 200px; 
+  width: 200px;
   color: white;
   height: 100%;
 }

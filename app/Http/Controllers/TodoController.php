@@ -47,7 +47,7 @@ class TodoController extends Controller
         
         return response()->json($todo, Response::HTTP_OK);
     }
-
+    // Delete  button  function  into to-do list 
     public function destroy($id)
     {
         // Check if the Todo exists before trying to delete
@@ -63,6 +63,7 @@ class TodoController extends Controller
 
         return response()->json(['message' => 'Todo deleted successfully'], Response::HTTP_OK);
     }
+    // Add  button into to-do list 
     public function addTodo(Request $request)
 {
     // Validate the incoming request

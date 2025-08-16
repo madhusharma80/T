@@ -13,7 +13,7 @@ Route::get('/welcome', [AuthController::class, 'welcome']);
 
 // Logout and authenticated user routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::prefix('user')->group(function () {
+Route::prefix('user')->group(function () {
         
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/', [AuthController::class, 'user']);
@@ -22,29 +22,29 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/change-password', [AuthController::class, 'changePassword']);
     });
     // Todo routes
-    Route::prefix('todos')->group(function () {
+Route::prefix('todos')->group(function () {
     Route::get('/', [TodoController::class, 'index']);  
     Route::post('/', [TodoController::class, 'store']);  
     Route::put('/{id}', [TodoController::class, 'update']);  
     Route::delete('/{id}', [TodoController::class, 'destroy']);  
  });
-    // Department and designation data for dropdown (this is assuming it's for employee data)
- Route::middleware('auth:sanctum')->post('/employee/add-employee', [EmployeeController::class, 'addEmployee']);
-Route::middleware('auth:sanctum')->post('/add-employee', [EmployeeController::class, 'addEmployee']);
-Route::middleware('auth:sanctum')->get('/department-designation-data', [EmployeeController::class, 'fetchDropdownData']);
-Route::middleware('auth:sanctum')->get('/employees', [EmployeeController::class, 'fetchEmployees']);
-// In routes/api.php
-Route::delete('/employee/delete-employee/{id}', [EmployeeController::class, 'deleteEmployee']);
+    // Department and designation data for dropdown
+    Route::post('employee/add-employee', [EmployeeController::class, 'addEmployee']);
+    Route::get('/department-designation-data', [EmployeeController::class, 'fetchDropdownData']);
+    Route::get('/employees', [EmployeeController::class, 'fetchEmployees']);
+    // In routes/api.php
+    Route::delete('/employee/delete-employee/{id}', [EmployeeController::class, 'deleteEmployee']);
 
-// In routes/api.php
-Route::get('employees/emails', [EmployeeController::class, 'getEmployeeEmails']);
-// Route::post('/todos/{todo}/assign', [EmployeeController::class, 'assignTask']);
-
-Route::middleware('auth:sanctum')->group(function () {
+    // In routes/api.php
+    Route::get('employees/emails', [EmployeeController::class, 'getEmployeeEmails']);
     Route::post('/tasks/{taskId}/assign', [EmployeeTaskController::class, 'assignTask']);
-    Route::get('/employee/{employeeId}/tasks', [EmployeeTaskController::class, 'fetchEmployeeTasks']);
+
+    //Route for pagination 
+    Route::get('/employee/{employeeId}/tasks', [EmployeeController::class, 'fetchEmployeeTasks']);
+
+    Route::post('/todos', [TodoController::class, 'addTodo']);
+
+ 
 });
 
 
-Route::middleware('auth:sanctum')->post('/todos', [TodoController::class, 'addTodo']);
-});
