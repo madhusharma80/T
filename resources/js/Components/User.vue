@@ -12,28 +12,23 @@
             <input v-model="newEmployee.last_name" class="custom_nameInput" type="text" placeholder="Last Name" />
           </th>
           <th>
-            <select v-model="newEmployee.email" class="custom_dropdown">
-              <option value="">Email</option>
-              <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
-            </select>
+            <!-- Updated email field to be an input instead of a dropdown -->
+            <input v-model="newEmployee.email" class="custom_nameInput" type="email" placeholder="Email" />
           </th>
           <th>
             <select v-model="newEmployee.department_id" class="custom_dropdown">
               <option value="">Department</option>
-              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name
-                }}</option>
+              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
           </th>
           <th>
             <select v-model="newEmployee.designation_id" class="custom_dropdown">
               <option value="">Designation</option>
-              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
-                designation.name }}</option>
+              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
             </select>
           </th>
           <th>
-            <button class="btn btn-primary w-100 add-button" @click="addEmployee" :disabled="isAddDisabled"><i
-                class="fas fa-plus"></i>Add</button>
+            <button class="btn btn-primary w-100 add-button" @click="addEmployee" :disabled="isAddDisabled"><i class="fas fa-plus"></i>Add</button>
           </th>
         </tr>
       </thead>
@@ -52,27 +47,21 @@
           </td>
           <td>
             <span v-if="!employee.isEditing">{{ employee.email }}</span>
-            <select v-else v-model="employee.email" class="custom_dropdown">
-              <option value="">Select Email</option>
-              <option v-for="email in employeeEmails" :key="email" :value="email">{{ email }}</option>
-            </select>
+            <!-- Updated email field to be an input instead of a dropdown -->
+            <input v-else v-model="employee.email" class="custom_input" type="email" placeholder="Email" />
           </td>
           <td>
             <span v-if="!employee.isEditing">{{ employee.department?.name || 'No Department' }}</span>
             <select v-else v-model="employee.department_id" class="custom_dropdown">
               <option value="">Select Department</option>
-              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name
-                }}</option>
+              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
             </select>
           </td>
-
-          <!-- Designation -->
           <td>
             <span v-if="!employee.isEditing">{{ employee.designation?.name || 'No Designation' }}</span>
             <select v-else v-model="employee.designation_id" class="custom_dropdown">
               <option value="">Select Designation</option>
-              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
-                designation.name }}</option>
+              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
             </select>
           </td>
           <td>
@@ -82,8 +71,7 @@
                 <i class="fas fa-edit"></i>
               </button>
               <!-- Save Button -->
-              <button v-if="employee.isEditing" class="btn btn-success save-button"
-                @click="saveEmployee(employee, index)">
+              <button v-if="employee.isEditing" class="btn btn-success save-button" @click="saveEmployee(employee, index)">
                 <i class="fas fa-save"></i>
               </button>
               <!-- Delete Button -->
@@ -97,30 +85,22 @@
     </table>
 
     <!-- Pagination Controls -->
-<div class="pagination">
-  <!-- Previous Button with Icon -->
-  <button @click="changePage(paginatedEmployees.current_page - 1)"
-          :disabled="paginatedEmployees.current_page === 1">
-    <i class="fas fa-chevron-left"></i>
-  </button>
+    <div class="pagination">
+      <button @click="changePage(paginatedEmployees.current_page - 1)" :disabled="paginatedEmployees.current_page === 1">
+        <i class="fas fa-chevron-left"></i>
+      </button>
 
-  <!-- Numbered Pages -->
-  <button v-for="page in paginatedEmployees.last_page"
-          :key="page"
-          @click="changePage(page)"
-          :class="{ active: paginatedEmployees.current_page === page }">
-    {{ page }}
-  </button>
+      <button v-for="page in paginatedEmployees.last_page" :key="page" @click="changePage(page)" :class="{ active: paginatedEmployees.current_page === page }">
+        {{ page }}
+      </button>
 
-  <!-- Next Button with Icon -->
-  <button @click="changePage(paginatedEmployees.current_page + 1)"
-          :disabled="paginatedEmployees.current_page === paginatedEmployees.last_page">
-    <i class="fas fa-chevron-right"></i>
-  </button>
-</div>
-
+      <button @click="changePage(paginatedEmployees.current_page + 1)" :disabled="paginatedEmployees.current_page === paginatedEmployees.last_page">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
@@ -201,6 +181,7 @@ const fetchEmployees = async (page = 1) => {
 };
 
 // Add employee to the list dynamically
+// Add employee to the list dynamically
 const addEmployee = async () => {
   if (isAddDisabled.value) {
     return;
@@ -233,11 +214,6 @@ const addEmployee = async () => {
   }
 };
 
-// Edit employee details
-const editEmployee = (employee) => {
-  employee.isEditing = true;
-};
-
 // Save the edited employee details
 const saveEmployee = async (employee, index) => {
   employee.isEditing = false;
@@ -265,6 +241,7 @@ const saveEmployee = async (employee, index) => {
     alert('Failed to save employee.');
   }
 };
+
 
 
 
