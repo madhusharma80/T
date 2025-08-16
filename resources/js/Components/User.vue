@@ -97,19 +97,28 @@
     </table>
 
     <!-- Pagination Controls -->
-    <div class="pagination">
-      <button @click="changePage(paginatedEmployees.current_page - 1)"
-        :disabled="paginatedEmployees.current_page === 1">
-        Previous
-      </button>
+<div class="pagination">
+  <!-- Previous Button with Icon -->
+  <button @click="changePage(paginatedEmployees.current_page - 1)"
+          :disabled="paginatedEmployees.current_page === 1">
+    <i class="fas fa-chevron-left"></i>
+  </button>
 
-      <span>Page {{ paginatedEmployees.current_page }} of {{ paginatedEmployees.last_page }}</span>
+  <!-- Numbered Pages -->
+  <button v-for="page in paginatedEmployees.last_page"
+          :key="page"
+          @click="changePage(page)"
+          :class="{ active: paginatedEmployees.current_page === page }">
+    {{ page }}
+  </button>
 
-      <button @click="changePage(paginatedEmployees.current_page + 1)"
-        :disabled="paginatedEmployees.current_page === paginatedEmployees.last_page">
-        Next
-      </button>
-    </div>
+  <!-- Next Button with Icon -->
+  <button @click="changePage(paginatedEmployees.current_page + 1)"
+          :disabled="paginatedEmployees.current_page === paginatedEmployees.last_page">
+    <i class="fas fa-chevron-right"></i>
+  </button>
+</div>
+
   </div>
 </template>
 
@@ -510,23 +519,36 @@ button:hover {
   background-color: #f4f4f4;
   color: black;
 }
-
 .pagination {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 8px;
   margin-top: 20px;
 }
 
 .pagination button {
-  padding: 8px 12px;
+  padding: 6px 12px;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: #f1f1f1;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover {
+  background-color: #1675e2;
+  color: white;
+}
+
+.pagination button.active {
+  background-color: #275b8f;
+  color: white;
+  font-weight: bold;
 }
 
 .pagination button:disabled {
   background-color: #ddd;
   cursor: not-allowed;
 }
+
 </style>
