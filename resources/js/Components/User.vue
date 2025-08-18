@@ -27,7 +27,7 @@
             </select>
           </th>
           <th>
-            <button class="btn  w-100 add-button">
+            <button class="btn btn-primary w-100 add-button" @click="addEmployee" :disabled="isAddDisabled">
               <i class="fas fa-plus"></i>Add
             </button>
           </th>
@@ -66,8 +66,8 @@
           <td>
             <div class="button-group">
               <!-- View Detail Button -->
-              <button class="btn view-button" @click="viewEmployee(employee)">
-                <i class="fas fa-eye"></i> 
+              <button class="btn btn-info view-button" @click="viewEmployee(employee)">
+                <i class="fas fa-eye"></i>
               </button>
               <!-- Edit Button -->
               <button v-if="!employee.isEditing" class="btn edit-button" @click="editEmployee(employee)">
@@ -92,45 +92,26 @@
       <button @click="changePage(paginatedEmployees.current_page - 1)" :disabled="paginatedEmployees.current_page === 1">
         <i class="fas fa-chevron-left"></i>
       </button>
+
       <button v-for="page in paginatedEmployees.last_page" :key="page" @click="changePage(page)" :class="{ active: paginatedEmployees.current_page === page }">
         {{ page }}
       </button>
+
       <button @click="changePage(paginatedEmployees.current_page + 1)" :disabled="paginatedEmployees.current_page === paginatedEmployees.last_page">
         <i class="fas fa-chevron-right"></i>
       </button>
     </div>
 
-    <!-- Employee Details Modal -->
-    <div v-if="selectedEmployee" class="modal-overlay" @click.self="closeModal">
-      <div class="modal">
+    <!-- Employee Detail Modal -->
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal-content">
         <h2>Employee Details</h2>
-        <p><strong>Name:</strong> {{ selectedEmployee.first_name }} {{ selectedEmployee.last_name }}</p>
+        <p><strong>First Name:</strong> {{ selectedEmployee.first_name }}</p>
+        <p><strong>Last Name:</strong> {{ selectedEmployee.last_name }}</p>
         <p><strong>Email:</strong> {{ selectedEmployee.email }}</p>
         <p><strong>Department:</strong> {{ selectedEmployee.department?.name || 'N/A' }}</p>
         <p><strong>Designation:</strong> {{ selectedEmployee.designation?.name || 'N/A' }}</p>
-
-        <h3>Assigned Tasks</h3>
-        <table class="task-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Task Name</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(task, i) in employeeTasks" :key="task.id">
-              <td>{{ i + 1 }}</td>
-              <td>{{ task.title }}</td>
-              <td>{{ task.status }}</td>
-            </tr>
-            <tr v-if="employeeTasks.length === 0">
-              <td colspan="3">No tasks assigned.</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <button class="close-btn" @click="closeModal">Close</button>
+        <button class="btn btn-secondary" @click="closeModal">Close</button>
       </div>
     </div>
   </div>
@@ -145,15 +126,15 @@ const departments = ref([]);
 const designations = ref([]);
 const employeeEmails = ref([]);
 const tasks = ref([]);
-const selectedEmployee = ref(null);
-const employeeTasks = ref([]);
-
 const paginatedEmployees = ref({
   data: [],
   current_page: 1,
   last_page: 1,
   per_page: 3,
 });
+
+const showModal = ref(false);
+const selectedEmployee = ref({});
 
 const newEmployee = ref({
   email: '',
@@ -201,7 +182,7 @@ const fetchEmployees = async (page = 1) => {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
     paginatedEmployees.value = response.data;
-    paginatedEmployees.value.data.forEach(emp => emp.isEditing = false);
+    paginatedEmployees.value.data.forEach(emp => emp.isEditing = false); // initialize editing state
   } catch (error) {
     console.error('Error fetching employees:', error);
   }
@@ -244,7 +225,7 @@ const saveEmployee = async (employee, index) => {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
 
-    employee.isEditing = false;
+    employee.isEditing = false; 
     fetchEmployees(paginatedEmployees.value.current_page);
   } catch (error) {
     console.error('Error updating employee:', error);
@@ -265,25 +246,6 @@ const deleteEmployee = async (index, employeeId) => {
   }
 };
 
-const viewEmployee = async (employee) => {
-  selectedEmployee.value = employee;
-
-  try {
-    const response = await axios.get(`/api/employee/${employee.id}/tasks`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-    employeeTasks.value = response.data;
-  } catch (error) {
-    console.error('Error fetching employee tasks:', error);
-    employeeTasks.value = [];
-  }
-};
-
-const closeModal = () => {
-  selectedEmployee.value = null;
-  employeeTasks.value = [];
-};
-
 const changePage = (page) => {
   if (page > 0 && page <= paginatedEmployees.value.last_page) {
     fetchEmployees(page);
@@ -299,6 +261,15 @@ const resetForm = () => {
     last_name: '',
     task_id: '',
   };
+};
+
+const viewEmployee = (employee) => {
+  selectedEmployee.value = employee;
+  showModal.value = true;
+};
+
+const closeModal = () => {
+  showModal.value = false;
 };
 </script>
 
@@ -376,27 +347,18 @@ td:first-child {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.6);
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
 }
-
-.modal {
+.modal-content {
   background: white;
   padding: 20px;
-  border-radius: 8px;
-  width: 550px;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.modal h2 {
-  margin-bottom: 10px;
-  color: #2c3e50;
+  border-radius: 10px;
+  width: 400px;
 }
 
 .task-table {
@@ -519,7 +481,7 @@ td:nth-child(8) {
   white-space: normal;
   box-shadow: inset 2px 4px 11px rgba(134, 187, 240, 0.5);
   color: rgb(43, 41, 41);
-  font-size: 14.7px;
+  font-size: 15px;
 }
 
 select,
@@ -656,13 +618,13 @@ button:hover {
 }
 .pagination {
   display: flex;
-  justify-content: center;
-  gap: 8px;
+  justify-content:left;
+  gap: 5px;
   margin-top: 20px;
 }
 
 .pagination button {
-  padding: 6px 12px;
+  padding: 4px 9px;
   border: 1px solid #ddd;
   border-radius: 6px;
   background-color: #f9f9f9;
@@ -678,7 +640,7 @@ button:hover {
 .pagination button.active {
   background-color: #275b8f;
   color: white;
-  font-weight: bold;
+
 }
 
 .pagination button:disabled {

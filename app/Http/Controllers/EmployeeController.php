@@ -144,18 +144,19 @@ public function fetchEmployees(Request $request)
 {
     // Paginate the results, limiting to 3 employees per page
     $employees = Employee::with('department', 'designation')
-        ->paginate(3);  // Limit to 3 employees per page
+        ->paginate(5);  // Limit to 3 employees per page
 
     return response()->json($employees);
 }
 
-public function fetchEmployeeTasks($employeeId)
+public function getEmployeeWithTasks($id)
 {
-    $tasks = \App\Models\Todo::where('assigned_to', $employeeId)
-        ->with('assignedDepartment')
-        ->get();
+    $employee = Employee::with(['department', 'designation', 'todos'])->findOrFail($id);
 
-    return response()->json($tasks);
+    return response()->json([
+        'employee' => $employee,
+        'tasks' => $employee->todos
+    ]);
+}
 }
 
-}

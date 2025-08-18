@@ -468,9 +468,10 @@ h1 {
 .delete-button {
 
   padding: 8px 12px;
-  color: white;
-  border-color: #d34a14;
+  color: rgb(12, 12, 12);
+  border-color: #e4e0de;
   border-radius: 4px;
+  border:0px;
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -479,8 +480,8 @@ h1 {
 
 .edit-button {
   padding: 8px 12px;
-  color: white;
-  border-color: #45a049;
+  color: rgb(14, 13, 13);
+  border:0px;
   border-radius: 4px;
   cursor: pointer;
   display: flex;
