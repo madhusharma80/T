@@ -43,8 +43,9 @@ Route::prefix('todos')->group(function () {
 
     //Route for pagination 
     Route::get('/employee/{employeeId}/tasks', [EmployeeController::class, 'fetchEmployeeTasks']);
-
     Route::post('/todos', [TodoController::class, 'addTodo']);
-
+    
+    Route::get('/employee/{employeeId}/tasks', [EmployeeController::class, 'fetchEmployeeTasks']);
+  
  
 });

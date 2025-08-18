@@ -148,4 +148,14 @@ public function fetchEmployees(Request $request)
 
     return response()->json($employees);
 }
+
+public function fetchEmployeeTasks($employeeId)
+{
+    $tasks = \App\Models\Todo::where('assigned_to', $employeeId)
+        ->with('assignedDepartment')
+        ->get();
+
+    return response()->json($tasks);
+}
+
 }

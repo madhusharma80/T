@@ -12,7 +12,6 @@
             <input v-model="newEmployee.last_name" class="custom_nameInput" type="text" placeholder="Last Name" />
           </th>
           <th>
-            <!-- Updated email field to be an input instead of a dropdown -->
             <input v-model="newEmployee.email" class="custom_nameInput" type="email" placeholder="Email" />
           </th>
           <th>
@@ -28,13 +27,14 @@
             </select>
           </th>
           <th>
-            <button class="btn btn-primary w-100 add-button" @click="addEmployee" :disabled="isAddDisabled"><i class="fas fa-plus"></i>Add</button>
+            <button class="btn  w-100 add-button">
+              <i class="fas fa-plus"></i>Add
+            </button>
           </th>
         </tr>
       </thead>
 
       <tbody>
-        <!-- Loop through the paginated employees array and display employee data dynamically -->
         <tr v-for="(employee, index) in paginatedEmployees.data" :key="employee.id">
           <td>{{ index + 1 + ((paginatedEmployees.current_page - 1) * paginatedEmployees.per_page) }}.</td>
           <td>
@@ -47,7 +47,6 @@
           </td>
           <td>
             <span v-if="!employee.isEditing">{{ employee.email }}</span>
-            <!-- Updated email field to be an input instead of a dropdown -->
             <input v-else v-model="employee.email" class="custom_input" type="email" placeholder="Email" />
           </td>
           <td>
@@ -66,6 +65,10 @@
           </td>
           <td>
             <div class="button-group">
+              <!-- View Detail Button -->
+              <button class="btn view-button" @click="viewEmployee(employee)">
+                <i class="fas fa-eye"></i> 
+              </button>
               <!-- Edit Button -->
               <button v-if="!employee.isEditing" class="btn edit-button" @click="editEmployee(employee)">
                 <i class="fas fa-edit"></i>
@@ -89,34 +92,68 @@
       <button @click="changePage(paginatedEmployees.current_page - 1)" :disabled="paginatedEmployees.current_page === 1">
         <i class="fas fa-chevron-left"></i>
       </button>
-
       <button v-for="page in paginatedEmployees.last_page" :key="page" @click="changePage(page)" :class="{ active: paginatedEmployees.current_page === page }">
         {{ page }}
       </button>
-
       <button @click="changePage(paginatedEmployees.current_page + 1)" :disabled="paginatedEmployees.current_page === paginatedEmployees.last_page">
         <i class="fas fa-chevron-right"></i>
       </button>
     </div>
+
+    <!-- Employee Details Modal -->
+    <div v-if="selectedEmployee" class="modal-overlay" @click.self="closeModal">
+      <div class="modal">
+        <h2>Employee Details</h2>
+        <p><strong>Name:</strong> {{ selectedEmployee.first_name }} {{ selectedEmployee.last_name }}</p>
+        <p><strong>Email:</strong> {{ selectedEmployee.email }}</p>
+        <p><strong>Department:</strong> {{ selectedEmployee.department?.name || 'N/A' }}</p>
+        <p><strong>Designation:</strong> {{ selectedEmployee.designation?.name || 'N/A' }}</p>
+
+        <h3>Assigned Tasks</h3>
+        <table class="task-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Task Name</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(task, i) in employeeTasks" :key="task.id">
+              <td>{{ i + 1 }}</td>
+              <td>{{ task.title }}</td>
+              <td>{{ task.status }}</td>
+            </tr>
+            <tr v-if="employeeTasks.length === 0">
+              <td colspan="3">No tasks assigned.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <button class="close-btn" @click="closeModal">Close</button>
+      </div>
+    </div>
   </div>
 </template>
-
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 
-const employees = ref([]);  // Dynamically populated employees list
-const departments = ref([]);  // List of departments
-const designations = ref([]);  // List of designations
-const employeeEmails = ref([]);  // List of employee emails for dropdown
-const tasks = ref([]);  // Store tasks
+const employees = ref([]);
+const departments = ref([]);
+const designations = ref([]);
+const employeeEmails = ref([]);
+const tasks = ref([]);
+const selectedEmployee = ref(null);
+const employeeTasks = ref([]);
+
 const paginatedEmployees = ref({
   data: [],
   current_page: 1,
   last_page: 1,
-  per_page: 3,  // Show 3 employees per page
-});  // Store paginated employee data
+  per_page: 3,
+});
 
 const newEmployee = ref({
   email: '',
@@ -124,11 +161,10 @@ const newEmployee = ref({
   designation_id: '',
   first_name: '',
   last_name: '',
-  task_id: ''  // Add task_id for assigning task to new employee
+  task_id: ''
 });
 
 const isAddDisabled = computed(() => {
-  // Disable the Add button if any field is missing
   return !newEmployee.value.email ||
     !newEmployee.value.department_id ||
     !newEmployee.value.designation_id ||
@@ -136,14 +172,11 @@ const isAddDisabled = computed(() => {
     !newEmployee.value.last_name;
 });
 
-// On mounted, fetch departments, designations, tasks, and employees
 onMounted(async () => {
   try {
     const response = await fetch('/api/department-designation-data', {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     });
 
     const data = await response.json();
@@ -152,125 +185,111 @@ onMounted(async () => {
     employeeEmails.value = data.employees.map(employee => employee.email);
 
     const taskResponse = await axios.get('/api/tasks', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     });
     tasks.value = taskResponse.data;
 
-    // Load employees from API with pagination
     fetchEmployees(1);
-
   } catch (error) {
     console.error('Error fetching data:', error);
   }
 });
 
-// Fetch paginated employees
 const fetchEmployees = async (page = 1) => {
   try {
     const response = await axios.get(`/api/employees?page=${page}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
-    paginatedEmployees.value = response.data;  // Store paginated employees
+    paginatedEmployees.value = response.data;
+    paginatedEmployees.value.data.forEach(emp => emp.isEditing = false);
   } catch (error) {
     console.error('Error fetching employees:', error);
   }
 };
 
-// Add employee to the list dynamically
-// Add employee to the list dynamically
 const addEmployee = async () => {
-  if (isAddDisabled.value) {
-    return;
-  }
+  if (isAddDisabled.value) return;
 
-  const employeeData = {
-    email: newEmployee.value.email,
-    department_id: newEmployee.value.department_id,
-    designation_id: newEmployee.value.designation_id,
-    first_name: newEmployee.value.first_name,
-    last_name: newEmployee.value.last_name,
-    task_id: newEmployee.value.task_id,
-  };
+  const employeeData = { ...newEmployee.value };
 
   try {
-    const response = await axios.post('/api/employee/add-employee', employeeData, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
+    await axios.post('/api/employee/add-employee', employeeData, {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     });
 
-    // Add the new employee to the array and reload the list with pagination
-    fetchEmployees(paginatedEmployees.value.current_page); // Reload with current page
-
+    fetchEmployees(paginatedEmployees.value.current_page);
     resetForm();
-
   } catch (error) {
     console.error('Error adding employee:', error);
     alert('Failed to add employee.');
   }
 };
 
-// Save the edited employee details
+const editEmployee = (employee) => {
+  employee.isEditing = true;
+};
+
 const saveEmployee = async (employee, index) => {
-  employee.isEditing = false;
-
-  const updatedEmployee = {
-    ...employee,
-    department: departments.value.find(dep => dep.id === employee.department_id),
-    designation: designations.value.find(desig => desig.id === employee.designation_id)
-  };
-
   try {
-    const response = await axios.put(`/api/employee/update-employee/${employee.id}`, updatedEmployee, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
+    const updatedEmployee = {
+      first_name: employee.first_name,
+      last_name: employee.last_name,
+      email: employee.email,
+      department_id: employee.department_id,
+      designation_id: employee.designation_id,
+      task_id: employee.task_id,
+    };
+
+    await axios.put(`/api/employee/update-employee/${employee.id}`, updatedEmployee, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
 
-    if (response.status === 200) {
-      paginatedEmployees.value.data[index] = updatedEmployee;
-      fetchEmployees(paginatedEmployees.value.current_page);
-    }
-
+    employee.isEditing = false;
+    fetchEmployees(paginatedEmployees.value.current_page);
   } catch (error) {
-    console.error('Error saving employee:', error);
+    console.error('Error updating employee:', error);
     alert('Failed to save employee.');
   }
 };
 
-
-
-
-// Delete employee
 const deleteEmployee = async (index, employeeId) => {
   try {
     const response = await axios.delete(`/api/employee/delete-employee/${employeeId}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     });
 
-    if (response.status === 200) {
-      fetchEmployees(paginatedEmployees.value.current_page);
-    }
+    if (response.status === 200) fetchEmployees(paginatedEmployees.value.current_page);
   } catch (error) {
     console.error('Error deleting employee:', error);
     alert('Failed to delete employee.');
   }
 };
 
-// Change page for pagination
+const viewEmployee = async (employee) => {
+  selectedEmployee.value = employee;
+
+  try {
+    const response = await axios.get(`/api/employee/${employee.id}/tasks`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    employeeTasks.value = response.data;
+  } catch (error) {
+    console.error('Error fetching employee tasks:', error);
+    employeeTasks.value = [];
+  }
+};
+
+const closeModal = () => {
+  selectedEmployee.value = null;
+  employeeTasks.value = [];
+};
+
 const changePage = (page) => {
   if (page > 0 && page <= paginatedEmployees.value.last_page) {
     fetchEmployees(page);
   }
 };
 
-// Reset the form fields
 const resetForm = () => {
   newEmployee.value = {
     email: '',
@@ -278,12 +297,13 @@ const resetForm = () => {
     designation_id: '',
     first_name: '',
     last_name: '',
-    task_id: '',  // Reset task_id when form is cleared
+    task_id: '',
   };
 };
 </script>
 
 <style scoped>
+
 .title {
   border-bottom: 1px solid #679fd8;
   text-align: center;
@@ -296,6 +316,126 @@ const resetForm = () => {
 .container {
   width: 100%;
   max-width: 950px;
+  background-color: #f8f9faa1;
+  padding: 40px;
+  border-radius: 4px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgb(118, 165, 209);
+  margin-left: 137px;
+  margin-top: 100px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+th {
+  padding: 6px;
+  border: 2px solid #ddd;
+  background: linear-gradient(to bottom, #275b8f, #b4cfe7);
+  color: white;
+  width: 14%;
+}
+
+th:first-child,
+td:first-child {
+  width: 4.3%;
+}
+
+/* Buttons */
+.view-button {
+  padding: 6px 10px;
+  background: #fbfcfd;
+  border: none;
+  border-radius: 5px;
+  color: rgb(26, 25, 25);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.view-button:hover {
+  background: #0d8ba1;
+  color:white;
+}
+
+.delete-button,
+.edit-button,
+.save-button {
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 550px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal h2 {
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.task-table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+}
+.task-table th,
+.task-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.close-btn {
+  margin-top: 15px;
+  padding: 8px 15px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.close-btn:hover {
+  background: #c0392b;
+}
+
+.title {
+  border-bottom: 1px solid #679fd8;
+  text-align: center;
+  color: #2c2a2a;
+  font-size: 1.5em;
+  font-weight: 600;
+  font-family: serif;
+}
+
+.container {
+  width: 100%;
+  max-width: 1150px;
   background-color: #f8f9faa1;
   padding: 40px;
   border-radius: 4px;
@@ -341,7 +481,7 @@ td:nth-child(5) {
 
 th:nth-child(6),
 td:nth-child(6) {
-  width: 13%;
+  width: 10%;
   text-align: left;
   white-space: normal;
   word-wrap: break-word;
@@ -349,7 +489,8 @@ td:nth-child(6) {
 
 th:nth-child(7),
 td:nth-child(7) {
-  width: 8.5%;
+  box-shadow: inset 2px 4px 11px rgba(134, 187, 240, 0.5);
+  width: 8.8%;
 }
 
 th:nth-child(8),
@@ -385,7 +526,7 @@ select,
 input {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #ddd;
+  border-color: #7bb0ec;
   border-radius: 4px;
   background-color: #ffffff;
   font-size: 16px;
@@ -399,10 +540,9 @@ input:focus {
   outline: none;
 }
 
-.custom_input .add-button {
-  width: 20%;
+.custom_input {
   padding: 5px;
-  border-color: #4396f5;
+ border-color: #7bb0ec;
   color: rgb(48, 45, 45);
   border-radius: 5px;
   cursor: pointer;
@@ -410,6 +550,10 @@ input:focus {
   justify-content: center;
   align-items: center;
   gap: 16px;
+}
+.add-button {
+
+  border:1px solid white ;
 }
 
 .custom_nameInput {
