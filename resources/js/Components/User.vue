@@ -1,117 +1,171 @@
 <template>
   <div class="container">
     <h1 class="title">EMPLOYEE TASK MANAGEMENT - TO-DO LIST</h1>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>s.no</th>
-          <th>
-            <input v-model="newEmployee.first_name" class="custom_nameInput" type="text" placeholder="First Name" />
-          </th>
-          <th>
-            <input v-model="newEmployee.last_name" class="custom_nameInput" type="text" placeholder="Last Name" />
-          </th>
-          <th>
-            <input v-model="newEmployee.email" class="custom_nameInput" type="email" placeholder="Email" />
-          </th>
-          <th>
-            <select v-model="newEmployee.department_id" class="custom_dropdown">
-              <option value="">Department</option>
-              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
-            </select>
-          </th>
-          <th>
-            <select v-model="newEmployee.designation_id" class="custom_dropdown">
-              <option value="">Designation</option>
-              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
-            </select>
-          </th>
-          <th>
-            <button class="btn btn-primary w-100 add-button" @click="addEmployee" :disabled="isAddDisabled">
-              <i class="fas fa-plus"></i>Add
-            </button>
-          </th>
-        </tr>
-      </thead>
 
-      <tbody>
-        <tr v-for="(employee, index) in paginatedEmployees.data" :key="employee.id">
-          <td>{{ index + 1 + ((paginatedEmployees.current_page - 1) * paginatedEmployees.per_page) }}.</td>
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.first_name }}</span>
-            <input v-else v-model="employee.first_name" class="custom_input" type="text" placeholder="First Name" />
-          </td>
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.last_name }}</span>
-            <input v-else v-model="employee.last_name" class="custom_input" type="text" placeholder="Last Name" />
-          </td>
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.email }}</span>
-            <input v-else v-model="employee.email" class="custom_input" type="email" placeholder="Email" />
-          </td>
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.department?.name || 'No Department' }}</span>
-            <select v-else v-model="employee.department_id" class="custom_dropdown">
-              <option value="">Select Department</option>
-              <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
-            </select>
-          </td>
-          <td>
-            <span v-if="!employee.isEditing">{{ employee.designation?.name || 'No Designation' }}</span>
-            <select v-else v-model="employee.designation_id" class="custom_dropdown">
-              <option value="">Select Designation</option>
-              <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
-            </select>
-          </td>
-          <td>
-            <div class="button-group">
-              <!-- View Detail Button -->
-              <button class="btn btn-info view-button" @click="viewEmployee(employee)">
-                <i class="fas fa-eye"></i>
-              </button>
-              <!-- Edit Button -->
-              <button v-if="!employee.isEditing" class="btn edit-button" @click="editEmployee(employee)">
-                <i class="fas fa-edit"></i>
-              </button>
-              <!-- Save Button -->
-              <button v-if="employee.isEditing" class="btn btn-success save-button" @click="saveEmployee(employee, index)">
-                <i class="fas fa-save"></i>
-              </button>
-              <!-- Delete Button -->
-              <button @click="deleteEmployee(index, employee.id)" class="delete-button">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="main-layout">
+      <!-- EMPLOYEE TABLE -->
+      <div class="table-section">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>s.no</th>
+              <th>
+                <input v-model="newEmployee.first_name" class="custom_nameInput" type="text" placeholder="First Name" />
+              </th>
+              <th>
+                <input v-model="newEmployee.last_name" class="custom_nameInput" type="text" placeholder="Last Name" />
+              </th>
+              <th>
+                <input v-model="newEmployee.email" class="custom_nameInput" type="email" placeholder="Email" />
+              </th>
+              <th>
+                <select v-model="newEmployee.department_id" class="custom_dropdown">
+                  <option value="">Department</option>
+                  <option v-for="department in departments" :key="department.id" :value="department.id">{{
+                    department.name }}</option>
+                </select>
+              </th>
+              <th>
+                <select v-model="newEmployee.designation_id" class="custom_dropdown">
+                  <option value="">Designation</option>
+                  <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
+                    designation.name }}</option>
+                </select>
+              </th>
+              <th>
+                <button class="btn btn-primary w-100 add-button">
+                  <i class="fas fa-plus"></i>Add
+                </button>
+              </th>
+            </tr>
+          </thead>
 
-    <!-- Pagination Controls -->
-    <div class="pagination">
-      <button @click="changePage(paginatedEmployees.current_page - 1)" :disabled="paginatedEmployees.current_page === 1">
-        <i class="fas fa-chevron-left"></i>
-      </button>
+          <tbody>
+            <tr v-for="(employee, index) in paginatedEmployees.data" :key="employee.id">
+              <td>{{ index + 1 + ((paginatedEmployees.current_page - 1) * paginatedEmployees.per_page) }}.</td>
+              <td>
+                <span v-if="!employee.isEditing">{{ employee.first_name }}</span>
+                <input v-else v-model="employee.first_name" class="custom_input" type="text" />
+              </td>
+              <td>
+                <span v-if="!employee.isEditing">{{ employee.last_name }}</span>
+                <input v-else v-model="employee.last_name" class="custom_input" type="text" />
+              </td>
+              <td>
+                <span v-if="!employee.isEditing">{{ employee.email }}</span>
+                <input v-else v-model="employee.email" class="custom_input" type="email" />
+              </td>
+              <td>
+                <span v-if="!employee.isEditing">{{ employee.department?.name || 'No Department' }}</span>
+                <select v-else v-model="employee.department_id" class="custom_dropdown">
+                  <option value="">Select Department</option>
+                  <option v-for="department in departments" :key="department.id" :value="department.id">{{
+                    department.name }}</option>
+                </select>
+              </td>
+              <td>
+                <span v-if="!employee.isEditing">{{ employee.designation?.name || 'No Designation' }}</span>
+                <select v-else v-model="employee.designation_id" class="custom_dropdown">
+                  <option value="">Select Designation</option>
+                  <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
+                    designation.name }}</option>
+                </select>
+              </td>
+              <td>
+                <div class="button-group">
+                  <!-- View Detail Button -->
+                  <button class="btn btn-info view-button" @click="viewEmployee(employee)">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <!-- Edit Button -->
+                  <button v-if="!employee.isEditing" class="btn edit-button" @click="editEmployee(employee)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <!-- Save Button -->
+                  <button v-if="employee.isEditing" class="btn btn-success save-button"
+                    @click="saveEmployee(employee, index)">
+                    <i class="fas fa-save"></i>
+                  </button>
+                  <!-- Delete Button -->
+                  <button @click="deleteEmployee(index, employee.id)" class="delete-button">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-      <button v-for="page in paginatedEmployees.last_page" :key="page" @click="changePage(page)" :class="{ active: paginatedEmployees.current_page === page }">
-        {{ page }}
-      </button>
-
-      <button @click="changePage(paginatedEmployees.current_page + 1)" :disabled="paginatedEmployees.current_page === paginatedEmployees.last_page">
-        <i class="fas fa-chevron-right"></i>
-      </button>
+        <!-- Pagination Controls -->
+        <div class="pagination">
+          <button @click="changePage(paginatedEmployees.current_page - 1)"
+            :disabled="paginatedEmployees.current_page === 1">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button v-for="page in paginatedEmployees.last_page" :key="page" @click="changePage(page)"
+            :class="{ active: paginatedEmployees.current_page === page }">
+            {{ page }}
+          </button>
+          <button @click="changePage(paginatedEmployees.current_page + 1)"
+            :disabled="paginatedEmployees.current_page === paginatedEmployees.last_page">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
     </div>
+    <!-- SIDE DETAIL CARD -->
+    <div class="detail-section" v-if="selectedEmployee">
+      <!-- Employee Detail Card -->
+      <div class="detail-card">
+        <div class="card-header">
+          <button class="close-btn" @click="selectedEmployee = null">✖</button>
+        </div>
 
-    <!-- Employee Detail Modal -->
-    <div v-if="showModal" class="modal-overlay">
-      <div class="modal-content">
-        <h2>Employee Details</h2>
-        <p><strong>First Name:</strong> {{ selectedEmployee.first_name }}</p>
-        <p><strong>Last Name:</strong> {{ selectedEmployee.last_name }}</p>
-        <p><strong>Email:</strong> {{ selectedEmployee.email }}</p>
-        <p><strong>Department:</strong> {{ selectedEmployee.department?.name || 'N/A' }}</p>
-        <p><strong>Designation:</strong> {{ selectedEmployee.designation?.name || 'N/A' }}</p>
-        <button class="btn btn-secondary" @click="closeModal">Close</button>
+        <div class="avatar">
+          {{ selectedEmployee.first_name?.charAt(0).toUpperCase() }}
+        </div>
+        <h4 class="emp-name">{{ selectedEmployee.first_name }} {{ selectedEmployee.last_name }}</h4>
+        <div class="emp-info">
+          <h5 class='detail'>Details</h5>
+          <p><strong>Email:</strong> {{ selectedEmployee.email }}</p>
+          <p><strong>Department:</strong> {{ selectedEmployee.department?.name || 'N/A' }}</p>
+          <p><strong>Designation:</strong> {{ selectedEmployee.designation?.name || 'N/A' }}</p>
+        </div>
+      </div>
+
+      <!-- Assigned Tasks Card -->
+      <div class="task-card">
+        <h4>Assigned Tasks</h4>
+        <table class="task-table">
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="task in employeeTasks" :key="task.id">
+              <td>{{ task.title }}</td>
+              <td><strong>{{ task.status }}</strong></td>
+              <td>
+                <!-- Edit Button -->
+                <button @click="editAssignedTask(task)" class="edit-button">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+
+                <!-- Delete Button -->
+                <button @click="deleteAssignedTask(task.id)" class="delete-button">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </td>
+            </tr>
+            <!-- No tasks assigned message -->
+            <tr v-if="employeeTasks.length === 0">
+              <td colspan="3" class="no-tasks">No tasks assigned</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -121,20 +175,13 @@
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 
-const employees = ref([]);
 const departments = ref([]);
 const designations = ref([]);
-const employeeEmails = ref([]);
 const tasks = ref([]);
-const paginatedEmployees = ref({
-  data: [],
-  current_page: 1,
-  last_page: 1,
-  per_page: 3,
-});
+const paginatedEmployees = ref({ data: [], current_page: 1, last_page: 1, per_page: 3 });
 
-const showModal = ref(false);
-const selectedEmployee = ref({});
+const selectedEmployee = ref(null);
+const employeeTasks = ref([]);
 
 const newEmployee = ref({
   email: '',
@@ -142,7 +189,6 @@ const newEmployee = ref({
   designation_id: '',
   first_name: '',
   last_name: '',
-  task_id: ''
 });
 
 const isAddDisabled = computed(() => {
@@ -155,21 +201,11 @@ const isAddDisabled = computed(() => {
 
 onMounted(async () => {
   try {
-    const response = await fetch('/api/department-designation-data', {
-      method: 'GET',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    const response = await axios.get('/api/department-designation-data', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
-
-    const data = await response.json();
-    departments.value = data.departments;
-    designations.value = data.designations;
-    employeeEmails.value = data.employees.map(employee => employee.email);
-
-    const taskResponse = await axios.get('/api/tasks', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    });
-    tasks.value = taskResponse.data;
-
+    departments.value = response.data.departments;
+    designations.value = response.data.designations;
     fetchEmployees(1);
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -177,72 +213,48 @@ onMounted(async () => {
 });
 
 const fetchEmployees = async (page = 1) => {
-  try {
-    const response = await axios.get(`/api/employees?page=${page}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-    paginatedEmployees.value = response.data;
-    paginatedEmployees.value.data.forEach(emp => emp.isEditing = false); // initialize editing state
-  } catch (error) {
-    console.error('Error fetching employees:', error);
-  }
+  const response = await axios.get(`/api/employees?page=${page}`, {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+  });
+  paginatedEmployees.value = response.data;
+  paginatedEmployees.value.data.forEach(emp => emp.isEditing = false);
 };
 
 const addEmployee = async () => {
-  if (isAddDisabled.value) return;
-
   const employeeData = { ...newEmployee.value };
-
-  try {
-    await axios.post('/api/employee/add-employee', employeeData, {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    });
-
-    fetchEmployees(paginatedEmployees.value.current_page);
-    resetForm();
-  } catch (error) {
-    console.error('Error adding employee:', error);
-    alert('Failed to add employee.');
-  }
+  await axios.post('/api/employee/add-employee', employeeData, {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+  });
+  fetchEmployees(paginatedEmployees.value.current_page);
+  resetForm();
 };
 
-const editEmployee = (employee) => {
-  employee.isEditing = true;
-};
+const editEmployee = (employee) => { employee.isEditing = true; };
 
-const saveEmployee = async (employee, index) => {
-  try {
-    const updatedEmployee = {
-      first_name: employee.first_name,
-      last_name: employee.last_name,
-      email: employee.email,
-      department_id: employee.department_id,
-      designation_id: employee.designation_id,
-      task_id: employee.task_id,
-    };
-
-    await axios.put(`/api/employee/update-employee/${employee.id}`, updatedEmployee, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-
-    employee.isEditing = false; 
-    fetchEmployees(paginatedEmployees.value.current_page);
-  } catch (error) {
-    console.error('Error updating employee:', error);
-    alert('Failed to save employee.');
-  }
+const saveEmployee = async (employee) => {
+  await axios.put(`/api/employee/update-employee/${employee.id}`, employee, {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+  });
+  employee.isEditing = false;
+  fetchEmployees(paginatedEmployees.value.current_page);
 };
 
 const deleteEmployee = async (index, employeeId) => {
-  try {
-    const response = await axios.delete(`/api/employee/delete-employee/${employeeId}`, {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    });
+  await axios.delete(`/api/employee/delete-employee/${employeeId}`, {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+  });
+  fetchEmployees(paginatedEmployees.value.current_page);
+};
 
-    if (response.status === 200) fetchEmployees(paginatedEmployees.value.current_page);
-  } catch (error) {
-    console.error('Error deleting employee:', error);
-    alert('Failed to delete employee.');
+const viewEmployee = async (employee) => {
+  selectedEmployee.value = employee;
+  try {
+    const response = await axios.get(`/api/employee/${employee.id}/tasks`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    employeeTasks.value = response.data;
+  } catch {
+    employeeTasks.value = [];
   }
 };
 
@@ -253,148 +265,11 @@ const changePage = (page) => {
 };
 
 const resetForm = () => {
-  newEmployee.value = {
-    email: '',
-    department_id: '',
-    designation_id: '',
-    first_name: '',
-    last_name: '',
-    task_id: '',
-  };
-};
-
-const viewEmployee = (employee) => {
-  selectedEmployee.value = employee;
-  showModal.value = true;
-};
-
-const closeModal = () => {
-  showModal.value = false;
+  newEmployee.value = { email: '', department_id: '', designation_id: '', first_name: '', last_name: '' };
 };
 </script>
 
 <style scoped>
-
-.title {
-  border-bottom: 1px solid #679fd8;
-  text-align: center;
-  color: #2c2a2a;
-  font-size: 1.5em;
-  font-weight: 600;
-  font-family: serif;
-}
-
-.container {
-  width: 100%;
-  max-width: 950px;
-  background-color: #f8f9faa1;
-  padding: 40px;
-  border-radius: 4px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgb(118, 165, 209);
-  margin-left: 137px;
-  margin-top: 100px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-th {
-  padding: 6px;
-  border: 2px solid #ddd;
-  background: linear-gradient(to bottom, #275b8f, #b4cfe7);
-  color: white;
-  width: 14%;
-}
-
-th:first-child,
-td:first-child {
-  width: 4.3%;
-}
-
-/* Buttons */
-.view-button {
-  padding: 6px 10px;
-  background: #fbfcfd;
-  border: none;
-  border-radius: 5px;
-  color: rgb(26, 25, 25);
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-.view-button:hover {
-  background: #0d8ba1;
-  color:white;
-}
-
-.delete-button,
-.edit-button,
-.save-button {
-  padding: 6px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  border: none;
-  transition: 0.2s;
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 400px;
-}
-
-.task-table {
-  width: 100%;
-  margin-top: 10px;
-  border-collapse: collapse;
-}
-.task-table th,
-.task-table td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: left;
-}
-
-.close-btn {
-  margin-top: 15px;
-  padding: 8px 15px;
-  background: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-.close-btn:hover {
-  background: #c0392b;
-}
-
-.title {
-  border-bottom: 1px solid #679fd8;
-  text-align: center;
-  color: #2c2a2a;
-  font-size: 1.5em;
-  font-weight: 600;
-  font-family: serif;
-}
-
 .container {
   width: 100%;
   max-width: 1150px;
@@ -411,6 +286,195 @@ table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
+}
+
+/* Buttons */
+.view-button {
+  padding: 6px 10px;
+  background: #fbfcfd;
+  border: none;
+  border-radius: 5px;
+  color: rgb(26, 25, 25);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.view-button:hover {
+  background: #0d8ba1;
+  color: white;
+}
+
+.delete-button,
+.edit-button,
+.save-button {
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+}
+
+.main-layout {
+  display: flex;
+  gap: 20px;
+}
+
+.table-section {
+  flex: 2;
+}
+
+.detail-card {
+  background: #fff;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 300px;
+  height: 400px;
+  font-family: sans-serif;
+  box-shadow: inset 2px 4px 11px rgba(134, 187, 240, 0.5);
+}
+
+.task-card {
+  flex: 1;
+  background: #fff;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: inset 2px 4px 11px rgba(134, 187, 240, 0.5);
+  height: 350px;
+}
+
+.task-card h5 {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 6px;
+}
+.task-card {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: inset 2px 4px 11px rgba(134, 187, 240, 0.5);
+}
+.task-table th, .task-table td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.task-table th {
+  background-color: #f4f4f4;
+}
+
+.task-table td {
+  background-color: #fff;
+}
+
+.task-table .no-tasks {
+  text-align: center;
+  color: #888;
+}
+.edit-button, .delete-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.edit-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.delete-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #45a049;
+}
+
+.delete-button:hover {
+  background-color: #d32f2f;
+}
+
+.edit-button i, .delete-button i {
+  margin-right: 5px;
+  font-size: 14px;
+}
+.detail {
+  font-size: 18px;
+  border-bottom: 1px solid rgb(116, 112, 112);
+  font-weight: bold;
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 20px;
+}
+
+.emp-name {
+  text-align: center;
+  font-size: 17px;
+  margin-bottom: 100px;
+
+}
+
+.emp-info p {
+  padding: 5px 0;
+  margin: 0px;
+}
+
+.detail-section {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.details-section p {
+  margin: 6px 0;
+}
+
+.avatar {
+  width: 70px;
+  height: 70px;
+  background: #295979;
+  color: #fff;
+  font-size: 37px;
+  border-radius: 11%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px auto;
+}
+
+.close-btn {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #444;
+}
+
+.close-btn:hover {
+  color: #e74c3c;
+}
+
+.title {
+  border-bottom: 1px solid #679fd8;
+  text-align: center;
+  color: #2c2a2a;
+  font-size: 1.5em;
+  font-weight: 600;
+  font-family: serif;
 }
 
 th {
@@ -480,7 +544,6 @@ td:nth-child(8) {
   word-wrap: break-word;
   white-space: normal;
   box-shadow: inset 2px 4px 11px rgba(134, 187, 240, 0.5);
-  color: rgb(43, 41, 41);
   font-size: 15px;
 }
 
@@ -504,7 +567,7 @@ input:focus {
 
 .custom_input {
   padding: 5px;
- border-color: #7bb0ec;
+  border-color: #7bb0ec;
   color: rgb(48, 45, 45);
   border-radius: 5px;
   cursor: pointer;
@@ -513,9 +576,10 @@ input:focus {
   align-items: center;
   gap: 16px;
 }
-.add-button {
 
-  border:1px solid white ;
+.add-button {
+  border:0px;
+  background-color: #0867b4;
 }
 
 .custom_nameInput {
@@ -523,7 +587,7 @@ input:focus {
 }
 
 .add-button:hover {
-  background-color: #1675e2;
+  background-color: #084b97;
   color: rgb(247, 246, 246);
 }
 
@@ -616,15 +680,16 @@ button:hover {
   background-color: #f4f4f4;
   color: black;
 }
+
 .pagination {
   display: flex;
-  justify-content:left;
+  justify-content: right;
   gap: 5px;
   margin-top: 20px;
 }
 
 .pagination button {
-  padding: 4px 9px;
+  padding: 2px 7px;
   border: 1px solid #ddd;
   border-radius: 6px;
   background-color: #f9f9f9;
@@ -647,5 +712,4 @@ button:hover {
   background-color: #ddd;
   cursor: not-allowed;
 }
-
 </style>

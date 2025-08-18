@@ -10,23 +10,12 @@
           <p v-if="showErrorTask" class="error-message">Task cannot be empty!</p>
         </div>
 
-        <!-- When in Assign Mode, replace input with dropdown -->
-        <div v-if="assignMode">
-          <select v-model="selectedEmployee" class="todo-input">
-            <option value="" disabled>Select Employee</option>
-            <option v-for="employee in employees" :key="employee.id" :value="employee.id">
-              {{ employee.first_name }} {{ employee.last_name }} ({{ employee.email }})
-            </option>
-          </select>
-          <p v-if="showErrorEmployee" class="error-message">Please select an employee!</p>
-        </div>
-
         <!-- Add Task and Assign Task Buttons (aligned side by side) -->
         <div class="buttons-container">
           <button @click="addTodo" class="add-button" :disabled="assignMode">
             <i class="fas fa-plus"></i> Add Task
           </button>
-          <button @click="openAssignModal" class="assign-button" :disabled="!selectedTasks.length">
+          <button @click="openAssignModal" class="assign-button" :disabled="selectedTasks.length === 0">
             <i class="fas fa-user-plus"></i> Assign
           </button>
         </div>
@@ -35,10 +24,19 @@
       <ul class="todo-list">
         <li v-for="todo in todos" :key="todo.id" class="todo-item">
           <input type="checkbox" v-model="selectedTasks" :value="todo.id" class="todo-checkbox" />
-          <span :class="{ completed: todo.completed }" class="todo-title">{{ todo.title }}</span>
+          <span v-if="!todo.isEditing" class="todo-title">{{ todo.task }}</span>
+          <input v-if="todo.isEditing" v-model="todo.task" class="todo-input" />
+          
+          <!-- Edit button -->
           <button @click="editTodo(todo)" class="edit-button" v-if="!todo.isEditing">
             <i class="fas fa-edit"></i>
           </button>
+          
+          <!-- Save button when editing -->
+          <button @click="saveTodo(todo)" class="save-button" v-if="todo.isEditing">
+            <i class="fas fa-save"></i> Save
+          </button>
+
           <button @click="deleteTodo(todo.id)" class="delete-button">
             <i class="fas fa-trash"></i>
           </button>
@@ -72,41 +70,22 @@
   </div>
 </template>
 
-
-
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 
 const todos = ref([]);
 const newTodo = ref("");
-const showErrorTask = ref(false);  // For task input error (only show after clicking Add Task)
-const showErrorEmployee = ref(false);  // For employee dropdown error (only show after clicking Assign Task)
+const showErrorTask = ref(false);
+const showErrorEmployee = ref(false);
 const assignModalOpen = ref(false);
 const selectedEmployee = ref(null);
 const selectedDepartment = ref(null);
 const employees = ref([]);
 const departments = ref([]);
-const selectedTasks = ref([]);
+const selectedTasks = ref([]);  // Store selected task IDs
+
 const assignMode = ref(false);  // Track if the input field should show the dropdown or task input
-
-// Watchers for input validation (errors only trigger after clicking respective button)
-watch(newTodo, () => {
-  if (!newTodo.value.trim()) {
-    showErrorTask.value = false;  // Prevent error message while typing
-  }
-});
-
-watch(selectedEmployee, () => {
-  if (!selectedEmployee.value) {
-    showErrorEmployee.value = false;  // Prevent error message while typing or selecting
-  }
-});
-
-onMounted(() => {
-  fetchTodos();
-  fetchDropdownData();
-});
 
 // Fetch todos from API
 const fetchTodos = async () => {
@@ -122,6 +101,11 @@ const fetchTodos = async () => {
   }
 };
 
+onMounted(() => {
+  fetchTodos();
+  fetchDropdownData();
+});
+
 // Fetch employees and departments from the backend
 const fetchDropdownData = async () => {
   try {
@@ -136,13 +120,13 @@ const fetchDropdownData = async () => {
 // Add new task
 const addTodo = async () => {
   if (!newTodo.value.trim()) {
-    showErrorTask.value = true;  // Show error if task is empty when Add Task is clicked
+    showErrorTask.value = true; 
     return;
   }
   showErrorTask.value = false;
   try {
     const response = await axios.post('/api/todos', {
-      title: newTodo.value
+      task: newTodo.value
     }, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -163,30 +147,13 @@ const openAssignModal = () => {
   }
 
   assignModalOpen.value = true;
-  assignMode.value = true;  // Switch to dropdown mode
-  fetchEmployeeEmails();  // Fetch employee emails when modal is opened
 };
 
-// Fetch employee emails for the assign modal dropdown
-const fetchEmployeeEmails = async () => {
-  try {
-    const response = await axios.get('/api/employees/emails', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-    console.log('Fetched employee data:', response.data);  // Log to check response
-    employees.value = response.data.employees;  // Populate employees list
-  } catch (error) {
-    console.error('Error fetching employee emails:', error);
-  }
-};
-
+// Close the assign modal
 const closeAssignModal = () => {
   assignModalOpen.value = false;
   selectedEmployee.value = null;
   selectedDepartment.value = null;
-  assignMode.value = false;  // Close the dropdown and return to task input field
 };
 
 // Assign task
@@ -209,36 +176,25 @@ const assignTask = async () => {
         }
       });
 
-      // Now update the assigned task in the employee list
-      const assignedTask = response.data; // This contains task info and assigned employee
-
-      // Update the employees array to reflect the task assignment in the employee task list
-      const employeeIndex = employees.value.findIndex(employee => employee.email === assignedTask.email);
-      if (employeeIndex !== -1) {
-        employees.value[employeeIndex].tasks.push(assignedTask);  // Add the assigned task to the employee's task list
+      // Update the task in the todo list after assignment
+      const taskIndex = todos.value.findIndex(task => task.id === taskId);
+      if (taskIndex !== -1) {
+        todos.value[taskIndex] = response.data;
       }
 
       alert(`Task with ID ${taskId} assigned successfully!`);
     }
 
-    // After assigning the task, set assignMode to false to show the input field
-    assignMode.value = false;  // Switch back to the task input field (hide dropdown)
-
-    // Close the modal
+    // Close the modal after task is assigned
     closeAssignModal();
-
-    // Fetch the updated list of tasks
-    fetchTodos();  // Refresh the todo list
 
     // Clear the selected employee and department
     selectedEmployee.value = null;
     selectedDepartment.value = null;
-
   } catch (error) {
     console.error('Error assigning task:', error);
   }
 };
-
 
 // Delete task
 const deleteTodo = async (id) => {
@@ -268,8 +224,7 @@ form {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
-  max-width: 450px;
-  /* Maximum width for form */
+  max-width: 550px;
   padding: 30px;
   background-color: rgba(3, 3, 3, 0.7);
   box-sizing: border-box;
@@ -284,11 +239,25 @@ form input {
   background: transparent;
   color: #fff;
 }
+.todo-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 15px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.todo-input:focus {
+  border-color: #4CAF50;
+}
+
 
 input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(58, 57, 57, 0.5);
   transition: color 0.3s ease;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 input:focus {
@@ -399,19 +368,6 @@ h1 {
 }
 
 
-.todo-input {
-  width: 100%;
-  padding: 8px;
-  font-size: 15px;
-  border: 2px solid #ddd;
-  border-radius: 5px;
-  outline: none;
-  transition: border-color 0.3s ease;
-}
-
-.todo-input:focus {
-  border-color: #4CAF50;
-}
 
 .add-button {
   padding: 8px;
@@ -457,7 +413,7 @@ h1 {
 
 .todo-title {
   flex-grow: 1;
-  font-size: 14.7px;
+  font-size: 15px;
 }
 
 .todo-title.completed {
@@ -468,10 +424,9 @@ h1 {
 .delete-button {
 
   padding: 8px 12px;
-  color: rgb(12, 12, 12);
-  border-color: #e4e0de;
+  color: rgb(36, 35, 35);
+  border: 0px;
   border-radius: 4px;
-  border:0px;
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -480,8 +435,8 @@ h1 {
 
 .edit-button {
   padding: 8px 12px;
-  color: rgb(14, 13, 13);
-  border:0px;
+  color: rgb(36, 35, 35);
+  border: 0px;
   border-radius: 4px;
   cursor: pointer;
   display: flex;
@@ -507,15 +462,26 @@ h1 {
   color: #f9f9f9;
 }
 
-.delete-button:hover i {
-  color: #f9f9f9;
+.save-button {
+  padding: 8px 12px;
+  background-color: #f7f8f7;
+  color: rgb(44, 43, 43);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 0px;
 }
 
-.delete-button i,
-.edit-button i {
-  font-size: 15px;
-  color: #333;
+.save-button:hover {
+  background-color: #45a049;
 }
+
+.save-button i {
+  font-size: 14px;
+}
+
 
 .assign-button {
   padding: 8px 12px;
@@ -531,20 +497,10 @@ h1 {
 
 .assign-button:hover {
   background-color: #45a049;
-  color: rgb(19, 18, 18);
 }
 
 .assign-button i {
   font-size: 14px;
-}
-
-.modal {
-  padding: 20px;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  max-width: 400px;
-  margin: 50px auto;
 }
 
 select {

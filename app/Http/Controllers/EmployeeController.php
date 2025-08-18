@@ -110,53 +110,13 @@ public function getEmployeeEmails()
         return response()->json(['employees' => $employees]);
     }
 
-    //assign task  
-public function assignTask(Request $request, $taskId)
-    {
-        // Validate input
-        $validated = $request->validate([
-            'employee_id' => 'required|exists:employees,id',
-        ]);
-
-        // Find the task
-        $task = Task::findOrFail($taskId);
-
-        // Check if the task is already assigned to this employee
-        $existingAssignment = EmployeeTask::where('task_id', $taskId)
-        ->where('employee_id', $validated['employee_id'])
-        ->first();
-        if ($existingAssignment) {
-            return response()->json(['message' => 'Task is already assigned to this employee.'], 400);
-        }
-
-        // Assign the task to the employee
-        $employeeTask = new EmployeeTask();
-        $employeeTask->employee_id = $validated['employee_id'];
-        $employeeTask->task_id = $taskId;
-        $employeeTask->save();
-
-        // Return success message
-        return response()->json(['message' => 'Task assigned successfully!'], 200);
-    }
-
     
 public function fetchEmployees(Request $request)
 {
     // Paginate the results, limiting to 3 employees per page
     $employees = Employee::with('department', 'designation')
-        ->paginate(5);  // Limit to 3 employees per page
+        ->paginate(4);  // Limit to 3 employees per page
 
     return response()->json($employees);
 }
-
-public function getEmployeeWithTasks($id)
-{
-    $employee = Employee::with(['department', 'designation', 'todos'])->findOrFail($id);
-
-    return response()->json([
-        'employee' => $employee,
-        'tasks' => $employee->todos
-    ]);
 }
-}
-
