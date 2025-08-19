@@ -346,7 +346,7 @@ h4 {
 h1 {
   text-align: center;
   color: #333;
-  font-size: 1.5em;
+  font-size: 1.4em;
   font-weight: 600;
   font-family: serif;
   border-bottom: 1px solid #679fd8;

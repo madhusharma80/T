@@ -282,8 +282,6 @@ const viewEmployee = async (employee) => {
   }
 };
 
-
-
 // Change pagination page
 const changePage = (page) => {
   if (page > 0 && page <= paginatedEmployees.value.last_page) {
@@ -336,7 +334,6 @@ const resetForm = () => {
 
 </script>
 
-
 <style scoped>
 .container {
   width: 100%;
@@ -356,7 +353,14 @@ table {
   table-layout: fixed;
 }
 
-/* Buttons */
+.title {
+  border-bottom: 1px solid #679fd8;
+  text-align: center;
+  color: #2c2a2a;
+  font-size: 1.4em;
+  font-weight: 600;
+  font-family: serif;
+}
 .view-button {
   padding: 6px 10px;
   background: #fbfcfd;
@@ -543,14 +547,7 @@ table {
   color: #e74c3c;
 }
 
-.title {
-  border-bottom: 1px solid #679fd8;
-  text-align: center;
-  color: #2c2a2a;
-  font-size: 1.5em;
-  font-weight: 600;
-  font-family: serif;
-}
+
 
 th {
   padding: 6px;
@@ -569,7 +566,7 @@ th:nth-child(2),
 td:nth-child(2),
 th:nth-child(3),
 td:nth-child(3) {
-  width: 7%;
+  width: 6%;
   padding-left: 15px;
 }
 
@@ -592,7 +589,7 @@ td:nth-child(6) {
 th:nth-child(7),
 td:nth-child(7) {
   box-shadow: inset 2px 4px 11px rgba(134, 187, 240, 0.5);
-  width: 8%;
+  width: 7.7%;
 }
 
 th:nth-child(8),
