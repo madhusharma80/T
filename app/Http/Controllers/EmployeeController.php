@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Designation;
+use App\Models\Todo;  // Use Todo model
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
@@ -40,83 +41,125 @@ class EmployeeController extends Controller
         ]);
     }
 
-
     // Method to add a new employee
-public function addEmployee(Request $request)
-{
-    // Validate the incoming request
-    $validatedData = $request->validate([
-        'email' => 'required|email',
-        'department_id' => 'required|exists:departments,id',
-        'designation_id' => 'required|exists:designations,id',
-        'first_name' => 'required|string',
-        'last_name' => 'required|string',
-    ]);
+    public function addEmployee(Request $request)
+    {
+        // Validate the incoming request
+        $validatedData = $request->validate([
+            'email' => 'required|email',
+            'department_id' => 'required|exists:departments,id',
+            'designation_id' => 'required|exists:designations,id',
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+        ]);
 
-    // Create a new employee
-    $employee = Employee::create($validatedData);
+        // Create a new employee
+        $employee = Employee::create($validatedData);
 
-    // Load department and designation details
-    $employee->load('department', 'designation'); // This ensures department and designation are included
+        // Load department and designation details
+        $employee->load('department', 'designation'); 
 
-    // Return the employee with department and designation
-    return response()->json(['employee' => $employee], 200);  // Send back the full employee object
-}
-// function for  delete button which is place in the Employee task management  list 
-public function deleteEmployee($id)
-{
-    $employee = Employee::find($id);
-
-    if (!$employee) {
-        return response()->json(['message' => 'Employee not found.'], 404);
+        // Return the employee with department and designation
+        return response()->json(['employee' => $employee], 200);  
     }
 
-    $employee->delete();  // Delete the employee from the database
-    return response()->json(['message' => 'Employee deleted successfully.'], 200);
-}
-// In EmployeeController.php
-public function updateEmployee(Request $request, $id)
-{
-    // Fetch employee by ID
-    $employee = Employee::findOrFail($id);
-
-    // If email is updated, apply unique validation
-    $emailValidation = $employee->email === $request->email
-        ? 'required|email'
-        : 'required|email|unique:employees,email';
-
-    // Validate the request data
-    $request->validate([
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'email' => $emailValidation,
-        'department_id' => 'required|exists:departments,id',
-        'designation_id' => 'required|exists:designations,id',
-    ]);
-
-    // Update the employee details
-    $employee->update($request->all());
-
-    return response()->json($employee);
-}
-
-
-public function getEmployeeEmails()
+    // Function to delete an employee
+    public function deleteEmployee($id)
     {
-        // Fetch only the necessary columns (id, first_name, last_name, email)
-        $employees = Employee::select('id', 'email')->get();
-        
-        // Return employees data in JSON format
+        $employee = Employee::find($id);
+
+        if (!$employee) {
+            return response()->json(['message' => 'Employee not found.'], 404);
+        }
+
+        $employee->delete();  // Delete the employee from the database
+        return response()->json(['message' => 'Employee deleted successfully.'], 200);
+    }
+
+    // Function to update employee details
+    public function updateEmployee(Request $request, $id)
+    {
+        $employee = Employee::findOrFail($id);
+
+        // If email is updated, apply unique validation
+        $emailValidation = $employee->email === $request->email
+            ? 'required|email'
+            : 'required|email|unique:employees,email';
+
+        // Validate the request data
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => $emailValidation,
+            'department_id' => 'required|exists:departments,id',
+            'designation_id' => 'required|exists:designations,id',
+        ]);
+
+        // Update the employee details
+        $employee->update($request->all());
+
+        return response()->json($employee);
+    }
+
+    // Method to fetch all employee emails
+    public function getEmployeeEmails()
+    {
+        // Fetch all employees from the database
+        $employees = Employee::select('id', 'first_name', 'last_name', 'email')->get();
+
+        // Return the employees as JSON
         return response()->json(['employees' => $employees]);
     }
 
-    
-public function fetchEmployees(Request $request)
-{
-    // Paginate the results, limiting to 3 employees per page
-    $employees = Employee::with('department', 'designation')
-        ->paginate(4);  // Limit to 3 employees per page
+    // Method to fetch tasks assigned to an employee from the 'todos' table
+    public function getEmployeeTasks($employeeId)
+    {
+        try {
+          // Fetch tasks assigned to the employee
+            $tasks = Todo::where('assigned_to', $employeeId)->get();
+                // Check if tasks exist, else return a message
+                if ($tasks->isEmpty()) {
+                  return response()->json(['message' => 'No tasks found'], 404);
+                }
+                       return response()->json($tasks); // Return tasks as JSON
+            } catch (\Exception $e) {
+                  return response()->json(['error' => 'Failed to fetch tasks', 'message' => $e->getMessage()], 500);
+                }
+    }
+    // Method to fetch paginated employees
+    public function fetchEmployees(Request $request)
+    {
+        // Paginate the results, limiting to 3 employees per page
+        $employees = Employee::with('department', 'designation')
+            ->paginate(4);  // Limit to 3 employees per page
 
-    return response()->json($employees);
-}
+        return response()->json($employees);
+    }
+
+    // Method to assign task to employee (using 'todos' table)
+    public function assignTask(Request $request)
+    {
+        // Validate incoming data
+        $request->validate([
+            'taskId' => 'required|exists:todos,id',  // Use 'todos' table for tasks
+            'employeeId' => 'required|exists:employees,id',
+        ]);
+
+        // Fetch the task by ID from 'todos' table
+        $task = Todo::findOrFail($request->taskId);
+
+        // Assign the task to the selected employee
+        $task->assigned_to = $request->employeeId;
+        $task->save();
+
+        return response()->json($task);
+    }
+    // Method to fetch employee tasks (from 'todos' table)
+    public function fetchEmployeeTasks($employeeId)
+    {
+        // Fetch tasks assigned to the employee from 'todos' table
+        $tasks = Todo::where('assigned_to', $employeeId)->get();
+        return response()->json($tasks);
+    }
+    
 }

@@ -6,16 +6,15 @@
         <!-- Task input or dropdown based on assignMode -->
         <div class="w-50">
           <!-- Show input if not assigning, show dropdown when assignMode is true -->
-          <input v-if="!assignMode && !isEditing" v-model="newTodo" type="text" placeholder="Add a new task" class="todo-input"
-            :class="{ 'input-error': showErrorTask }" />
-          
+          <input v-if="!assignMode && !isEditing" v-model="newTodo" type="text" placeholder="Add a new task"
+            class="todo-input" :class="{ 'input-error': showErrorTask }" />
+
           <select v-if="assignMode && !isEditing" v-model="selectedEmployee" class="todo-input">
             <option value="" disabled>Select Employee</option>
             <option v-for="employee in employees" :key="employee.id" :value="employee.id">
               {{ employee.first_name }} {{ employee.last_name }} ({{ employee.email }})
             </option>
           </select>
-          
           <p v-if="showErrorTask" class="error-message">Task cannot be empty!</p>
         </div>
 
@@ -33,7 +32,7 @@
       <ul class="todo-list">
         <li v-for="todo in todos" :key="todo.id" class="todo-item">
           <input type="checkbox" v-model="selectedTasks" :value="todo.id" class="todo-checkbox" />
-          
+
           <!-- Show task title or dropdown for assignment -->
           <span v-if="!todo.isEditing && !todo.isAssigned" class="todo-title">{{ todo.task }}</span>
 
@@ -52,10 +51,10 @@
           <button @click="editTodo(todo)" class="edit-button" v-if="!todo.isEditing">
             <i class="fas fa-edit"></i>
           </button>
-          
+
           <!-- Save button when editing -->
           <button @click="saveTodo(todo)" class="save-button" v-if="todo.isEditing">
-            <i class="fas fa-save"></i> 
+            <i class="fas fa-save"></i>
           </button>
 
           <button @click="deleteTodo(todo.id)" class="delete-button">
@@ -93,26 +92,32 @@ const fetchTodos = async () => {
     console.error('Error fetching todos:', error);
   }
 };
-
 onMounted(() => {
   fetchTodos();
-  fetchDropdownData();
+  fetchEmployeeEmails(); // Call this function when the component is mounted
 });
 
-// Fetch employees from the backend
-const fetchDropdownData = async () => {
+// Fetch employee emails from the backend
+const fetchEmployeeEmails = async () => {
   try {
-    const response = await axios.get('/api/fetchDropdownData');
-    employees.value = response.data.employees;
+    const response = await axios.get('/api/employee-emails', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    if (response.data && response.data.employees) {
+      employees.value = response.data.employees;
+    }
   } catch (error) {
-    console.error('Error fetching dropdown data:', error);
+    console.error('Error fetching employee emails:', error);
   }
 };
 
 // Add new task
 const addTodo = async () => {
   if (!newTodo.value.trim()) {
-    showErrorTask.value = true; 
+    showErrorTask.value = true;
     return;
   }
   showErrorTask.value = false;
@@ -124,7 +129,7 @@ const addTodo = async () => {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
-    todos.value.push(response.data);
+    todos.value.push(response.data.task);
     newTodo.value = "";
     assignMode.value = false; // Reset to input mode after adding task
   } catch (error) {
@@ -137,11 +142,13 @@ const toggleAssignMode = () => {
   assignMode.value = !assignMode.value;
 };
 
+// Edit task
 const editTodo = (todo) => {
   todo.isEditing = true;
   isEditing.value = true; // Set the global editing flag to true
 };
 
+// Save edited task
 const saveTodo = async (todo) => {
   try {
     const response = await axios.put(`/api/todos/${todo.id}`, { task: todo.task }, {
@@ -170,8 +177,31 @@ const deleteTodo = async (id) => {
     console.error('Error deleting todo:', error);
   }
 };
-</script>
 
+// Assign Task to Employee
+const assignTask = async () => {
+  if (!selectedEmployee.value) {
+    alert('Please select an employee!');
+    return;
+  }
+  try {
+    const response = await axios.post(`/api/todos/${selectedTasks.value}/assign`, {
+      employee_id: selectedEmployee.value,
+    });
+
+    todos.value = todos.value.map(task => {
+      if (task.id === selectedTasks.value) {
+        task.assigned_to = selectedEmployee.value; // Assign employee
+      }
+      return task;
+    });
+
+    alert('Task assigned successfully!');
+  } catch (error) {
+    console.error('Error assigning task:', error);
+  }
+};
+</script>
 
 <style scoped>
 .text-danger {
@@ -200,6 +230,7 @@ form input {
   background: transparent;
   color: #fff;
 }
+
 .todo-input {
   width: 100%;
   padding: 8px;
@@ -328,8 +359,6 @@ h1 {
   margin-bottom: 20px;
 }
 
-
-
 .add-button {
   padding: 8px;
   border: 0px;
@@ -442,7 +471,6 @@ h1 {
 .save-button i {
   font-size: 14px;
 }
-
 
 .assign-button {
   padding: 8px 12px;

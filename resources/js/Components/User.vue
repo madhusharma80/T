@@ -21,18 +21,20 @@
               <th>
                 <select v-model="newEmployee.department_id" class="custom_dropdown">
                   <option value="">Department</option>
-                  <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
+                  <option v-for="department in departments" :key="department.id" :value="department.id">{{
+                    department.name }}</option>
                 </select>
               </th>
               <th>
                 <select v-model="newEmployee.designation_id" class="custom_dropdown">
                   <option value="">Designation</option>
-                  <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
+                  <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
+                    designation.name }}</option>
                 </select>
               </th>
               <th>
-                <button @click="toggleAssignMode" class="btn btn-primary w-100 add-button">
-                  <i class="fas fa-plus"></i> Add
+                <button class="btn btn-primary w-100 add-button" @click="addEmployee">
+                  <i class="fas fa-plus"></i>Add
                 </button>
               </th>
             </tr>
@@ -57,14 +59,16 @@
                 <span v-if="!employee.isEditing">{{ employee.department?.name || 'No Department' }}</span>
                 <select v-else v-model="employee.department_id" class="custom_dropdown">
                   <option value="">Select Department</option>
-                  <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
+                  <option v-for="department in departments" :key="department.id" :value="department.id">{{
+                    department.name }}</option>
                 </select>
               </td>
               <td>
                 <span v-if="!employee.isEditing">{{ employee.designation?.name || 'No Designation' }}</span>
                 <select v-else v-model="employee.designation_id" class="custom_dropdown">
                   <option value="">Select Designation</option>
-                  <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
+                  <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
+                    designation.name }}</option>
                 </select>
               </td>
               <td>
@@ -78,7 +82,8 @@
                     <i class="fas fa-edit"></i>
                   </button>
                   <!-- Save Button -->
-                  <button v-if="employee.isEditing" class="btn btn-success save-button" @click="saveEmployee(employee, index)">
+                  <button v-if="employee.isEditing" class="btn btn-success save-button"
+                    @click="saveEmployee(employee, index)">
                     <i class="fas fa-save"></i>
                   </button>
                   <!-- Delete Button -->
@@ -93,13 +98,16 @@
 
         <!-- Pagination Controls -->
         <div class="pagination">
-          <button @click="changePage(paginatedEmployees.current_page - 1)" :disabled="paginatedEmployees.current_page === 1">
+          <button @click="changePage(paginatedEmployees.current_page - 1)"
+            :disabled="paginatedEmployees.current_page === 1">
             <i class="fas fa-chevron-left"></i>
           </button>
-          <button v-for="page in paginatedEmployees.last_page" :key="page" @click="changePage(page)" :class="{ active: paginatedEmployees.current_page === page }">
+          <button v-for="page in paginatedEmployees.last_page" :key="page" @click="changePage(page)"
+            :class="{ active: paginatedEmployees.current_page === page }">
             {{ page }}
           </button>
-          <button @click="changePage(paginatedEmployees.current_page + 1)" :disabled="paginatedEmployees.current_page === paginatedEmployees.last_page">
+          <button @click="changePage(paginatedEmployees.current_page + 1)"
+            :disabled="paginatedEmployees.current_page === paginatedEmployees.last_page">
             <i class="fas fa-chevron-right"></i>
           </button>
         </div>
@@ -141,18 +149,14 @@
               <td>{{ task.title }}</td>
               <td><strong>{{ task.status }}</strong></td>
               <td>
-                <!-- Edit Button -->
                 <button @click="editAssignedTask(task)" class="edit-button">
                   <i class="fas fa-edit"></i> Edit
                 </button>
-
-                <!-- Delete Button -->
                 <button @click="deleteAssignedTask(task.id)" class="delete-button">
                   <i class="fas fa-trash"></i> Delete
                 </button>
               </td>
             </tr>
-            <!-- No tasks assigned message -->
             <tr v-if="employeeTasks.length === 0">
               <td colspan="3" class="no-tasks">No tasks assigned</td>
             </tr>
@@ -172,8 +176,10 @@ const designations = ref([]);
 const tasks = ref([]);
 const paginatedEmployees = ref({ data: [], current_page: 1, last_page: 1, per_page: 3 });
 
-const selectedEmployee = ref(null);
-const employeeTasks = ref([]);
+const selectedEmployee = ref(null);  // Employee selected to assign task
+const employeeTasks = ref([]);  // List of tasks assigned to the selected employee
+const newTask = ref("");  // New task to be added
+const selectedEmployeeId = ref(null);  // Store selected employee's ID for task assignment
 
 const newEmployee = ref({
   email: '',
@@ -191,8 +197,7 @@ const isAddDisabled = computed(() => {
     !newEmployee.value.last_name;
 });
 
-const assignMode = ref(false); // Add this flag to toggle between input and dropdown
-
+// Fetch initial data for departments, designations, and employees
 onMounted(async () => {
   try {
     const response = await axios.get('/api/department-designation-data', {
@@ -206,6 +211,7 @@ onMounted(async () => {
   }
 });
 
+// Fetch paginated list of employees
 const fetchEmployees = async (page = 1) => {
   const response = await axios.get(`/api/employees?page=${page}`, {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -214,23 +220,29 @@ const fetchEmployees = async (page = 1) => {
   paginatedEmployees.value.data.forEach(emp => emp.isEditing = false);
 };
 
-// Toggle between input and dropdown when Add Task is clicked
-const toggleAssignMode = () => {
-  assignMode.value = !assignMode.value;
-};
-
-// Add Employee
+// Add a new employee
 const addEmployee = async () => {
+  if (isAddDisabled.value) return;
+
   const employeeData = { ...newEmployee.value };
-  await axios.post('/api/employee/add-employee', employeeData, {
-    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-  });
-  fetchEmployees(paginatedEmployees.value.current_page);
-  resetForm();
+  console.log('Adding new employee:', employeeData);
+
+  try {
+    const response = await axios.post('/api/employee/add-employee', employeeData, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    console.log('Employee added successfully:', response.data);
+    fetchEmployees(paginatedEmployees.value.current_page);
+    resetForm(); // Reset the form after successful addition
+  } catch (error) {
+    console.error('Error adding employee:', error);
+  }
 };
 
+// Edit employee details
 const editEmployee = (employee) => { employee.isEditing = true; };
 
+// Save edited employee details
 const saveEmployee = async (employee) => {
   await axios.put(`/api/employee/update-employee/${employee.id}`, employee, {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -239,6 +251,7 @@ const saveEmployee = async (employee) => {
   fetchEmployees(paginatedEmployees.value.current_page);
 };
 
+// Delete an employee
 const deleteEmployee = async (index, employeeId) => {
   await axios.delete(`/api/employee/delete-employee/${employeeId}`, {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -246,34 +259,88 @@ const deleteEmployee = async (index, employeeId) => {
   fetchEmployees(paginatedEmployees.value.current_page);
 };
 
+// View tasks for a selected employee
 const viewEmployee = async (employee) => {
   selectedEmployee.value = employee;
   try {
     const response = await axios.get(`/api/employee/${employee.id}/tasks`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
-    employeeTasks.value = response.data;
-  } catch {
-    employeeTasks.value = [];
+
+    // Check what response is returned
+    console.log(response.data);  // Log the response
+
+    if (response.data && response.data.length > 0) {
+      employeeTasks.value = response.data;
+    } else {
+      employeeTasks.value = [];
+    }
+
+  } catch (error) {
+    console.error('Error fetching employee tasks:', error);
+    employeeTasks.value = []; // If error, reset tasks to empty array
   }
 };
 
+
+
+// Change pagination page
 const changePage = (page) => {
   if (page > 0 && page <= paginatedEmployees.value.last_page) {
     fetchEmployees(page);
   }
 };
 
+// Add a new task and assign it to the selected employee
+const addTask = async () => {
+  if (!newTask.value.trim() || !selectedEmployeeId.value) {
+    alert("Please provide a task title and select an employee.");
+    return;
+  }
+
+  try {
+    const response = await axios.post('/api/todos', {
+      task: newTask.value,
+      assigned_to: selectedEmployeeId.value  // Assign task to selected employee
+    }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+
+    // After creating task, refresh the employee's tasks
+    viewEmployee(selectedEmployee.value);  // Fetch tasks for the selected employee again
+
+    newTask.value = ""; // Clear input after adding task
+  } catch (error) {
+    console.error('Error adding task:', error);
+  }
+};
+
+// Delete a task assigned to an employee
+const deleteAssignedTask = async (taskId) => {
+  try {
+    await axios.delete(`/api/todos/${taskId}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+
+    // Refresh the employee's tasks after deletion
+    viewEmployee(selectedEmployee.value);
+  } catch (error) {
+    console.error('Error deleting task:', error);
+  }
+};
+
+// Reset the new employee form
 const resetForm = () => {
   newEmployee.value = { email: '', department_id: '', designation_id: '', first_name: '', last_name: '' };
 };
+
 </script>
 
 
 <style scoped>
 .container {
   width: 100%;
-  max-width: 1150px;
+  max-width: 1200px;
   background-color: #f8f9faa1;
   padding: 40px;
   border-radius: 4px;
@@ -351,13 +418,16 @@ table {
   border-bottom: 1px solid #ddd;
   padding-bottom: 6px;
 }
+
 .task-card {
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: inset 2px 4px 11px rgba(134, 187, 240, 0.5);
 }
-.task-table th, .task-table td {
+
+.task-table th,
+.task-table td {
   padding: 10px;
   text-align: left;
   border: 1px solid #ddd;
@@ -375,7 +445,9 @@ table {
   text-align: center;
   color: #888;
 }
-.edit-button, .delete-button {
+
+.edit-button,
+.delete-button {
   padding: 6px 12px;
   border: none;
   border-radius: 4px;
@@ -401,10 +473,12 @@ table {
   background-color: #d32f2f;
 }
 
-.edit-button i, .delete-button i {
+.edit-button i,
+.delete-button i {
   margin-right: 5px;
   font-size: 14px;
 }
+
 .detail {
   font-size: 18px;
   border-bottom: 1px solid rgb(116, 112, 112);
@@ -492,23 +566,24 @@ td:first-child {
 }
 
 th:nth-child(2),
-td:nth-child(2) {
-  width: 10%;
+td:nth-child(2),
+th:nth-child(3),
+td:nth-child(3) {
+  width: 7%;
   padding-left: 15px;
 }
 
-th:nth-child(3),
-td:nth-child(3),
+
 th:nth-child(4),
 td:nth-child(4),
 th:nth-child(5),
 td:nth-child(5) {
-  width: 10%;
+  width: 9%;
 }
 
 th:nth-child(6),
 td:nth-child(6) {
-  width: 10%;
+  width: 9%;
   text-align: left;
   white-space: normal;
   word-wrap: break-word;
@@ -517,7 +592,7 @@ td:nth-child(6) {
 th:nth-child(7),
 td:nth-child(7) {
   box-shadow: inset 2px 4px 11px rgba(134, 187, 240, 0.5);
-  width: 8.8%;
+  width: 8%;
 }
 
 th:nth-child(8),
@@ -579,7 +654,7 @@ input:focus {
 }
 
 .add-button {
-  border:0px;
+  border: 0px;
   background-color: #0867b4;
 }
 

@@ -30,6 +30,7 @@ Route::prefix('todos')->group(function () {
  });
     // Department and designation data for dropdown ETML
     Route::post('employee/add-employee', [EmployeeController::class, 'addEmployee']);
+
     Route::get('/department-designation-data', [EmployeeController::class, 'fetchDropdownData']);
     Route::get('/fetchDropdownData', [TodoController::class, 'fetchDropdownData']);
 
@@ -38,19 +39,20 @@ Route::prefix('todos')->group(function () {
     Route::delete('/employee/delete-employee/{id}', [EmployeeController::class, 'deleteEmployee']);
     Route::put('/employee/update-employee/{id}', [EmployeeController::class, 'updateEmployee']);
 
-
     // Todo list routes
-    Route::get('employees/emails', [EmployeeController::class, 'getEmployeeEmails']);
+    Route::get('/employee-emails', [EmployeeController::class, 'getEmployeeEmails']);
     Route::post('/tasks/{taskId}/assign', [EmployeeTaskController::class, 'assignTask']);
 
+    //connect task  to Employee task management List
+    Route::get('/employee/{employeeId}/tasks', [EmployeeController::class, 'getEmployeeTasks']);
+
     //Route for pagination 
-    Route::get('/employee/{employeeId}/tasks', [EmployeeController::class, 'fetchEmployeeTasks']);
+    Route::get('/employee/{employeeId}/tasks', [EmployeeController::class, 'fetchEmployeeTasks']); 
     Route::post('/todos', [TodoController::class, 'addTodo']);
 
-
-   
-   Route::get('/employee/{id}/details', [EmployeeController::class, 'showWithTasks']);
-   Route::get('/employee/{id}/tasks', [EmployeeController::class, 'getEmployeeTasks']);
+    Route::get('/employee/{id}/details', [EmployeeController::class, 'showWithTasks']);
+    Route::get('/employee/{id}/tasks', [EmployeeController::class, 'getEmployeeTasks']);
+    Route::post('/todos/{task}/assign', [TodoController::class, 'assignTask']);
 
 
  
