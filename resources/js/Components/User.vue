@@ -21,20 +21,18 @@
               <th>
                 <select v-model="newEmployee.department_id" class="custom_dropdown">
                   <option value="">Department</option>
-                  <option v-for="department in departments" :key="department.id" :value="department.id">{{
-                    department.name }}</option>
+                  <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
                 </select>
               </th>
               <th>
                 <select v-model="newEmployee.designation_id" class="custom_dropdown">
                   <option value="">Designation</option>
-                  <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
-                    designation.name }}</option>
+                  <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
                 </select>
               </th>
               <th>
-                <button class="btn btn-primary w-100 add-button">
-                  <i class="fas fa-plus"></i>Add
+                <button @click="toggleAssignMode" class="btn btn-primary w-100 add-button">
+                  <i class="fas fa-plus"></i> Add
                 </button>
               </th>
             </tr>
@@ -59,16 +57,14 @@
                 <span v-if="!employee.isEditing">{{ employee.department?.name || 'No Department' }}</span>
                 <select v-else v-model="employee.department_id" class="custom_dropdown">
                   <option value="">Select Department</option>
-                  <option v-for="department in departments" :key="department.id" :value="department.id">{{
-                    department.name }}</option>
+                  <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.name }}</option>
                 </select>
               </td>
               <td>
                 <span v-if="!employee.isEditing">{{ employee.designation?.name || 'No Designation' }}</span>
                 <select v-else v-model="employee.designation_id" class="custom_dropdown">
                   <option value="">Select Designation</option>
-                  <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{
-                    designation.name }}</option>
+                  <option v-for="designation in designations" :key="designation.id" :value="designation.id">{{ designation.name }}</option>
                 </select>
               </td>
               <td>
@@ -82,8 +78,7 @@
                     <i class="fas fa-edit"></i>
                   </button>
                   <!-- Save Button -->
-                  <button v-if="employee.isEditing" class="btn btn-success save-button"
-                    @click="saveEmployee(employee, index)">
+                  <button v-if="employee.isEditing" class="btn btn-success save-button" @click="saveEmployee(employee, index)">
                     <i class="fas fa-save"></i>
                   </button>
                   <!-- Delete Button -->
@@ -98,16 +93,13 @@
 
         <!-- Pagination Controls -->
         <div class="pagination">
-          <button @click="changePage(paginatedEmployees.current_page - 1)"
-            :disabled="paginatedEmployees.current_page === 1">
+          <button @click="changePage(paginatedEmployees.current_page - 1)" :disabled="paginatedEmployees.current_page === 1">
             <i class="fas fa-chevron-left"></i>
           </button>
-          <button v-for="page in paginatedEmployees.last_page" :key="page" @click="changePage(page)"
-            :class="{ active: paginatedEmployees.current_page === page }">
+          <button v-for="page in paginatedEmployees.last_page" :key="page" @click="changePage(page)" :class="{ active: paginatedEmployees.current_page === page }">
             {{ page }}
           </button>
-          <button @click="changePage(paginatedEmployees.current_page + 1)"
-            :disabled="paginatedEmployees.current_page === paginatedEmployees.last_page">
+          <button @click="changePage(paginatedEmployees.current_page + 1)" :disabled="paginatedEmployees.current_page === paginatedEmployees.last_page">
             <i class="fas fa-chevron-right"></i>
           </button>
         </div>
@@ -199,6 +191,8 @@ const isAddDisabled = computed(() => {
     !newEmployee.value.last_name;
 });
 
+const assignMode = ref(false); // Add this flag to toggle between input and dropdown
+
 onMounted(async () => {
   try {
     const response = await axios.get('/api/department-designation-data', {
@@ -220,6 +214,12 @@ const fetchEmployees = async (page = 1) => {
   paginatedEmployees.value.data.forEach(emp => emp.isEditing = false);
 };
 
+// Toggle between input and dropdown when Add Task is clicked
+const toggleAssignMode = () => {
+  assignMode.value = !assignMode.value;
+};
+
+// Add Employee
 const addEmployee = async () => {
   const employeeData = { ...newEmployee.value };
   await axios.post('/api/employee/add-employee', employeeData, {
@@ -268,6 +268,7 @@ const resetForm = () => {
   newEmployee.value = { email: '', department_id: '', designation_id: '', first_name: '', last_name: '' };
 };
 </script>
+
 
 <style scoped>
 .container {

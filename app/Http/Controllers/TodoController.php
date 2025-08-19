@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Todo;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Models\Employee; 
+use App\Models\Department;
 
 class TodoController extends Controller
 {
@@ -34,9 +36,7 @@ public function store(Request $request)
     // Return the created todo as JSON
     return response()->json($todo, 201);
 }
-
-
-    public function update(Request $request, $id)
+public function update(Request $request, $id)
     {
         // Fetch the Todo from the database
         $todo = Todo::findOrFail($id);
@@ -53,7 +53,7 @@ public function store(Request $request)
         return response()->json($todo, Response::HTTP_OK);
     }
     // Delete  button  function  into to-do list 
-    public function destroy($id)
+public function destroy($id)
     {
         // Check if the Todo exists before trying to delete
         $todo = Todo::find($id);
@@ -100,6 +100,18 @@ public function assignTask(Request $request, $id)
     return response()->json(['message' => 'Task not found'], 404);
 }
 
+ public function fetchDropdownData()
+    {
+        // Get all employees and departments from the database
+        $employees = Employee::all();
+        $departments = Department::all();
+
+        // Return data in a structured format for the frontend
+        return response()->json([
+            'employees' => $employees,
+            'departments' => $departments
+        ]);
+    }
 
 
 }

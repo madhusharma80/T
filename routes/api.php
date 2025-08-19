@@ -31,6 +31,8 @@ Route::prefix('todos')->group(function () {
     // Department and designation data for dropdown ETML
     Route::post('employee/add-employee', [EmployeeController::class, 'addEmployee']);
     Route::get('/department-designation-data', [EmployeeController::class, 'fetchDropdownData']);
+    Route::get('/fetchDropdownData', [TodoController::class, 'fetchDropdownData']);
+
     Route::get('/employees', [EmployeeController::class, 'fetchEmployees']);
     // In routes/api.php
     Route::delete('/employee/delete-employee/{id}', [EmployeeController::class, 'deleteEmployee']);

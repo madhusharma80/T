@@ -4,18 +4,27 @@
     <div class="sub-container">
       <div class="add-todo">
         <!-- Task input or dropdown based on assignMode -->
-        <div v-if="!assignMode" class="w-50">
-          <input v-model="newTodo" type="text" placeholder="Add a new task" class="todo-input"
+        <div class="w-50">
+          <!-- Show input if not assigning, show dropdown when assignMode is true -->
+          <input v-if="!assignMode && !isEditing" v-model="newTodo" type="text" placeholder="Add a new task" class="todo-input"
             :class="{ 'input-error': showErrorTask }" />
+          
+          <select v-if="assignMode && !isEditing" v-model="selectedEmployee" class="todo-input">
+            <option value="" disabled>Select Employee</option>
+            <option v-for="employee in employees" :key="employee.id" :value="employee.id">
+              {{ employee.first_name }} {{ employee.last_name }} ({{ employee.email }})
+            </option>
+          </select>
+          
           <p v-if="showErrorTask" class="error-message">Task cannot be empty!</p>
         </div>
 
-        <!-- Add Task and Assign Task Buttons (aligned side by side) -->
+        <!-- Add Task and Assign Task Buttons -->
         <div class="buttons-container">
-          <button @click="addTodo" class="add-button" :disabled="assignMode">
+          <button @click="addTodo" class="add-button" :disabled="assignMode || isEditing">
             <i class="fas fa-plus"></i> Add Task
           </button>
-          <button @click="openAssignModal" class="assign-button" :disabled="selectedTasks.length === 0">
+          <button @click="toggleAssignMode" class="assign-button" :disabled="selectedTasks.length === 0 || isEditing">
             <i class="fas fa-user-plus"></i> Assign
           </button>
         </div>
@@ -24,9 +33,21 @@
       <ul class="todo-list">
         <li v-for="todo in todos" :key="todo.id" class="todo-item">
           <input type="checkbox" v-model="selectedTasks" :value="todo.id" class="todo-checkbox" />
-          <span v-if="!todo.isEditing" class="todo-title">{{ todo.task }}</span>
-          <input v-if="todo.isEditing" v-model="todo.task" class="todo-input" />
           
+          <!-- Show task title or dropdown for assignment -->
+          <span v-if="!todo.isEditing && !todo.isAssigned" class="todo-title">{{ todo.task }}</span>
+
+          <!-- Show dropdown for employee selection when task is assigned -->
+          <select v-if="todo.isAssigned && !todo.isEditing" v-model="todo.assigned_to" class="todo-input">
+            <option value="" disabled>Select Employee</option>
+            <option v-for="employee in employees" :key="employee.id" :value="employee.id">
+              {{ employee.first_name }} {{ employee.last_name }} ({{ employee.email }})
+            </option>
+          </select>
+
+          <!-- Edit task input field -->
+          <input v-if="todo.isEditing" v-model="todo.task" class="todo-input" />
+
           <!-- Edit button -->
           <button @click="editTodo(todo)" class="edit-button" v-if="!todo.isEditing">
             <i class="fas fa-edit"></i>
@@ -34,7 +55,7 @@
           
           <!-- Save button when editing -->
           <button @click="saveTodo(todo)" class="save-button" v-if="todo.isEditing">
-            <i class="fas fa-save"></i> Save
+            <i class="fas fa-save"></i> 
           </button>
 
           <button @click="deleteTodo(todo.id)" class="delete-button">
@@ -43,49 +64,21 @@
         </li>
       </ul>
     </div>
-
-    <!-- Assign Modal -->
-    <div v-if="assignModalOpen" class="modal">
-      <h3>Assign Task</h3>
-      <label for="employee">Employee</label>
-      <select v-model="selectedEmployee" @change="validateEmployee" class="todo-input">
-        <option value="" disabled>Select Employee</option>
-        <option v-for="employee in employees" :key="employee.id" :value="employee.id">
-          {{ employee.first_name }} {{ employee.last_name }} ({{ employee.email }})
-        </option>
-      </select>
-      <p v-if="showErrorEmployee && !selectedEmployee" class="error-message">Please select an employee!</p>
-
-      <label for="department">Department</label>
-      <select v-model="selectedDepartment" id="department">
-        <option value="" disabled>Select Department</option>
-        <option v-for="dep in departments" :key="dep.id" :value="dep.id">{{ dep.name }}</option>
-      </select>
-
-      <button @click="assignTask" class="assign-button" :disabled="!selectedEmployee || !selectedDepartment">
-        Assign Task
-      </button>
-      <button @click="closeAssignModal" class="cancel-button">Cancel</button>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
 const todos = ref([]);
 const newTodo = ref("");
 const showErrorTask = ref(false);
-const showErrorEmployee = ref(false);
-const assignModalOpen = ref(false);
+const assignMode = ref(false); // Toggle between input field and dropdown
 const selectedEmployee = ref(null);
-const selectedDepartment = ref(null);
-const employees = ref([]);
-const departments = ref([]);
 const selectedTasks = ref([]);  // Store selected task IDs
-
-const assignMode = ref(false);  // Track if the input field should show the dropdown or task input
+const employees = ref([]);
+const isEditing = ref(false);  // Track if any task is being edited
 
 // Fetch todos from API
 const fetchTodos = async () => {
@@ -106,12 +99,11 @@ onMounted(() => {
   fetchDropdownData();
 });
 
-// Fetch employees and departments from the backend
+// Fetch employees from the backend
 const fetchDropdownData = async () => {
   try {
     const response = await axios.get('/api/fetchDropdownData');
     employees.value = response.data.employees;
-    departments.value = response.data.departments;
   } catch (error) {
     console.error('Error fetching dropdown data:', error);
   }
@@ -134,65 +126,34 @@ const addTodo = async () => {
     });
     todos.value.push(response.data);
     newTodo.value = "";
+    assignMode.value = false; // Reset to input mode after adding task
   } catch (error) {
     console.error('Error adding todo:', error);
   }
 };
 
-// Open the assign modal when tasks are selected
-const openAssignModal = () => {
-  if (selectedTasks.value.length === 0) {
-    alert('Please select at least one task');  // Show error if no task is selected
-    return;
-  }
-
-  assignModalOpen.value = true;
+// Toggle between input and dropdown
+const toggleAssignMode = () => {
+  assignMode.value = !assignMode.value;
 };
 
-// Close the assign modal
-const closeAssignModal = () => {
-  assignModalOpen.value = false;
-  selectedEmployee.value = null;
-  selectedDepartment.value = null;
+const editTodo = (todo) => {
+  todo.isEditing = true;
+  isEditing.value = true; // Set the global editing flag to true
 };
 
-// Assign task
-const assignTask = async () => {
-  if (!selectedEmployee.value || !selectedDepartment.value) {
-    showErrorEmployee.value = true;
-    alert('Please select both employee and department');
-    return;
-  }
-
+const saveTodo = async (todo) => {
   try {
-    // Loop through the selected tasks to assign them one by one
-    for (let taskId of selectedTasks.value) {
-      const response = await axios.post(`/api/todos/${taskId}/assign`, {
-        assigned_to: selectedEmployee.value,  // Selected employee's ID
-        department_id: selectedDepartment.value  // Selected department's ID
-      }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      // Update the task in the todo list after assignment
-      const taskIndex = todos.value.findIndex(task => task.id === taskId);
-      if (taskIndex !== -1) {
-        todos.value[taskIndex] = response.data;
+    const response = await axios.put(`/api/todos/${todo.id}`, { task: todo.task }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
-
-      alert(`Task with ID ${taskId} assigned successfully!`);
-    }
-
-    // Close the modal after task is assigned
-    closeAssignModal();
-
-    // Clear the selected employee and department
-    selectedEmployee.value = null;
-    selectedDepartment.value = null;
+    });
+    todo.isEditing = false;
+    todo.task = response.data.task;
+    isEditing.value = false; // Reset global editing flag after save
   } catch (error) {
-    console.error('Error assigning task:', error);
+    console.error('Error saving todo:', error);
   }
 };
 
