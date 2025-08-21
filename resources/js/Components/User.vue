@@ -39,7 +39,6 @@
               </th>
             </tr>
           </thead>
-
           <tbody>
             <tr v-for="(employee, index) in paginatedEmployees.data" :key="employee.id">
               <td>{{ index + 1 + ((paginatedEmployees.current_page - 1) * paginatedEmployees.per_page) }}.</td>
