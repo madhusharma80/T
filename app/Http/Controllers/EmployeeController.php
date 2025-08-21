@@ -137,23 +137,20 @@ class EmployeeController extends Controller
     }
 
     // Method to assign task to employee (using 'todos' table)
-    public function assignTask(Request $request)
-    {
-        // Validate incoming data
-        $request->validate([
-            'taskId' => 'required|exists:todos,id',  // Use 'todos' table for tasks
-            'employeeId' => 'required|exists:employees,id',
-        ]);
-
-        // Fetch the task by ID from 'todos' table
-        $task = Todo::findOrFail($request->taskId);
-
-        // Assign the task to the selected employee
-        $task->assigned_to = $request->employeeId;
+  public function assignTask(Request $request)
+{
+    // Find the task
+    $task = Todo::find($request->taskId);
+    
+    if ($task) {
+        // Assign the task to the employee
+        $task->assigned_to = $request->assigned_to;
         $task->save();
-
-        return response()->json($task);
     }
+
+    return response()->json($task);
+}
+
     // Method to fetch employee tasks (from 'todos' table)
     public function fetchEmployeeTasks($employeeId)
     {

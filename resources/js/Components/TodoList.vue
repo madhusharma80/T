@@ -79,6 +79,15 @@ const selectedTasks = ref([]);  // Store selected task IDs
 const employees = ref([]);
 const isEditing = ref(false);  // Track if any task is being edited
 
+
+onMounted(() => {
+  fetchTodos();
+  fetchTodos();  // Fetch tasks from API and localStorage
+ console.log("Loaded tasks:", todos.value); // Debug message
+
+  fetchEmployeeEmails(); // Call this function when the component is mounted
+});
+
 // Fetch todos from API
 const fetchTodos = async () => {
   try {
@@ -87,15 +96,13 @@ const fetchTodos = async () => {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
-    todos.value = response.data;
+    todos.value = response.data;  // Store tasks from API
   } catch (error) {
-    console.error('Error fetching todos:', error);
+    console.error('Error fetching todos from API:', error);
+    const localTasks = JSON.parse(localStorage.getItem('todos')) || [];
+    todos.value
   }
 };
-onMounted(() => {
-  fetchTodos();
-  fetchEmployeeEmails(); // Call this function when the component is mounted
-});
 
 // Fetch employee emails from the backend
 const fetchEmployeeEmails = async () => {
@@ -118,10 +125,20 @@ const fetchEmployeeEmails = async () => {
 const addTodo = async () => {
   if (!newTodo.value.trim()) {
     showErrorTask.value = true;
+    console.log("Error: Task is empty before submission"); // Debug message
     return;
   }
   showErrorTask.value = false;
+
+  console.log("Adding task:", newTodo.value);  // Log the task to be added
+
   try {
+    // Store in localStorage immediately (just to test)
+    const currentTodos = JSON.parse(localStorage.getItem('todos')) || [];
+    currentTodos.push({ task: newTodo.value, assigned_to: null });
+    localStorage.setItem('todos', JSON.stringify(currentTodos));
+
+    // Now make the API request
     const response = await axios.post('/api/todos', {
       task: newTodo.value
     }, {
@@ -129,9 +146,15 @@ const addTodo = async () => {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
-    todos.value.push(response.data.task);
-    newTodo.value = "";
-    assignMode.value = false; // Reset to input mode after adding task
+
+    // Log the response to see if the task is added properly
+    console.log("API Response:", response.data);
+
+    // Push the entire task object to todos array after API response
+    todos.value.push(response.data);  // Push the entire task object
+
+    newTodo.value = "";  // Clear the input field
+    assignMode.value = false; // Reset assign mode after adding task
   } catch (error) {
     console.error('Error adding todo:', error);
   }

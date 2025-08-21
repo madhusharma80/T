@@ -135,7 +135,7 @@
 
       <!-- Assigned Tasks Card -->
       <div class="task-card">
-        <h4>Assigned Tasks</h4>
+        <h4 class="title">Assigned Tasks</h4>
         <table class="task-table">
           <thead>
             <tr>
