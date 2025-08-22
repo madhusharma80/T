@@ -94,7 +94,6 @@
             </tr>
           </tbody>
         </table>
-
         <!-- Pagination Controls -->
         <div class="pagination">
           <button @click="changePage(paginatedEmployees.current_page - 1)"
@@ -131,33 +130,56 @@
           <p><strong>Designation:</strong> {{ selectedEmployee.designation?.name || 'N/A' }}</p>
         </div>
       </div>
-
-      <!-- Assigned Tasks Card -->
+      <!--  Assign Task card -->
       <div class="task-card">
         <h4 class="title">Assigned Tasks</h4>
         <table class="task-table">
           <thead>
             <tr>
+              <th>S.No.</th>
               <th>Task</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="task in employeeTasks" :key="task.id">
-              <td>{{ task.title }}</td>
-              <td><strong>{{ task.status }}</strong></td>
+            <tr v-for="(task, index) in employeeTasks" :key="task.id">
+              <!-- Serial Number -->
+              <td>{{ index + 1 }}.</td>
+
+              <!-- Task Name -->
               <td>
-                <button @click="editAssignedTask(task)" class="edit-button">
-                  <i class="fas fa-edit"></i> Edit
+                <span v-if="!task.isEditing">{{ task.task }}</span>
+                <input v-else v-model="task.task" class="task-input" type="text" />
+              </td>
+
+              <!-- Status Dropdown -->
+              <td>
+                <select v-if="!task.isEditing" v-model="task.status" class="task-input">
+                  <option value="pending">Pending</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="complete">Complete</option>
+                </select>
+                <span v-else>{{ task.status }}</span>
+              </td>
+
+              <!-- Actions (Edit, Save, Delete) -->
+              <td>
+                 <div class="button-group">
+                <button v-if="!task.isEditing" @click="editAssignedTask(task)" class="edit-button">
+                  <i class="fas fa-edit"></i> 
+                </button>
+                <button v-if="task.isEditing" @click="saveAssignedTask(task)" class="save-button">
+                  <i class="fas fa-save"></i> 
                 </button>
                 <button @click="deleteAssignedTask(task.id)" class="delete-button">
-                  <i class="fas fa-trash"></i> Delete
+                  <i class="fas fa-trash"></i> 
                 </button>
+                </div>
               </td>
             </tr>
             <tr v-if="employeeTasks.length === 0">
-              <td colspan="3" class="no-tasks">No tasks assigned</td>
+              <td colspan="4" class="no-tasks">No tasks assigned</td>
             </tr>
           </tbody>
         </table>
@@ -270,11 +292,10 @@ const viewEmployee = async (employee) => {
     console.log(response.data);  // Log the response
 
     if (response.data && response.data.length > 0) {
-      employeeTasks.value = response.data;
+      employeeTasks.value = response.data;  // Populate employeeTasks with the response data
     } else {
       employeeTasks.value = [];
     }
-
   } catch (error) {
     console.error('Error fetching employee tasks:', error);
     employeeTasks.value = []; // If error, reset tasks to empty array
@@ -287,50 +308,37 @@ const changePage = (page) => {
     fetchEmployees(page);
   }
 };
-
-// Add a new task and assign it to the selected employee
-const addTask = async () => {
-  if (!newTask.value.trim() || !selectedEmployeeId.value) {
-    alert("Please provide a task title and select an employee.");
-    return;
-  }
-
+const editAssignedTask = (task) => {
+  task.isEditing = true; // Enable edit mode for the task
+};
+const saveAssignedTask = async (task) => {
   try {
-    const response = await axios.post('/api/todos', {
-      task: newTask.value,
-      assigned_to: selectedEmployeeId.value  // Assign task to selected employee
+    const response = await axios.put(`/api/todos/${task.id}`, {
+      task: task.task,
+      status: task.status,  // Make sure to send the status
     }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
     });
-
-    // After creating task, refresh the employee's tasks
-    viewEmployee(selectedEmployee.value);  // Fetch tasks for the selected employee again
-
-    newTask.value = ""; // Clear input after adding task
+    task.isEditing = false;
+    task.task = response.data.task;
+    task.status = response.data.status;  // Update status from backend
   } catch (error) {
-    console.error('Error adding task:', error);
+    console.error('Error saving task:', error);
   }
 };
 
-// Delete a task assigned to an employee
-const deleteAssignedTask = async (taskId) => {
-  try {
-    await axios.delete(`/api/todos/${taskId}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    });
-
-    // Refresh the employee's tasks after deletion
-    viewEmployee(selectedEmployee.value);
-  } catch (error) {
-    console.error('Error deleting task:', error);
-  }
+// Delete assigned task (only from UI)
+const deleteAssignedTask = (taskId) => {
+  // Remove the task from the UI list
+  employeeTasks.value = employeeTasks.value.filter(task => task.id !== taskId);
 };
 
 // Reset the new employee form
 const resetForm = () => {
   newEmployee.value = { email: '', department_id: '', designation_id: '', first_name: '', last_name: '' };
 };
-
 </script>
 
 <style scoped>
@@ -360,6 +368,7 @@ table {
   font-weight: 600;
   font-family: serif;
 }
+
 .view-button {
   padding: 6px 10px;
   background: #fbfcfd;
@@ -409,7 +418,6 @@ table {
 
 .task-card {
   flex: 1;
-  background: #fff;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -429,63 +437,79 @@ table {
   box-shadow: inset 2px 4px 11px rgba(134, 187, 240, 0.5);
 }
 
-.task-table th,
-.task-table td {
-  padding: 10px;
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  table-layout: auto; /* This ensures columns adjust based on content */
+  color: rgb(68, 67, 67);
+}
+
+.task-table th, .task-table td {
+  padding: 5px;
   text-align: left;
+  border-bottom: 1px solid #ddd;
+  box-shadow: inset 2px 4px 11px rgba(134, 187, 240, 0.5);
+  background-color: white;
+}
+
+.task-table th:nth-child(1), .task-table td:nth-child(1) {
+  width: 5%; /* Adjust width for Serial Number column */
+}
+
+.task-table th:nth-child(2), .task-table td:nth-child(2) {
+  width: 65%; /* Adjust width for Task column */
+}
+
+.task-table th:nth-child(3), .task-table td:nth-child(3) {
+  width: 30%; /* Adjust width for Status column */
+}
+
+.task-table th:nth-child(4), .task-table td:nth-child(4) {
+  width: 25%; /* Adjust width for Actions column */
+}
+
+/* Optional styling for task input */
+.task-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
   border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
-.task-table th {
-  background-color: #f4f4f4;
-}
-
-.task-table td {
-  background-color: #fff;
-}
-
-.task-table .no-tasks {
-  text-align: center;
-  color: #888;
-}
-
-.edit-button,
-.delete-button {
+.edit-button, .save-button, .delete-button {
   padding: 6px 12px;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
-  margin-right: 10px;
-}
-
-.edit-button {
   background-color: #4CAF50;
   color: white;
+  border-radius: 4px;
+}
+
+.edit-button:hover, .save-button:hover, .delete-button:hover {
+  background-color: #45a049;
 }
 
 .delete-button {
   background-color: #f44336;
-  color: white;
-}
-
-.edit-button:hover {
-  background-color: #45a049;
 }
 
 .delete-button:hover {
   background-color: #d32f2f;
 }
 
-.edit-button i,
-.delete-button i {
-  margin-right: 5px;
-  font-size: 14px;
+.no-tasks {
+  text-align: center;
+  font-size: 16px;
+  color: #888;
 }
 
 .detail {
   font-size: 18px;
   border-bottom: 1px solid rgb(116, 112, 112);
   font-weight: bold;
+  color:#444
 }
 
 .profile-header {
@@ -545,8 +569,6 @@ table {
 .close-btn:hover {
   color: #e74c3c;
 }
-
-
 
 th {
   padding: 6px;

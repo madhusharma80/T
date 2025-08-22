@@ -84,17 +84,27 @@ class TodoController extends Controller
     return response()->json($todo, 201);
     }
 
-    public function assignTask(Request $request)
-    {
-        $request->validate([
-        'taskId' => 'required|exists:todos,id',
-        'employeeId' => 'required|exists:employees,id',
+ public function assignTask(Request $request, $taskId)
+{
+    // Validate the incoming request
+    $validated = $request->validate([
+        'employee_id' => 'required|exists:employees,id',  // Ensures the employee_id exists in the employee table
     ]);
-        $task = Todo::findOrFail($request->taskId); // Fetch the task by ID
-        $task->assigned_to = $request->employeeId;  // Assign the task to the employee
-        $task->save();  
-        return response()->json($task);  // Return the updated task
+
+    // Find the task by ID
+    $task = Todo::find($taskId);
+
+    if (!$task) {
+        return response()->json(['message' => 'Task not found'], 404);
     }
+
+    // Assign the task to the employee
+    $task->assigned_to = $validated['employee_id'];
+    $task->save();
+
+    return response()->json(['message' => 'Task assigned successfully']);
+}
+
  
     public function fetchDropdownData()
     {

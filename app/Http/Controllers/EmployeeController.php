@@ -94,11 +94,10 @@ class EmployeeController extends Controller
             'department_id' => 'required|exists:departments,id',
             'designation_id' => 'required|exists:designations,id',
         ]);
+                // Update the employee details
+                $employee->update($request->all());
 
-        // Update the employee details
-        $employee->update($request->all());
-
-        return response()->json($employee);
+                return response()->json($employee);
     }
 
     // Method to fetch all employee emails
@@ -137,19 +136,19 @@ class EmployeeController extends Controller
     }
 
     // Method to assign task to employee (using 'todos' table)
-  public function assignTask(Request $request)
-{
-    // Find the task
-    $task = Todo::find($request->taskId);
+    public function assignTask(Request $request)
+    {
+        // Find the task
+        $task = Todo::find($request->taskId);
     
-    if ($task) {
-        // Assign the task to the employee
-        $task->assigned_to = $request->assigned_to;
-        $task->save();
-    }
+            if ($task) {
+            // Assign the task to the employee
+            $task->assigned_to = $request->assigned_to;
+            $task->save();
+        }
 
-    return response()->json($task);
-}
+            return response()->json($task);
+    }
 
     // Method to fetch employee tasks (from 'todos' table)
     public function fetchEmployeeTasks($employeeId)

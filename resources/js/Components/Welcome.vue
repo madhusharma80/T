@@ -114,7 +114,7 @@ const logout = () => {
 }
 .sidebar {
   position: fixed;
-  width: 230px;
+  width: 250px;
   height: 100vh;
   background: linear-gradient(to bottom, #183655, #74aee0);
   box-shadow: 0 4px 8px rgba(15, 15, 15, 0.1);
@@ -123,6 +123,7 @@ const logout = () => {
   justify-content: space-between;
   transition: transform 0.3s ease;
 }
+
 
 .sidebar-hidden {
   transform: translateX(-100%);
@@ -174,7 +175,7 @@ const logout = () => {
 }
 
 .sidebar-link i {
-  font-size: 18px;
+  font-size: 16.5px;
 }
 
 .sidebar-link:hover {

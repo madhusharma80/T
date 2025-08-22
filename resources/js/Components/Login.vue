@@ -140,7 +140,7 @@ form {
   background-color: rgba(3, 3, 3, 0.7);
   box-sizing: border-box;
   box-shadow: 0 15px 25px rgba(51, 51, 51, 0.6);
-  border-radius: 10px;
+  border-radius: 2px;
 }
 
 form input {
