@@ -8,7 +8,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import App from './Components/App.vue';
 import Register from './Components/Register.vue';
 import Login from './Components/Login.vue';
-import Welcome from './Components/Welcome.vue'; 
+import Welcome from './Components/Welcome.vue';
 import Setting from './Components/Setting.vue';
 import TodoList from './Components/TodoList.vue';
 import User from './Components/User.vue';
@@ -16,7 +16,7 @@ import Menu from './Components/Menu.vue';
 import MainLayout from './Components/MainLayout.vue';
 
 const routes = [
-  { path: '/', component: Register},
+  { path: '/', component: Register },
   { path: '/login', component: Login, name: 'login' },
   { path: '/register', component: Register, name: 'register' },
   // { path: '/setting', component: Setting, name: 'setting' },
@@ -28,13 +28,13 @@ const routes = [
     beforeEnter: (to, from, next) => {
       const token = localStorage.getItem('token');
       if (!token) {
-        next('/login');  
+        next('/login');
       } else {
-        next(); 
+        next();
       }
     }
   },
-   {
+  {
     path: '/',
     component: MainLayout,  // Use persistent layout with sidebar
     children: [
@@ -51,34 +51,22 @@ const routes = [
       {
         path: 'User',
         component: User,
-        name: 'user' 
+        name: 'user'
       },
       {
-        path:'Menu',
+        path: 'Menu',
         component: Menu,
-        name:'menu'
+        name: 'menu'
       }
-      
+
     ],
     meta: { requiresAuth: true },  // These routes require the user to be authenticated
   },
 ];
 
-
 const router = createRouter({
   history: createWebHistory(),
   routes,
 });
-
-// router.beforeEach((to, from, next) => {
-//   const authStore = useAuthStore();  // Accessing authentication store
-//   const isAuthenticated = authStore.isAuthenticated; // Check if the user is logged in
-
-//   if (to.meta.requiresAuth && !isAuthenticated) {
-//     next('/login');  // Redirect to login page if not authenticated
-//   } else {
-//     next();
-//   }
-// });
 
 createApp(App).use(router).mount('#app');

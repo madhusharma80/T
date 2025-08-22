@@ -53,7 +53,5 @@ Route::prefix('todos')->group(function () {
     Route::get('/employee/{id}/details', [EmployeeController::class, 'showWithTasks']);
     Route::get('/employee/{id}/tasks', [EmployeeController::class, 'getEmployeeTasks']);
     Route::post('/todos/{task}/assign', [TodoController::class, 'assignTask']);
-
-
  
 });

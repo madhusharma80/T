@@ -19,21 +19,21 @@ class TodoController extends Controller
     public function store(Request $request)
     {
     // Validate incoming data
-    $validatedData = $request->validate([
+        $validatedData = $request->validate([
         'task' => 'required|string|max:255',
         'assigned_to' => 'nullable|exists:employees,id', // Ensure it's an employee ID
         'department_id' => 'nullable|exists:departments,id',
-    ]);
+        ]);
 
-    // Create the task with validated data
-    $task = Todo::create([
+        // Create the task with validated data
+        $task = Todo::create([
         'task' => $validatedData['task'],
         'assigned_to' => $validatedData['assigned_to'], // Assign the employee ID
         'department_id' => $validatedData['department_id'], 
-    ]);
-    return response()->json(['task' => $task], 201);  // Return the created task
-    }
+        ]);
 
+        return response()->json(['task' => $task], 201);  // Return the created task
+    }
     // Edit button into to-do list 
      public function update(Request $request, $id)
     {
@@ -72,40 +72,37 @@ class TodoController extends Controller
         // Validate the incoming request
          $validated = $request->validate([
         'task' => 'required|string|max:255',
-    ]);
+        ]);
 
-    // Create a new task
-    $todo = Todo::create([
+        // Create a new task
+        $todo = Todo::create([
         'task' => $validated['task'],
         'completed' => false, 
-    ]);
-
-    // Return the created task in the response
-    return response()->json($todo, 201);
-    }
-
- public function assignTask(Request $request, $taskId)
-{
-    // Validate the incoming request
-    $validated = $request->validate([
-        'employee_id' => 'required|exists:employees,id',  // Ensures the employee_id exists in the employee table
-    ]);
-
-    // Find the task by ID
-    $task = Todo::find($taskId);
-
-    if (!$task) {
-        return response()->json(['message' => 'Task not found'], 404);
-    }
-
-    // Assign the task to the employee
-    $task->assigned_to = $validated['employee_id'];
-    $task->save();
-
-    return response()->json(['message' => 'Task assigned successfully']);
-}
-
+        ]);
  
+        // Return the created task in the response
+         return response()->json($todo, 201);
+    }
+    public function assignTask(Request $request, $taskId)
+    {
+        // Validate the incoming request
+        $validated = $request->validate([
+       'employee_id' => 'required|exists:employees,id',  // Ensures the employee_id exists in the employee table
+        ]);
+
+        // Find the task by ID
+        $task = Todo::find($taskId);
+
+        if (!$task) {
+        return response()->json(['message' => 'Task not found'], 404);
+        }
+
+        // Assign the task to the employee
+        $task->assigned_to = $validated['employee_id'];
+        $task->save();
+
+        return response()->json(['message' => 'Task assigned successfully']);
+    }
     public function fetchDropdownData()
     {
         // Get all employees and departments from the database
@@ -123,5 +120,5 @@ class TodoController extends Controller
     // Fetch tasks assigned to the given employee
         $tasks = Todo::where('assigned_to', $employeeId)->get();
         return response()->json($tasks);
-   }
+    }
 }

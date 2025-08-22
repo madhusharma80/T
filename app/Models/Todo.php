@@ -10,7 +10,6 @@ class Todo extends Model
     protected $fillable = ['task', 'assigned_to', 'department_id'];
     
     // Relationship to fetch tasks assigned to this employee
-   
     public function assignedEmployee()
     {
         return $this->belongsTo(Employee::class, 'assigned_to');
@@ -24,12 +23,11 @@ class Todo extends Model
     public function getEmployeeTasks($employeeId)
     {
     // Fetch tasks assigned to the given employee from the todo table
-    $tasks = Todo::where('assigned_to', $employeeId)->get();
-
-    return response()->json($tasks);
+        $tasks = Todo::where('assigned_to', $employeeId)->get();
+        return response()->json($tasks);
     }
     public function employee()
     {
-    return $this->belongsTo(Employee::class, 'assigned_to');
+        return $this->belongsTo(Employee::class, 'assigned_to');
     }
 }

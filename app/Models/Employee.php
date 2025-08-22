@@ -24,15 +24,14 @@ class Employee extends Model
     {
         return $this->belongsTo(Department::class);
     }
-
     // Define the relationship with Designation (if applicable)
     public function designation()
     {
         return $this->belongsTo(Designation::class);
     }
-    
+
     public function tasks()
     {
-    return $this->hasMany(Todo::class, 'assigned_to');
+         return $this->hasMany(Todo::class, 'assigned_to');
     }
 }

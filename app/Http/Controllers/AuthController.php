@@ -35,34 +35,32 @@ class AuthController extends Controller
     }
     // Login function
     public function login(Request $request)
-{
-    $validated = $request->validate([
-        'email' => 'required|email',
-        'password' => 'required|min:8',
-    ]);
+    {
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:8',
+        ]);
 
     if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
 
         $user = Auth::user();
         $token = $user->createToken('YourAppName')->plainTextToken;
-
         return response()->json([
-            'token' => $token,
-            'user' => $user 
-        ]);
+              'token' => $token,
+              'user' => $user 
+            ]);
+        }
     }
-}
     // User function
     public function user(Request $request)
     {
         return response()->json($request->user());
     }
 
-  public function index()
-{
-    return response()->json(User::all());
-}
-
+    public function index()
+    {
+        return response()->json(User::all());
+    }
 
     // Logout function
     public function logout(Request $request)
@@ -72,6 +70,7 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Successfully logged out']);
     }
+
     // setting(updateProfile)function
     public function updateProfile(Request $request)
     {
@@ -93,7 +92,7 @@ class AuthController extends Controller
     }
 
     // setting(changepassword)function
-   public function changePassword(Request $request)
+    public function changePassword(Request $request)
     {
         $validated = $request->validate([
             'currentPassword' => 'required|string',
@@ -105,7 +104,6 @@ class AuthController extends Controller
         if (!Hash::check($request->currentPassword, $user->password)) {
             return response()->json(['message' => 'Current password is incorrect.'], 400);
         }
-
         // Update password
         $user->password = Hash::make($request->newPassword);
         $user->save();

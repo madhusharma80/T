@@ -12,7 +12,6 @@ class Department extends Model
         return $this->hasMany(Employee::class);
     }
 
-    
      public function todos()
     {
         return $this->hasMany(Todo::class, 'department_id');

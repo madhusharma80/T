@@ -15,7 +15,6 @@
               @input="validateForm" />
             <span v-if="errors.email" class="text-danger">{{ errors.email[0] }}</span>
           </div>
-
           <div class="mb-4">
             <input type="password" class="form-control" id="password" placeholder="Enter Password"
               v-model="form.password" @input="validateForm" />
@@ -33,7 +32,7 @@
             <button @click="goToLogin" type="button" class="btn btn-link mt-3">Already have an account? Login</button>
           </div>
 
-          <div v-if="message" :class="['alert', messageType === 'success' ? 'alert-success' : 'alert-danger', ]">
+          <div v-if="message" :class="['alert', messageType === 'success' ? 'alert-success' : 'alert-danger',]">
             {{ message }}
           </div>
         </form>
@@ -69,7 +68,6 @@ const register = async () => {
   errors.value = {};
   message.value = '';
   messageType.value = '';
-
 
   if (!form.name) errors.value.name = ['Name is required'];
   else if (form.name.length < 3) errors.value.name = ['Name must be between 3 and 15 characters'];

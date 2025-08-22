@@ -454,19 +454,19 @@ table {
 }
 
 .task-table th:nth-child(1), .task-table td:nth-child(1) {
-  width: 5%; /* Adjust width for Serial Number column */
+  width: 5%; 
 }
 
 .task-table th:nth-child(2), .task-table td:nth-child(2) {
-  width: 65%; /* Adjust width for Task column */
+  width: 65%; 
 }
 
 .task-table th:nth-child(3), .task-table td:nth-child(3) {
-  width: 30%; /* Adjust width for Status column */
+  width: 30%; 
 }
 
 .task-table th:nth-child(4), .task-table td:nth-child(4) {
-  width: 25%; /* Adjust width for Actions column */
+  width: 25%; 
 }
 
 /* Optional styling for task input */
@@ -590,7 +590,6 @@ td:nth-child(3) {
   width: 6%;
   padding-left: 15px;
 }
-
 
 th:nth-child(4),
 td:nth-child(4),

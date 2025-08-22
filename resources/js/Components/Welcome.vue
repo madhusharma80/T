@@ -11,31 +11,19 @@
       </div>
       <ul>
         <li>
-          <router-link
-            to="/menu"
-            active-class="active-link"
-            class="sidebar-link">
+          <router-link to="/menu" active-class="active-link" class="sidebar-link">
             <i class="fas fa-home"></i> HOME</router-link>
         </li>
         <li>
-          <router-link
-            to="/user"
-            active-class="active-link"
-            class="sidebar-link">
+          <router-link to="/user" active-class="active-link" class="sidebar-link">
             <i class="fas fa-user"></i> USER</router-link>
         </li>
         <li>
-          <router-link
-            to="/todolist"
-            active-class="active-link"
-            class="sidebar-link">
+          <router-link to="/todolist" active-class="active-link" class="sidebar-link">
             <i class="fas fa-check-square"></i> TODO</router-link>
         </li>
         <li>
-          <router-link
-            to="/setting"
-            active-class="active-link"
-            class="sidebar-link">
+          <router-link to="/setting" active-class="active-link" class="sidebar-link">
             <i class="fas fa-cogs"></i> SETTINGS</router-link>
         </li>
       </ul>
@@ -83,7 +71,7 @@ const showWelcomeCard = ref(false);
 // Check if the user has already closed the success card
 onMounted(() => {
   const hasSeenWelcomeCard = localStorage.getItem('hasSeenWelcomeCard');
-  
+
   // Show the card if it's the user's first login (has not seen the card)
   if (!hasSeenWelcomeCard) {
     showWelcomeCard.value = true;
@@ -112,6 +100,7 @@ const logout = () => {
   display: flex;
   height: 100vh;
 }
+
 .sidebar {
   position: fixed;
   width: 250px;
@@ -123,7 +112,6 @@ const logout = () => {
   justify-content: space-between;
   transition: transform 0.3s ease;
 }
-
 
 .sidebar-hidden {
   transform: translateX(-100%);
@@ -185,7 +173,7 @@ const logout = () => {
 
 /* Highlight the active link */
 .active-link {
-  background-color: #fffefe; 
+  background-color: #fffefe;
   color: #726b6b;
 }
 
@@ -213,14 +201,16 @@ const logout = () => {
 }
 
 .content {
-  margin-left: 230px; /* Adjust for sidebar width */
+  margin-left: 230px;
+  /* Adjust for sidebar width */
   padding: 20px;
   flex-grow: 1;
   transition: margin-left 0.3s ease;
 }
 
 .content-area-expanded {
-  margin-left: 230px; /* Keep the space for sidebar when open */
+  margin-left: 230px;
+  /* Keep the space for sidebar when open */
 }
 
 /* Welcome card style */

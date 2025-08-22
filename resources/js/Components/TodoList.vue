@@ -18,7 +18,6 @@
           </select>
           <p v-if="showErrorTask" class="error-message">Field cannot be empty!</p>
         </div>
-
         <!-- Separate Add and Assign buttons -->
         <div class="buttons-container">
           <!-- Add Task Button -->
@@ -100,7 +99,6 @@ const fetchTodos = async () => {
     console.error('Error fetching todos from API:', error);
   }
 };
-
 // Fetch employee emails from the backend
 const fetchEmployeeEmails = async () => {
   try {
@@ -116,7 +114,6 @@ const fetchEmployeeEmails = async () => {
     console.error('Error fetching employee emails:', error);
   }
 };
-
 // Add new task
 const addTodo = async () => {
   if (!newTodo.value.trim()) {
@@ -147,7 +144,6 @@ const clearError = () => {
 // Handle toggle and assign functionality
 const handleAssignOrToggle = async () => {
 
-  
   if (assignMode.value) {
     // If in assignMode, proceed with assignment
     if (!selectedEmployee.value) {
@@ -167,7 +163,6 @@ const handleAssignOrToggle = async () => {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
         });
-
         // Update the task locally (in the todos array)
         todos.value = todos.value.map(task => {
           if (task.id === taskId) {
@@ -176,7 +171,6 @@ const handleAssignOrToggle = async () => {
           return task;
         });
       }
-
       alert('Tasks assigned successfully!');
       selectedTasks.value = [];  // Clear selected tasks after assignment
       assignMode.value = false;  // Exit assign mode
@@ -226,8 +220,6 @@ const deleteTodo = async (id) => {
 };
 </script>
 
-
-
 <style scoped>
 .text-danger {
   font-size: 12px;
@@ -269,7 +261,6 @@ form input {
 .todo-input:focus {
   border-color: #4CAF50;
 }
-
 
 input::placeholder {
   color: rgba(58, 57, 57, 0.5);

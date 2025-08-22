@@ -96,7 +96,6 @@ class EmployeeController extends Controller
         ]);
                 // Update the employee details
                 $employee->update($request->all());
-
                 return response()->json($employee);
     }
 

@@ -75,7 +75,6 @@ import axios from 'axios';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
-
 const form = ref({
   name: '',
   email: '',
