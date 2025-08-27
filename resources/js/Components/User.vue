@@ -139,7 +139,6 @@
               <th>S.No.</th>
               <th>Task</th>
               <th>Status</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -155,27 +154,12 @@
 
               <!-- Status Dropdown -->
               <td>
-                <select v-if="!task.isEditing" v-model="task.status" class="task-input">
+                <select v-if="!task.isEditing" v-model="task.status" class="task-input" @change="updateStatus(task)">
                   <option value="pending">Pending</option>
                   <option value="in-progress">In Progress</option>
                   <option value="complete">Complete</option>
                 </select>
                 <span v-else>{{ task.status }}</span>
-              </td>
-
-              <!-- Actions (Edit, Save, Delete) -->
-              <td>
-                 <div class="button-group">
-                <button v-if="!task.isEditing" @click="editAssignedTask(task)" class="edit-button">
-                  <i class="fas fa-edit"></i> 
-                </button>
-                <button v-if="task.isEditing" @click="saveAssignedTask(task)" class="save-button">
-                  <i class="fas fa-save"></i> 
-                </button>
-                <button @click="deleteAssignedTask(task.id)" class="delete-button">
-                  <i class="fas fa-trash"></i> 
-                </button>
-                </div>
               </td>
             </tr>
             <tr v-if="employeeTasks.length === 0">
@@ -194,13 +178,9 @@ import axios from 'axios';
 
 const departments = ref([]);
 const designations = ref([]);
-const tasks = ref([]);
 const paginatedEmployees = ref({ data: [], current_page: 1, last_page: 1, per_page: 3 });
-
 const selectedEmployee = ref(null);  // Employee selected to assign task
 const employeeTasks = ref([]);  // List of tasks assigned to the selected employee
-const newTask = ref("");  // New task to be added
-const selectedEmployeeId = ref(null);  // Store selected employee's ID for task assignment
 
 const newEmployee = ref({
   email: '',
@@ -308,32 +288,6 @@ const changePage = (page) => {
     fetchEmployees(page);
   }
 };
-const editAssignedTask = (task) => {
-  task.isEditing = true; // Enable edit mode for the task
-};
-const saveAssignedTask = async (task) => {
-  try {
-    const response = await axios.put(`/api/todos/${task.id}`, {
-      task: task.task,
-      status: task.status,  // Make sure to send the status
-    }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-    task.isEditing = false;
-    task.task = response.data.task;
-    task.status = response.data.status;  // Update status from backend
-  } catch (error) {
-    console.error('Error saving task:', error);
-  }
-};
-
-// Delete assigned task (only from UI)
-const deleteAssignedTask = (taskId) => {
-  // Remove the task from the UI list
-  employeeTasks.value = employeeTasks.value.filter(task => task.id !== taskId);
-};
 
 // Reset the new employee form
 const resetForm = () => {
@@ -384,6 +338,7 @@ table {
 .view-button:hover {
   background: #0d8ba1;
   color: white;
+
 }
 
 .delete-button,
@@ -441,11 +396,12 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-  table-layout: auto; /* This ensures columns adjust based on content */
+  table-layout: auto;
   color: rgb(68, 67, 67);
 }
 
-.task-table th, .task-table td {
+.task-table th,
+.task-table td {
   padding: 5px;
   text-align: left;
   border-bottom: 1px solid #ddd;
@@ -453,23 +409,21 @@ table {
   background-color: white;
 }
 
-.task-table th:nth-child(1), .task-table td:nth-child(1) {
-  width: 5%; 
+.task-table th:nth-child(1),
+.task-table td:nth-child(1) {
+  width: 4%;
 }
 
-.task-table th:nth-child(2), .task-table td:nth-child(2) {
-  width: 65%; 
+.task-table th:nth-child(2),
+.task-table td:nth-child(2) {
+  width: 65%;
 }
 
-.task-table th:nth-child(3), .task-table td:nth-child(3) {
-  width: 30%; 
+.task-table th:nth-child(3),
+.task-table td:nth-child(3) {
+  width: 30%;
 }
 
-.task-table th:nth-child(4), .task-table td:nth-child(4) {
-  width: 25%; 
-}
-
-/* Optional styling for task input */
 .task-input {
   width: 100%;
   padding: 8px;
@@ -478,16 +432,22 @@ table {
   border-radius: 4px;
 }
 
-.edit-button, .save-button, .delete-button {
+.edit-button,
+.save-button,
+.delete-button {
   padding: 6px 12px;
   border: none;
   cursor: pointer;
   background-color: #4CAF50;
   color: white;
+
+
   border-radius: 4px;
 }
 
-.edit-button:hover, .save-button:hover, .delete-button:hover {
+.edit-button:hover,
+.save-button:hover,
+.delete-button:hover {
   background-color: #45a049;
 }
 
@@ -509,7 +469,7 @@ table {
   font-size: 18px;
   border-bottom: 1px solid rgb(116, 112, 112);
   font-weight: bold;
-  color:#444
+  color: #444
 }
 
 .profile-header {
@@ -612,10 +572,6 @@ td:nth-child(7) {
   width: 7.7%;
 }
 
-th:nth-child(8),
-td:nth-child(8) {
-  width: 9%;
-}
 
 th:first-child,
 td:first-child,
@@ -628,9 +584,7 @@ td:nth-child(4),
 th:nth-child(5),
 td:nth-child(5),
 th:nth-child(6),
-td:nth-child(6),
-th:nth-child(8),
-td:nth-child(8) {
+td:nth-child(6) {
   padding: 10px;
   border: 2px solid #cacaca;
   overflow: hidden;
